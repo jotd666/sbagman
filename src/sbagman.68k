@@ -1,0 +1,236 @@
+* super bagman (super bagnard)
+*
+* Z80
+* disassembled by JOTD in 2023
+*
+* Original code (C) 1984 Valadon Automation, singlehandedly coded
+* by Jacques Brisse
+
+* xy <-> logical address conversions (Python proto code)
+*def xy2addr(x,y,current_screen):
+*     rval = 0x4062 + 0x400 * current_screen + y/8 + ((0xE0-x)/8)*0x20
+*     return rval
+*def addr2xy(addr):
+*     b = addr - 0x4000
+*     current_screen = 0
+*     while b < 0x400:
+*	b-=0x400
+*	current_screen+=1
+*     b -= 0x62
+*     y = (b % 0x20) * 8
+*     x = 0xE0 - b / 4
+*     return [x,y,current_screen]
+
+
+    .global sbagman_irq
+    .global sbagman_reset
+
+	.include	"sbagman.inc"
+	.ifdef	__amiga__
+	.include "sbagman_ram.68k"
+	.align	2
+	.endif
+
+
+	.macro	WPSET	addr
+	clr.b	\addr
+	.endm
+	
+	.macro	LOAD_AX_BE_WORD_DY	ax,dy
+	move.b	(\ax),\dy               
+	lsl.w	#8,\dy
+	move.b	(1,\ax),\dy
+	.endm
+	
+
+	
+	.macro	STORE_DX_BE_WORD_AY	dx,ay
+	move.w	\dx,-(sp)
+	lsr.w	#8,\dx
+	move.b	\dx,(\ay)
+	move.w	(sp)+,\dx
+	move.b	\dx,(0x01,\ay)
+	.endm	
+	
+	.macro CLEAR_XC_FLAG
+	moveq	#0,d7
+	roxl.b	#1,d7
+	.endm
+	.macro SET_XC_FLAG
+	st	d7
+	roxl.b	#1,d7
+	.endm
+
+* walk/climb/pick sounds are played continuously
+* if a sound is played too close to the same one,
+* don't play it
+start_a_sound:
+	movem.l	a0/d1,-(a7)
+	lea		last_played_sound_timer_table,a0
+	
+	add.w	d0,d0
+	move.w	(a0,d0.w),d1
+	jeq		0f			| zero: not played ever: play it
+	sub.w	sound_timer,d1
+	jcc		0f			| wrap around
+	neg.w	d1
+	cmp.w	#35,d1		| empiric
+	jcc		0f
+	* too close: don't play
+	movem.l	(a7)+,a0/d1
+	rts
+	
+0:
+	move.w	sound_timer,(a0,d0.w)		| timestamp last sound play
+	lsr.w	#1,d0
+	jbsr		osd_sound_start
+	movem.l	(a7)+,a0/d1
+	rts
+	
+play_first_tune:
+	move.w	#TUNE1_SND,d0
+	jra		play_tune
+
+play_second_tune:
+	move.w	#TUNE2_SND,d0
+play_tune:
+	move.w	d0,-(a7)
+	move.b	time_61E8,d0                    	| [$3ba6: ld   a,(time_61E8)]
+
+	cmp.b	#0x05,d0                         	| [$3bab: cp   $05]
+	movem.w	(a7)+,d0
+	bcc.b	0f                               	| [$3bad: ret  nc] [...]
+	* don't start music if timer is too low
+	rts  
+0:	
+	jra		osd_sound_start
+	
+is_invincible:
+	*tst.b	game_locked_6053
+	*bne.b	0f
+	tst.b	invincible_flag
+	rts
+0:
+	cmp.b	d0,d0
+	rts
+	
+* < D6: ROM offset
+read_rom:
+	swap	d6
+	clr.w	d6
+	swap	d6
+	.ifndef		RELEASE
+	cmp.w	#0x6000,d6
+	bcc.b	rr_error
+	.endif
+	
+	lea		game_mem,a0
+	move.b	(a0,d6.l),d0
+	
+	rts
+	
+rr_error:
+	jbsr	assert_failed_blitz
+	illegal
+	
+* < A0: source (HL)
+* < A1: destination (DE)
+* < D1: length (16 bit)
+ldir:
+    subq.w    #1,d1
+0:
+    move.b    (a0)+,(a1)+
+    dbf        d1,0b
+    clr.w    d1
+    rts
+
+* < A0: source (HL)
+* < D1: length to search
+* > D0.B value searched for (A)
+* > Z flag if found
+cpir:
+    subq.w    #1,d1
+0:
+    cmp.b    (a0)+,d0
+    beq.b    1f
+    dbf        d1,0b
+    clr.w    d1
+    * not found: unset Z
+    cmp.b   #1,d1
+1:
+    rts
+
+* < all registers d1-d6/a0/a1/a4 (BC,DE,HL)
+* > all registers swapped
+*: note regscopy must be defined somewhere in RAM
+*: with a size of 36*2
+exx:
+	move.w	d0,-(a7)
+	jbsr	osd_is_vblank_interrupt_enabled
+	tst		d0
+	movem.w	(a7)+,d0
+	beq.b	0f		| interrupts disabled => no need to do anything
+	
+	* if interrupts are enabled, disable them to copy memory
+	* then enable them again
+	jbsr	osd_disable_vblank_interrupt
+	bsr.b	0f
+	jbsr	osd_enable_vblank_interrupt
+	rts
+0:
+
+    lea     regscopy+36,a6
+    * save current regs in region 1
+    movem.l d1-d6/a0/a1/a4,-(a6)
+    * restore old regs from region 2
+    lea     regscopy+36,a6
+    movem.l (a6),d1-d6/a0/a1/a4
+    * now copy region 1 to region 2
+    movem.l d1-d6/a0/a1/a4,-(a7)
+    lea     regscopy,a6
+    movem.l (a6)+,d1-d6/a0/a1/a4
+    movem.l d1-d6/a0/a1/a4,(a6)
+    movem.l (a7)+,d1-d6/a0/a1/a4
+    rts
+
+* < A0: source (HL)
+* < D1: length to search
+* > D0.B value searched for (A)
+* > Z flag if found
+cpdr:
+    subq.w    #1,d1
+0:
+    subq.w  #1,a0
+    cmp.b    (1,a0),d0
+    beq.b    1f
+    dbf        d1,0b
+    clr.w    d1
+    * not found: unset Z
+    cmp.b   #1,d1
+1:
+    rts
+
+*---------------
+
+assert_failed_blitz:
+	jbra		osd_break
+	
+	
+	
+sbagman_reset:
+	* default: 1 update/irq call
+	* we need 60 updates / second so on amiga PAL
+	* we need to set this variable to 2 once out of 5 calls
+	move.b	#1,vb_ticks_count
+
+	jra	l_1200                             	| [$0000: jp   $1200]
+
+sbagman_irq:
+
+game_tick_0038:
+	addq.w	#1,sound_timer
+	bne.b	0f
+	* don't stay at 0 ever
+	addq.w	#1,sound_timer
+0:
+
