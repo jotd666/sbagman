@@ -21,7 +21,7 @@
 0051: CD 65 15    call $1565
 0054: 3A 8C 62    ld   a,(unknown_628C)
 0057: FE 01       cp   $01
-0059: CC 89 16    call z,$1689
+0059: CC 89 16    call z,read_player_controls_1689
 005C: 3A 42 61    ld   a,(ay_sound_start_6142)
 005F: 3C          inc  a
 0060: 32 42 61    ld   (ay_sound_start_6142),a
@@ -89,7 +89,7 @@
 00FC: 18 0B       jr   $0109
 00FE: DD 21 94 65 ld   ix,guard_1_struct_6594
 0102: FD 21 B8 65 ld   iy,previous_guard_1_struct_65B8
-0106: CD D7 D6    call $D6D7
+0106: CD D7 D6    call update_sprite_data_d6d7
 0109: FD 21 BC 65 ld   iy,previous_guard_2_struct_65BC
 010D: 3A 0D 60    ld   a,(player_screen_600D)
 0110: 47          ld   b,a
@@ -100,7 +100,7 @@
 011A: 18 0B       jr   $0127
 011C: DD 21 98 65 ld   ix,guard_2_struct_6598
 0120: FD 21 BC 65 ld   iy,previous_guard_2_struct_65BC
-0124: CD D7 D6    call $D6D7
+0124: CD D7 D6    call update_sprite_data_d6d7
 0127: 3A 43 63    ld   a,(unknown_6343)
 012A: FE 01       cp   $01
 012C: 28 0B       jr   z,$0139
@@ -175,19 +175,19 @@
 01EE: 32 2C 60    ld   (unknown_602C),a
 01F1: 3A 00 B8    ld   a,($B800)
 01F4: CD 3E F8    call wagon_player_collision_F83E
-01F7: CD 92 07    call $0792
+01F7: CD 92 07    call handle_player_walk_0792
 01FA: CD C6 CB    call $CBC6
 01FD: CD D5 07    call $07D5
-0200: CD 82 09    call $0982
+0200: CD 82 09    call compute_wagon_start_values_0982
 0203: CD 10 09    call $0910
 0206: 3A 00 B8    ld   a,($B800)
 0209: CD 9F D5    call $D59F
 020C: CD D6 D5    call $D5D6
 020F: 3A ED 61    ld   a,(check_scenery_disabled_61ED)
 0212: FE 00       cp   $00
-0214: CC A6 09    call z,$09A6
+0214: CC A6 09    call z,move_wagons_09A6
 0217: 3A 00 B8    ld   a,($B800)
-021A: CD 8A DA    call $DA8A
+021A: CD 8A DA    call handle_pick_hold_timer_DA8A
 021D: 3A 26 60    ld   a,(player_input_6026)
 0220: E6 60       and  $60
 0222: FE 00       cp   $00
@@ -196,13 +196,13 @@
 0229: F5          push af
 022A: 3D          dec  a
 022B: 32 83 65    ld   (player_y_6583),a
-022E: CD A7 EA    call $EAA7
+022E: CD A7 EA    call update_player_screen_address_from_xy_EAA7
 0231: F1          pop  af
 0232: 32 83 65    ld   (player_y_6583),a
 0235: 3A C7 61    ld   a,(holds_barrow_61C7)
 0238: FE 00       cp   $00
 023A: CC 14 0E    call z,$0E14
-023D: CD A7 EA    call $EAA7
+023D: CD A7 EA    call update_player_screen_address_from_xy_EAA7
 0240: 3A 4E 60    ld   a,(fatal_fall_height_reached_604E)
 0243: FE 00       cp   $00
 0245: 20 57       jr   nz,$029E
@@ -342,7 +342,7 @@
 039C: DD 21 94 65 ld   ix,guard_1_struct_6594
 03A0: 3A 37 60    ld   a,(guard_1_in_elevator_6037)
 03A3: FE 01       cp   $01
-03A5: C4 BB 05    call nz,$05BB
+03A5: C4 BB 05    call nz,guard_ladder_movement_05bb
 03A8: 3A 57 61    ld   a,(unknown_6157)
 03AB: FE 00       cp   $00
 03AD: 20 69       jr   nz,$0418
@@ -385,7 +385,7 @@
 040C: DD 21 98 65 ld   ix,guard_2_struct_6598
 0410: 3A 77 60    ld   a,(guard_2_in_elevator_6077)
 0413: FE 01       cp   $01
-0415: C4 BB 05    call nz,$05BB
+0415: C4 BB 05    call nz,guard_ladder_movement_05bb
 0418: 3A 9A 60    ld   a,(guard_2_screen_609A)
 041B: 32 98 60    ld   (current_guard_screen_index_6098),a
 041E: 21 7B 60    ld   hl,guard_2_in_elevator_607B
@@ -479,7 +479,7 @@
 0509: 32 5B 63    ld   (unknown_635B),a
 050C: CD 2E 16    call $162E
 050F: CD 0F 56    call write_scores_and_time_560f
-0512: CD 89 16    call $1689
+0512: CD 89 16    call read_player_controls_1689
 0515: CD 4D D3    call $D34D
 0518: 3A 56 63    ld   a,(unknown_6356)
 051B: FE 00       cp   $00
@@ -564,10 +564,16 @@
 05B1: 3E 01       ld   a,$01
 05B3: 32 52 61    ld   (wait_flag_6152),a
 05B6: C9          ret
-05B7: 94          sub  h
-05B8: 65          ld   h,l
-05B9: 98          sbc  a,b
-05BA: 65          ld   h,l
+
+
+	;; in ix guard structure
+	;; structure is as follows: (same struct for player)
+	;; offset 0:	sprite frame gfx index (ex: 27/A7:	climbing)
+	;; offset 1:	?
+	;; offset 2:	x
+	;; offset 3:	y
+
+guard_ladder_movement_05bb:
 05BB: FD 7E 00    ld   a,(iy+$00)
 05BE: E6 10       and  $10
 05C0: FE 10       cp   $10
@@ -823,6 +829,7 @@ guard_unconditional_move_0722:
 078B: 32 1D 60    ld   (player_in_wagon_2_601D),a
 078E: 32 1E 60    ld   (player_in_wagon_3_601E),a
 0791: C9          ret
+handle_player_walk_0792:
 0792: 21 1C 60    ld   hl,player_in_wagon_1_601C
 0795: DD 21 8A 65 ld   ix,wagon_data_658A
 0799: FD 21 82 65 ld   iy,player_x_6582
@@ -912,10 +919,7 @@ guard_unconditional_move_0722:
 084A: AF          xor  a
 084B: 32 25 60    ld   (player_death_flag_6025),a
 084E: C9          ret
-084F: 1D          dec  e
-0850: 1D          dec  e
-0851: 1D          dec  e
-0852: 1D          dec  e
+
 0853: 06 20       ld   b,$20
 0855: C5          push bc
 0856: 2A 09 60    ld   hl,(player_logical_address_6009)
@@ -1090,6 +1094,8 @@ compute_wagon_start_values_0982:
 09A0: 3E FF       ld   a,$FF
 09A2: FD 77 00    ld   (iy+$00),a
 09A5: C9          ret
+
+move_wagons_09A6:
 09A6: DD 21 16 60 ld   ix,wagon_direction_array_6016
 09AA: FD 21 3C 0A ld   iy,$0A3C
 09AE: 21 8A 65    ld   hl,wagon_data_658A
@@ -1187,11 +1193,7 @@ handle_elevator_stops_0A40:
 0A6F: 2B          dec  hl
 0A70: 77          ld   (hl),a
 0A71: C9          ret
-0A72: C4 C5 C6    call nz,$C6C5
-0A75: C7          rst  $00
-0A76: C8          ret  z
-0A77: C9          ret
-0A78: CA CB CC    jp   z,$CCCB
+
 
 	;; player entering in the elevator
 
@@ -1235,24 +1237,7 @@ handle_elevator_stops_0A40:
 0AC3: F1          pop  af
 0AC4: 77          ld   (hl),a
 0AC5: C9          ret
-0AC6: AF          xor  a
-0AC7: 77          ld   (hl),a
-0AC8: C9          ret
-0AC9: B8          cp   b
-0ACA: B9          cp   c
-0ACB: BA          cp   d
-0ACC: BB          cp   e
-0ACD: BC          cp   h
-0ACE: BD          cp   l
-0ACF: BE          cp   (hl)
-0AD0: BF          cp   a
-0AD1: C0          ret  nz
-0AD2: C1          pop  bc
-0AD3: C2 C3 C4    jp   nz,$C4C3
-0AD6: C5          push bc
-0AD7: C6 C7       add  a,$C7
-0AD9: C8          ret  z
-0ADA: C9          ret
+
 
 ; < ix: player struct (6580)
 ; < iy: unknown_6014
@@ -1637,7 +1622,7 @@ character_can_walk_left_0DCC:
 0DD3: 3E 02       ld   a,$02
 0DD5: 32 0B 60    ld   (way_clear_flag_600B),a
 0DD8: C9          ret
-0DD9: CD A4 C0    call $C0A4
+0DD9: CD A4 C0    call check_blocked_by_breakable_wall_C0A4
 0DDC: 3A 0B 60    ld   a,(way_clear_flag_600B)
 0DDF: FE 02       cp   $02
 0DE1: C8          ret  z
@@ -1823,10 +1808,10 @@ start_a_game_0F15:
 0F49: 27          daa
 0F4A: 32 00 60    ld   (number_of_credits_6000),a
 0F4D: 3E 02       ld   a,$02
-0F4F: 32 7D 61    ld   (unknown_617D),a
+0F4F: 32 7D 61    ld   (number_of_players_617D),a
 0F52: 18 05       jr   $0F59
 0F54: 3E 01       ld   a,$01
-0F56: 32 7D 61    ld   (unknown_617D),a
+0F56: 32 7D 61    ld   (number_of_players_617D),a
 0F59: AF          xor  a
 0F5A: 32 7C 61    ld   (current_player_617C),a
 0F5D: 3A 00 60    ld   a,(number_of_credits_6000)
@@ -2091,7 +2076,7 @@ handle_player_object_carry_10C6:
 handle_player_object_pickup_115E:
 115E: 3A 54 60    ld   a,(gameplay_allowed_6054)
 1161: FE 01       cp   $01
-1163: 28 0A       jr   z,$116F
+1163: 28 0A       jr   z,object_pickup_test_116F
 1165: 3A 50 60    ld   a,(player_previous_input_6050)
 1168: E6 80       and  $80
 116A: FE 80       cp   $80
@@ -2659,6 +2644,8 @@ play_intro_1218:
 1686: 86          add  a,(hl)
 1687: 77          ld   (hl),a
 1688: C9          ret
+
+read_player_controls_1689:
 1689: 3A 26 60    ld   a,(player_input_6026)
 168C: 32 50 60    ld   (player_previous_input_6050),a
 168F: AF          xor  a
@@ -3424,6 +3411,7 @@ C0A1: 0A          ld   a,(bc)
 C0A2: FB          ei
 C0A3: C9          ret
 
+check_blocked_by_breakable_wall_C0A4:
 C0A4: C5          push bc
 C0A5: E5          push hl
 C0A6: D5          push de
@@ -4234,7 +4222,7 @@ C6D4: 3E 01       ld   a,$01
 C6D6: 32 79 62    ld   (unknown_6279),a
 C6D9: CD C6 C7    call $C7C6
 C6DC: CD FB C8    call $C8FB
-C6DF: 3A 7D 61    ld   a,(unknown_617D)
+C6DF: 3A 7D 61    ld   a,(number_of_players_617D)
 C6E2: FE 01       cp   $01
 C6E4: 28 58       jr   z,$C73E
 C6E6: 3A 00 B0    ld   a,($B000)
@@ -5051,7 +5039,7 @@ CDAF: C0          ret  nz
 CDB0: CD C1 CD    call $CDC1
 CDB3: 06 30       ld   b,$30
 CDB5: C5          push bc
-CDB6: CD A6 09    call $09A6
+CDB6: CD A6 09    call move_wagons_09A6
 CDB9: C1          pop  bc
 CDBA: 10 F9       djnz $CDB5
 CDBC: AF          xor  a
@@ -5384,7 +5372,7 @@ D012: ED 52       sbc  hl,de
 D014: C1          pop  bc
 D015: E1          pop  hl
 D016: C9          ret
-D017: 3A 7D 61    ld   a,(unknown_617D)
+D017: 3A 7D 61    ld   a,(number_of_players_617D)
 D01A: FE 01       cp   $01
 D01C: C8          ret  z
 D01D: 3E 01       ld   a,$01
@@ -5833,7 +5821,7 @@ D3BB: DD 77 03    ld   (ix+$03),a
 D3BE: 3E FF       ld   a,$FF
 D3C0: 32 9F 65    ld   (sprite_object_y_659F),a
 D3C3: C9          ret
-D3C4: CD BE EA    call $EABE
+D3C4: CD BE EA    call update_guard_2_screen_address_from_xy_EABE
 D3C7: CD 81 D4    call $D481
 D3CA: 28 12       jr   z,$D3DE
 D3CC: AF          xor  a
@@ -5856,7 +5844,7 @@ D3F6: 3A 9A 60    ld   a,(guard_2_screen_609A)
 D3F9: 32 98 60    ld   (current_guard_screen_index_6098),a
 D3FC: 01 12 62    ld   bc,unknown_6212
 D3FF: CD 41 D4    call $D441
-D402: CD B1 EA    call $EAB1
+D402: CD B1 EA    call update_guard_1_screen_address_from_xy_EAB1
 D405: CD 81 D4    call $D481
 D408: 28 12       jr   z,$D41C
 D40A: AF          xor  a
@@ -6004,22 +5992,22 @@ D50E: 3A 54 60    ld   a,(gameplay_allowed_6054)
 D511: 3A 00 B8    ld   a,(io_read_shit_B800)
 D514: DD 21 80 65 ld   ix,player_struct_6580
 D518: FD 21 A8 65 ld   iy,player_shadow_sprite_65A8
-D51C: CD D7 D6    call $D6D7
+D51C: CD D7 D6    call update_sprite_data_d6d7
 D51F: DD 21 84 65 ld   ix,elevator_struct_6584
 D523: FD 21 A4 65 ld   iy,elevator_shadow_sprite_65A4
-D527: CD D7 D6    call $D6D7
+D527: CD D7 D6    call update_sprite_data_d6d7
 D52A: DD 21 88 65 ld   ix,wagon_1_struct_6588
 D52E: FD 21 AC 65 ld   iy,wagon_1_shadow_sprite_65AC
-D532: CD D7 D6    call $D6D7
+D532: CD D7 D6    call update_sprite_data_d6d7
 D535: DD 21 8C 65 ld   ix,wagon_2_shadow_sprite_658C
 D539: FD 21 B0 65 ld   iy,unknown_65B0
-D53D: CD D7 D6    call $D6D7
+D53D: CD D7 D6    call update_sprite_data_d6d7
 D540: DD 21 90 65 ld   ix,wagon_3_shadow_sprite_6590
 D544: FD 21 B4 65 ld   iy,unknown_65B4
-D548: CD D7 D6    call $D6D7
+D548: CD D7 D6    call update_sprite_data_d6d7
 D54B: DD 21 9C 65 ld   ix,object_held_struct_659C
 D54F: FD 21 A0 65 ld   iy,barrow_sprite_shadow_ram_65A0
-D553: CD D7 D6    call $D6D7
+D553: CD D7 D6    call update_sprite_data_d6d7
 D556: AF          xor  a
 D557: 32 5F 98    ld   ($985F),a
 D55A: 0E 01       ld   c,$01
@@ -6133,6 +6121,7 @@ D642: 32 9C 65    ld   (object_held_struct_659C),a
 D645: 3E 08       ld   a,$08
 D647: 32 9D 65    ld   (unknown_659D),a
 D64A: C9          ret
+
 D64B: 3A C7 61    ld   a,(holds_barrow_61C7)
 D64E: FE 01       cp   $01
 D650: C0          ret  nz
@@ -6198,6 +6187,8 @@ D6CE: 3E 01       ld   a,$01
 D6D0: 32 60 61    ld   (pickup_flag_6160),a
 D6D3: CD BD DA    call $DABD
 D6D6: C9          ret
+
+update_sprite_data_d6d7:
 D6D7: 06 04       ld   b,$04
 D6D9: DD 7E 00    ld   a,(ix+$00)
 D6DC: FD 77 00    ld   (iy+$00),a
@@ -6580,6 +6571,8 @@ DA86: 67          ld   h,a
 DA87: 08          ex   af,af'
 DA88: 77          ld   (hl),a
 DA89: C9          ret
+
+handle_pick_hold_timer_DA8A:
 DA8A: 3A CF 61    ld   a,(has_pick_61CF)
 DA8D: FE 00       cp   $00
 DA8F: C8          ret  z
@@ -8456,25 +8449,35 @@ EA9D: 32 F4 91    ld   ($91F4),a
 EAA0: 3A F3 91    ld   a,($91F3)
 EAA3: 32 7D 62    ld   (unknown_627D),a
 EAA6: C9          ret
+
+update_player_screen_address_from_xy_EAA7:
 EAA7: DD 21 80 65 ld   ix,player_struct_6580
 EAAB: FD 21 09 60 ld   iy,player_logical_address_6009
 EAAF: 18 34       jr   $EAE5
+
+update_guard_1_screen_address_from_xy_EAB1:
 EAB1: DD 21 94 65 ld   ix,guard_1_struct_6594
 EAB5: FD 21 38 60 ld   iy,guard_1_logical_address_6038
 EAB9: 3A 99 60    ld   a,(guard_1_screen_6099)
 EABC: 18 2A       jr   $EAE8
+
+update_guard_2_screen_address_from_xy_EABE:
 EABE: DD 21 98 65 ld   ix,guard_2_struct_6598
 EAC2: FD 21 78 60 ld   iy,guard_2_logical_address_6078
 EAC6: 3A 9A 60    ld   a,(guard_2_screen_609A)
 EAC9: 18 1D       jr   $EAE8
+
 EACB: DD 21 8C 65 ld   ix,wagon_2_shadow_sprite_658C
 EACF: FD 21 B2 62 ld   iy,unknown_62B2
 EAD3: 3A 0D 60    ld   a,(player_screen_600D)
 EAD6: 18 10       jr   $EAE8
+
 EAD8: DD 21 9C 65 ld   ix,object_held_struct_659C
 EADC: FD 21 5A 61 ld   iy,unknown_615A
 EAE0: 3A 0D 60    ld   a,(player_screen_600D)
 EAE3: 18 03       jr   $EAE8
+
+compute_player_logical_address_from_xy_EAE5:
 EAE5: 3A 0D 60    ld   a,(player_screen_600D)
 EAE8: 32 98 60    ld   (current_guard_screen_index_6098),a
 EAEB: CD EF EA    call compute_logical_address_from_xy_EAEF
@@ -10303,14 +10306,14 @@ FA7E: 32 58 61    ld   (has_bag_6158),a
 FA81: 32 C7 61    ld   (holds_barrow_61C7),a
 FA84: 32 11 63    ld   (unknown_6311),a
 FA87: CD BF DF    call $DFBF
-FA8A: 3A 7D 61    ld   a,(unknown_617D)
+FA8A: 3A 7D 61    ld   a,(number_of_players_617D)
 FA8D: FE 01       cp   $01
 FA8F: 28 14       jr   z,$FAA5
 FA91: 3A 7C 61    ld   a,(current_player_617C)
 FA94: C6 01       add  a,$01
 FA96: E6 01       and  $01
 FA98: 32 7C 61    ld   (current_player_617C),a
-FA9B: 3A 7D 61    ld   a,(unknown_617D)
+FA9B: 3A 7D 61    ld   a,(number_of_players_617D)
 FA9E: 47          ld   b,a
 FA9F: FE 02       cp   $02
 FAA1: 78          ld   a,b
@@ -10322,7 +10325,7 @@ FAAC: 3A 7C 61    ld   a,(current_player_617C)
 FAAF: C6 01       add  a,$01
 FAB1: E6 01       and  $01
 FAB3: 32 7C 61    ld   (current_player_617C),a
-FAB6: 3A 7D 61    ld   a,(unknown_617D)
+FAB6: 3A 7D 61    ld   a,(number_of_players_617D)
 FAB9: 47          ld   b,a
 FABA: FE 02       cp   $02
 FABC: 78          ld   a,b

@@ -19,3 +19,4 @@ maybe...:
 - TODO where is D6 defined ? debug this      	| [$0a17: ld   a,l]
 - try to cookie cut bags & pickaxes, avoid to destroy background
 
+z80 conv: review move.w into address register inc hl/dec hl => subq.w
