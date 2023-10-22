@@ -1,10 +1,10 @@
 *
-*	Amiga-specific portions of bagman
+*	Amiga-specific portions of Super Bagman
 *
 * (c) JOTD 2023
 *
 
-.include "../src/bagman.inc"
+.include "../src/sbagman.inc"
 .include "custom.i"
 .include "exec_lvos.i"
 .include "dos_lvos.i"

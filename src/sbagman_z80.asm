@@ -1854,7 +1854,7 @@ start_a_game_0F15:
 0FB1: 32 FC 61    ld   (unknown_61FC),a
 0FB4: CD C9 D7    call $D7C9
 0FB7: CD DB CF    call set_bags_coordinates_easy_level_CFDB
-0FBA: CD E7 CF    call set_bags_coordinates_CFE7
+0FBA: CD E7 CF    call copy_bags_coordinates_player_2_CFE7
 0FBD: AF          xor  a
 0FBE: 32 53 63    ld   (unknown_6353),a
 0FC1: CD F7 D0    call $D0F7
@@ -2224,22 +2224,22 @@ play_intro_1218:
 12AA: 21 A5 91    ld   hl,$91A5
 12AD: 3E 16       ld   a,$16
 12AF: 08          ex   af,af'
-12B0: CD F0 55    call $55F0
+12B0: CD F0 55    call write_text_55f0
 12B3: 11 0B 4C    ld   de,$4C0B
 12B6: 21 A6 91    ld   hl,$91A6
 12B9: 3E 16       ld   a,$16
 12BB: 08          ex   af,af'
-12BC: CD F0 55    call $55F0
+12BC: CD F0 55    call write_text_55f0
 12BF: 11 16 4C    ld   de,$4C16
 12C2: 21 A7 91    ld   hl,$91A7
 12C5: 3E 16       ld   a,$16
 12C7: 08          ex   af,af'
-12C8: CD F0 55    call $55F0
+12C8: CD F0 55    call write_text_55f0
 12CB: 11 21 4C    ld   de,$4C21
 12CE: 21 AA 91    ld   hl,$91AA
 12D1: 3E 13       ld   a,$13
 12D3: 08          ex   af,af'
-12D4: CD F0 55    call $55F0
+12D4: CD F0 55    call write_text_55f0
 12D7: 3A 00 B0    ld   a,(dip_switch_B000)
 12DA: E6 20       and  $20
 12DC: FE 20       cp   $20
@@ -2490,18 +2490,7 @@ play_intro_1218:
 1553: 3A 00 B8    ld   a,(io_read_shit_B800)
 1556: E1          pop  hl
 1557: 18 A4       jr   $14FD
-1559: 00          nop
-155A: 00          nop
-155B: 00          nop
-155C: 00          nop
-155D: 00          nop
-155E: 00          nop
-155F: 00          nop
-1560: 00          nop
-1561: 00          nop
-1562: 00          nop
-1563: 00          nop
-1564: 00          nop
+
 1565: CD 72 15    call $1572
 1568: CD 8F 15    call $158F
 156B: CD AC 15    call $15AC
@@ -3115,6 +3104,7 @@ guide_guard_on_hidden_screen_193A:
 555B: F1          pop  af
 555C: AF          xor  a
 555D: C9          ret
+* seems unreached!
 555E: DD 21 80 65 ld   ix,player_struct_6580
 5562: FD 21 09 60 ld   iy,player_logical_address_6009
 5566: 18 1A       jr   $5582
@@ -3153,6 +3143,7 @@ guide_guard_on_hidden_screen_193A:
 55B2: CB 3F       srl  a
 55B4: C3 CD 5B    jp   $5BCD
 55B7: 00          nop
+* seems still unreached!
 55B8: 47          ld   b,a
 55B9: 11 20 00    ld   de,$0020
 55BC: 21 00 40    ld   hl,$4000
@@ -3189,6 +3180,9 @@ guide_guard_on_hidden_screen_193A:
 55EC: 13          inc  de
 55ED: 09          add  hl,bc
 55EE: 18 E9       jr   $55D9
+*  ^^^^ unreached above
+
+write_text_55f0:
 55F0: 01 E0 FF    ld   bc,$FFE0
 55F3: 1A          ld   a,(de)
 55F4: FE 3F       cp   $3F
@@ -3204,7 +3198,7 @@ guide_guard_on_hidden_screen_193A:
 5600: E1          pop  hl
 5601: 13          inc  de
 5602: 09          add  hl,bc
-5603: 18 EB       jr   $55F0
+5603: 18 EB       jr   write_text_55f0
 
 write_attribute_on_line_5605:
 5605: 11 20 00    ld   de,$0020
@@ -4456,12 +4450,12 @@ C8BE: 11 00 4D    ld   de,$4D00
 C8C1: 21 82 93    ld   hl,$9382
 C8C4: 3E 12       ld   a,$12
 C8C6: 08          ex   af,af'
-C8C7: CD F0 55    call $55F0
+C8C7: CD F0 55    call write_text_55f0
 C8CA: 11 1B 4D    ld   de,$4D1B
 C8CD: 21 90 93    ld   hl,$9390
 C8D0: 3E 12       ld   a,$12
 C8D2: 08          ex   af,af'
-C8D3: CD F0 55    call $55F0
+C8D3: CD F0 55    call write_text_55f0
 C8D6: 06 0D       ld   b,$0D
 C8D8: 3E 8B       ld   a,$8B
 C8DA: 21 83 93    ld   hl,$9383
@@ -4558,12 +4552,12 @@ C989: 11 00 4D    ld   de,$4D00
 C98C: 21 91 93    ld   hl,$9391
 C98F: 3E 12       ld   a,$12
 C991: 08          ex   af,af'
-C992: CD F0 55    call $55F0
+C992: CD F0 55    call write_text_55f0
 C995: 11 1B 4D    ld   de,$4D1B
 C998: 21 9E 93    ld   hl,$939E
 C99B: 3E 12       ld   a,$12
 C99D: 08          ex   af,af'
-C99E: CD F0 55    call $55F0
+C99E: CD F0 55    call write_text_55f0
 C9A1: 06 0C       ld   b,$0C
 C9A3: 21 92 93    ld   hl,$9392
 C9A6: 3E 8B       ld   a,$8B
@@ -4631,12 +4625,12 @@ CA3E: 32 07 A0    ld   ($A007),a
 CA41: C9          ret
 CA42: 3E 14       ld   a,$14
 CA44: 08          ex   af,af'
-CA45: CD F0 55    call $55F0
+CA45: CD F0 55    call write_text_55f0
 CA48: C9          ret
 CA49: 3E 18       ld   a,$18
 CA4B: 08          ex   af,af'
 CA4C: CD 53 CA    call $CA53
-CA4F: CD F0 55    call $55F0
+CA4F: CD F0 55    call write_text_55f0
 CA52: C9          ret
 CA53: F5          push af
 CA54: 3A 00 B0    ld   a,(dip_switch_B000)
@@ -4679,10 +4673,10 @@ CA94: FE A5       cp   $A5
 CA96: C0          ret  nz
 CA97: 11 58 1A    ld   de,$1A58
 CA9A: 21 A2 93    ld   hl,$93A2
-CA9D: CD F0 55    call $55F0
+CA9D: CD F0 55    call write_text_55f0
 CAA0: 11 75 1A    ld   de,$1A75
 CAA3: 21 A3 93    ld   hl,$93A3
-CAA6: CD F0 55    call $55F0
+CAA6: CD F0 55    call write_text_55f0
 CAA9: 3E 00       ld   a,$00
 CAAB: 18 E4       jr   $CA91
 CAAD: DD 21 CC 61 ld   ix,current_pickaxe_screen_params_61CC
@@ -5326,6 +5320,7 @@ CFC4: AF          xor  a
 CFC5: 32 41 63    ld   (unknown_6341),a
 CFC8: 11 9C 60    ld   de,bags_coordinates_609C
 CFCB: 21 15 1B    ld   hl,$1B15
+* a is always 0 there!
 CFCE: FE 02       cp   $02
 CFD0: 20 03       jr   nz,$CFD5
 CFD2: 21 4E 1B    ld   hl,$1B4E
@@ -5340,7 +5335,7 @@ CFE1: 01 36 00    ld   bc,$0036
 CFE4: ED B0       ldir
 CFE6: C9          ret
 
-set_bags_coordinates_CFE7:
+copy_bags_coordinates_player_2_CFE7:
 CFE7: 11 7F 61    ld   de,bags_coordinates_617F
 CFEA: 21 DC 1A    ld   hl,$1ADC
 CFED: 01 36 00    ld   bc,$0036
@@ -5404,12 +5399,12 @@ D05E: 21 93 92    ld   hl,$9293
 D061: 11 42 1A    ld   de,$1A42
 D064: 3E 1F       ld   a,$1F
 D066: 08          ex   af,af'
-D067: CD F0 55    call $55F0
+D067: CD F0 55    call write_text_55f0
 D06A: 21 95 92    ld   hl,$9295
 D06D: 11 4D 1A    ld   de,$1A4D
 D070: 3E 1F       ld   a,$1F
 D072: 08          ex   af,af'
-D073: CD F0 55    call $55F0
+D073: CD F0 55    call write_text_55f0
 D076: 3E 8E       ld   a,$8E
 D078: 32 74 91    ld   ($9174),a
 D07B: 3E 8B       ld   a,$8B
@@ -8718,7 +8713,7 @@ ECBC: 3E 40       ld   a,$40
 ECBE: 32 E8 61    ld   (time_61E8),a
 ECC1: CD 18 12    call play_intro_1218
 ECC4: CD DB CF    call set_bags_coordinates_easy_level_CFDB
-ECC7: CD E7 CF    call set_bags_coordinates_CFE7
+ECC7: CD E7 CF    call copy_bags_coordinates_player_2_CFE7
 ECCA: 21 3C 51    ld   hl,$513C
 ECCD: 22 40 61    ld   (ay_sound_pointer_6140),hl
 ECD0: 22 4E 63    ld   (unknown_634E),hl
@@ -10389,7 +10384,7 @@ FB75: 32 00 A0    ld   (interrupt_control_A000),a
 FB78: CD D5 C5    call $C5D5
 FB7B: F3          di
 FB7C: CD DB CF    call set_bags_coordinates_easy_level_CFDB
-FB7F: CD E7 CF    call set_bags_coordinates_CFE7
+FB7F: CD E7 CF    call copy_bags_coordinates_player_2_CFE7
 FB82: CD 1A C4    call $C41A
 FB85: AF          xor  a
 FB86: 32 53 60    ld   (game_locked_6053),a

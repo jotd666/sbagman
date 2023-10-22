@@ -4,9 +4,9 @@ from PIL import Image,ImageOps
 import os,glob,collections,itertools
 
 this_dir = os.path.abspath(os.path.dirname(__file__))
-indir = os.path.join(this_dir,"sbagman")
+game_name = "sbagman"
+indir = os.path.join(this_dir,game_name)
 palette_name = "palette0 *_0000.txt"
-game_name = "bagman"
 groups = {0:{"name":"tile"},1:{"name":"sprite"},2:{"name":"tiles"}}
 text_bitmap = " .=#"
 def get_clut(tile_group_index,clut_index):

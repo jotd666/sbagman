@@ -11,6 +11,7 @@ def ensure_empty(d):
     else:
         os.mkdir(d)
 
+gamename = "sbagman"
 
 this_dir = os.path.dirname(__file__)
 src_dir = os.path.join(this_dir,"../../src/amiga")
@@ -108,7 +109,7 @@ block_dict = {}
 
 # hackish convert of c gfx table to dict of lists
 # (Thanks to Mark Mc Dougall for providing the ripped gfx as C tables)
-with open(os.path.join(this_dir,"..","bagman_gfx.c")) as f:
+with open(os.path.join(this_dir,"..",f"{gamename}_gfx.c")) as f:
     block = []
     block_name = ""
     start_block = False

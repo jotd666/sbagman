@@ -9,7 +9,7 @@ _base	SLAVE_HEADER					; ws_security + ws_id
 	dc.w	17					; ws_version (was 10)
 	dc.w	WHDLF_NoError
     IFD CHIP_ONLY
-	dc.l	$180000					; ws_basememsize
+	dc.l	$100000					; ws_basememsize
     ELSE
 	dc.l	$80000					; ws_expmem
     ENDC
@@ -63,10 +63,10 @@ DECL_VERSION:MACRO
 	ENDC
 	ENDM
 _data   dc.b    0
-_name	dc.b	'Bagman',0
+_name	dc.b	'Super Bagman',0
 _copy	dc.b	'2023 JOTD',0
 _info
-    dc.b    "Music by J.M.D",0
+    dc.b    "Music by no9",0
 	dc.b	0
 _kickname   dc.b    0
 ;--- version id
@@ -128,5 +128,5 @@ _resload:
 progstart
     dc.l    0
 exe
-	dc.b	"bagman",0
+	dc.b	"sbagman",0
 	

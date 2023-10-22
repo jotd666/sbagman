@@ -1,4 +1,4 @@
-PROGNAME = bagman
+PROGNAME = sbagman
 MAIN = ..\$(PROGNAME)
 
 
@@ -39,7 +39,7 @@ all: $(AMIGASRC)/graphics.68k $(AMIGASRC)/sounds.68k $(MAIN) $(WHDLOADER) $(WHDL
 clean:
 	del $(OBJS) "$(MAIN)"
 	
-$(AMIGASRC)/graphics.68k: $(ASSETS)/convert_graphics.py $(ASSETS)/../bagman_gfx.c
+$(AMIGASRC)/graphics.68k: $(ASSETS)/convert_graphics.py $(ASSETS)/../$(PROGNAME)_gfx.c
 	cmd /c $(ASSETS)\convert_graphics.py
 
 
