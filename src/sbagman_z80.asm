@@ -2240,7 +2240,7 @@ play_intro_1218:
 12D1: 3E 13       ld   a,$13
 12D3: 08          ex   af,af'
 12D4: CD F0 55    call $55F0
-12D7: 3A 00 B0    ld   a,($B000)
+12D7: 3A 00 B0    ld   a,(dip_switch_B000)
 12DA: E6 20       and  $20
 12DC: FE 20       cp   $20
 12DE: 20 0A       jr   nz,$12EA
@@ -2261,7 +2261,7 @@ play_intro_1218:
 12FF: 7A          ld   a,d
 1300: FE 00       cp   $00
 1302: 20 F7       jr   nz,$12FB
-1304: 3A 00 B0    ld   a,($B000)
+1304: 3A 00 B0    ld   a,(dip_switch_B000)
 1307: E6 40       and  $40
 1309: FE 40       cp   $40
 130B: 20 11       jr   nz,$131E
@@ -2470,7 +2470,7 @@ play_intro_1218:
 1524: 3E 04       ld   a,$04
 1526: CD A3 C3    call change_attribute_everywhere_C3A3
 1529: DD 21 A1 1F ld   ix,$1FA1
-152D: 3A 00 B0    ld   a,($B000)
+152D: 3A 00 B0    ld   a,(dip_switch_B000)
 1530: E6 20       and  $20
 1532: FE 20       cp   $20
 1534: 20 04       jr   nz,$153A
@@ -2673,7 +2673,7 @@ read_player_controls_1689:
 16C1: 2F          cpl
 16C2: CD F0 16    call $16F0
 16C5: 32 51 60    ld   (coin_start_inputs_6051),a
-16C8: 3A 00 B0    ld   a,($B000)
+16C8: 3A 00 B0    ld   a,(dip_switch_B000)
 16CB: 2F          cpl
 16CC: 32 63 61    ld   (flipped_dip_switches_copy_6163),a
 16CF: 3E 01       ld   a,$01
@@ -2706,7 +2706,7 @@ read_player_controls_1689:
 1702: E6 03       and  $03
 1704: C9          ret
 1705: 47          ld   b,a
-1706: 3A 00 B0    ld   a,($B000)
+1706: 3A 00 B0    ld   a,(dip_switch_B000)
 1709: 2F          cpl
 170A: CB 07       rlc  a
 170C: E6 01       and  $01
@@ -3624,7 +3624,7 @@ C242: 3E 3F       ld   a,$3F
 C244: 32 77 9A    ld   ($9A77),a
 C247: CD DD D0    call $D0DD
 C24A: 3A 00 B8    ld   a,(io_read_shit_B800)
-C24D: 3A 00 B0    ld   a,($B000)
+C24D: 3A 00 B0    ld   a,(dip_switch_B000)
 C250: E6 20       and  $20
 C252: FE 20       cp   $20
 C254: 20 0F       jr   nz,$C265
@@ -4125,7 +4125,7 @@ C5FE: FE 01       cp   $01
 C600: 20 04       jr   nz,$C606
 C602: 3A 7B 61    ld   a,(score_ten_thousands_player_2_617B)
 C605: 47          ld   b,a
-C606: 3A 00 B0    ld   a,($B000)
+C606: 3A 00 B0    ld   a,(dip_switch_B000)
 C609: CB 1F       rr   a
 C60B: CB 1F       rr   a
 C60D: CB 1F       rr   a
@@ -4225,7 +4225,7 @@ C6DC: CD FB C8    call $C8FB
 C6DF: 3A 7D 61    ld   a,(number_of_players_617D)
 C6E2: FE 01       cp   $01
 C6E4: 28 58       jr   z,$C73E
-C6E6: 3A 00 B0    ld   a,($B000)
+C6E6: 3A 00 B0    ld   a,(dip_switch_B000)
 C6E9: E6 80       and  $80
 C6EB: FE 80       cp   $80
 C6ED: 28 05       jr   z,$C6F4
@@ -4338,7 +4338,7 @@ C7D0: FE 01       cp   $01
 C7D2: 20 05       jr   nz,$C7D9
 C7D4: CD 0A CA    call $CA0A
 C7D7: 18 0C       jr   $C7E5
-C7D9: 3A 00 B0    ld   a,($B000)
+C7D9: 3A 00 B0    ld   a,(dip_switch_B000)
 C7DC: E6 80       and  $80
 C7DE: FE 80       cp   $80
 C7E0: 28 F2       jr   z,$C7D4
@@ -4639,7 +4639,7 @@ CA4C: CD 53 CA    call $CA53
 CA4F: CD F0 55    call $55F0
 CA52: C9          ret
 CA53: F5          push af
-CA54: 3A 00 B0    ld   a,($B000)
+CA54: 3A 00 B0    ld   a,(dip_switch_B000)
 CA57: E6 20       and  $20
 CA59: FE 20       cp   $20
 CA5B: 20 08       jr   nz,$CA65
@@ -4654,7 +4654,7 @@ CA66: C9          ret
 
 display_localized_text_CA67:
 CA67: F5          push af
-CA68: 3A 00 B0    ld   a,($B000)
+CA68: 3A 00 B0    ld   a,(dip_switch_B000)
 CA6B: E6 20       and  $20
 CA6D: FE 20       cp   $20
 CA6F: 28 08       jr   z,$CA79
@@ -5246,7 +5246,8 @@ CF3A: 00          nop
 CF3B: 10 FD       djnz $CF3A
 CF3D: 3A 56 63    ld   a,(unknown_6356)
 CF40: C9          ret
-CF41: 3A 00 B0    ld   a,($B000)
+* not reached?
+CF41: 3A 00 B0    ld   a,(dip_switch_B000)
 CF44: E6 40       and  $40
 CF46: FE 40       cp   $40
 CF48: 3E 03       ld   a,$03
@@ -5514,7 +5515,7 @@ D14B: 3E 01       ld   a,$01
 D14D: 32 32 63    ld   (unknown_6332),a
 D150: 32 42 63    ld   (unknown_6342),a
 D153: DD 21 13 1C ld   ix,$1C13
-D157: 3A 00 B0    ld   a,($B000)
+D157: 3A 00 B0    ld   a,(dip_switch_B000)
 D15A: E6 20       and  $20
 D15C: FE 20       cp   $20
 D15E: 20 04       jr   nz,$D164
@@ -5556,28 +5557,8 @@ D1AB: DD 7E 02    ld   a,(ix+$02)
 D1AE: 22 9F 60    ld   (unknown_609F),hl
 D1B1: 32 A1 60    ld   (unknown_60A1),a
 D1B4: C9          ret
-D1B5: 00          nop
-D1B6: 00          nop
-D1B7: 00          nop
-D1B8: 23          inc  hl
-D1B9: 91          sub  c
-D1BA: 01 03 92    ld   bc,$9203
-D1BD: 02          ld   (bc),a
-D1BE: A3          and  e
-D1BF: 92          sub  d
-D1C0: 03          inc  bc
-D1C1: 7C          ld   a,h
-D1C2: 92          sub  d
-D1C3: 03          inc  bc
-D1C4: 03          inc  bc
-D1C5: 91          sub  c
-D1C6: 03          inc  bc
-D1C7: F0          ret  p
-D1C8: 90          sub  b
-D1C9: 03          inc  bc
-D1CA: D3 92       out  ($92),a
-D1CC: 01 3C 92    ld   bc,$923C
-D1CF: 02          ld   (bc),a
+
+
 D1D0: 3A 43 63    ld   a,(unknown_6343)
 D1D3: FE 01       cp   $01
 D1D5: 28 1C       jr   z,$D1F3
@@ -5613,7 +5594,7 @@ D21D: CD B7 C3    call clear_screen_C3B7
 D220: 3E 04       ld   a,$04
 D222: CD A3 C3    call change_attribute_everywhere_C3A3
 D225: DD 21 AE 1C ld   ix,$1CAE
-D229: 3A 00 B0    ld   a,($B000)
+D229: 3A 00 B0    ld   a,(dip_switch_B000)
 D22C: E6 20       and  $20
 D22E: FE 20       cp   $20
 D230: 20 04       jr   nz,$D236
@@ -5981,7 +5962,7 @@ D4F8: 20 0F       jr   nz,$D509
 D4FA: 3A 54 60    ld   a,(gameplay_allowed_6054)
 D4FD: FE 01       cp   $01
 D4FF: 28 08       jr   z,$D509
-D501: 3A 00 B0    ld   a,($B000)
+D501: 3A 00 B0    ld   a,(dip_switch_B000)
 D504: E6 40       and  $40
 D506: FE 40       cp   $40
 D508: C9          ret
@@ -8713,7 +8694,7 @@ EC89: 28 0F       jr   z,$EC9A
 EC8B: 3A 54 60    ld   a,(gameplay_allowed_6054)
 EC8E: FE 01       cp   $01
 EC90: 28 08       jr   z,$EC9A
-EC92: 3A 00 B0    ld   a,($B000)
+EC92: 3A 00 B0    ld   a,(dip_switch_B000)
 EC95: E6 40       and  $40
 EC97: FE 40       cp   $40
 EC99: C0          ret  nz
@@ -8870,7 +8851,7 @@ EE0D: 3A 9A 60    ld   a,(guard_2_screen_609A)
 EE10: B8          cp   b
 EE11: CC 56 F7    call z,$F756
 EE14: FB          ei
-EE15: 32 00 B0    ld   ($B000),a
+EE15: 32 00 B0    ld   (dip_switch_B000),a
 EE18: 3A 99 60    ld   a,(guard_1_screen_6099)
 EE1B: 32 98 60    ld   (current_guard_screen_index_6098),a
 EE1E: FD 21 94 65 ld   iy,guard_1_struct_6594
