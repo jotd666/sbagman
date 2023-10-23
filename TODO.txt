@@ -1,3 +1,3 @@
 - suspicious : @246e
-
+- guard_wait_for_elevator_test_2AFA vs guard_wait_for_elevator_test_C4BC
 z80 conv: review move.w into address register inc hl/dec hl => subq.w

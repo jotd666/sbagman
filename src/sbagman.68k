@@ -3293,14 +3293,14 @@ l_162e:
 	move.b	#0xE0,d0                        	| [$$1646: ld   a,$$E0]
 	move.b	#0x06,d1                        	| [$$1648: ld   b,$$06]
 	move.w	#0x93BF,d6                      	| [$$164a: ld   hl,$$93BF]
-	jbsr	l_c373                            	| [$$164d: call $$C373]
+	jbsr	draw_repeated_char_c373                            	| [$$164d: call $$C373]
 	move.b	lives_6056,d0                   	| [$$1650: ld   a,(lives_6056)]
 	                         	| [$$1653: cp   $$00]
 	jeq	l_1660                             	| [$$1655: jr   z,$$1660]
 	move.w	#0x93BF,d6                      	| [$$1657: ld   hl,$$93BF]
 	move.b	d0,d1                           	| [$$165a: ld   b,a]
 	move.b	#0xCA,d0                        	| [$$165b: ld   a,$$CA]
-	jbsr	l_c373                            	| [$$165d: call $$C373]
+	jbsr	draw_repeated_char_c373                            	| [$$165d: call $$C373]
 l_1660:
 	move.b	must_play_music_6210,d0         	| [$$1660: ld   a,(must_play_music_6210)]
 	cmp.b	#0x01,d0                         	| [$$1663: cp   $$01]
@@ -3418,7 +3418,7 @@ l_171c:
 	bne.b	0f                               	| [...]
 	rts                                    	| [$$172c: ret  z] [...]
 0:
-	jbsr	l_5500                            	| [$$172d: call $$5500]
+	jbsr	really_add_to_score_5500                            	| [$$172d: call $$5500]
 	rts                                    	| [$$1730: ret]
 l_1731:
 	move.b	gameplay_allowed_6054,d0        	| [$$1731: ld   a,(gameplay_allowed_6054)]
@@ -3836,280 +3836,285 @@ l_251a:
 
 
 
-l_5500:
-	move.b	check_scenery_disabled_61ED,d0  	| [$$5500: ld   a,(check_scenery_disabled_61ED)]
-	cmp.b	#0x01,d0                         	| [$$5503: cp   $$01]
-	bne.b	0f                               	| [...]
-	rts                                    	| [$$5505: ret  z] [...]
+ * internal actual add to score routine
+ * score is stored from 6176 to 6178 for player 1
+ * 6179 to 617B for player 2
+really_add_to_score_5500:
+	* we don't want to score if moves are guided / intermission
+	move.b	check_scenery_disabled_61ED,d0                 	| [$5500: ld   a,(check_scenery_disabled_61ED)]
+	cmp.b	#0x01,d0                         	| [$5503: cp   $01]
+	bne.b	0f
+	rts                                    	| [$5505: ret  z]
 0:
-	move.b	current_player_617C,d0          	| [$$5506: ld   a,(current_player_617C)]
-	                         	| [$$5509: cp   $$00]
-	jne	l_5531                             	| [$$550b: jp   nz,$$5531]
-	lea	player_1_score_6176,a2         	| [$$550e: ld   ix,player_1_score_6176]
+	move.b	current_player_617C,d0          	| [$5506: ld   a,(current_player_617C)]
+	                         	| [$5509: cp   $00]
+	jne	l_5531                             	| [$550b: jp   nz,$5531]
+	lea	player_1_score_6176,a2                	| [$550e: ld   ix,player_1_score_6176]
 l_5512:
-	clr.b	d0                               	| [$$5512: xor  a]
-	move.b	d6,d0                           	| [$$5513: ld   a,l]
-	move.b	d0,d1                           	| [$$5514: ld   b,a]
-	move.b	(A2),d0                    	| [$$5515: ld   a,(ix+$$00)]
-	add.b	d1,d0                            	| [$$5518: add  a,b]
-daa
-	move.b	d0,(A2)                    	| [$$551a: ld   (ix+$$00),a]
-	move.b	d5,d0                           	| [$$551d: ld   a,h]
-	move.b	d0,d1                           	| [$$551e: ld   b,a]
-	move.b	(0x01,a2),d0                    	| [$$551f: ld   a,(ix+$$01)]
-adc  a,b
-daa
-	move.b	d0,(0x01,a2)                    	| [$$5524: ld   (ix+$$01),a]
-	move.b	(0x02,a2),d0                    	| [$$5527: ld   a,(ix+$$02)]
-adc  a,$$00
-daa
-	move.b	d0,(0x02,a2)                    	| [$$552d: ld   (ix+$$02),a]
-	rts                                    	| [$$5530: ret]
+	* pre-shift D6 MSB as it would destroy X flag
+	move.w	d6,d5                           	| [$551d: ld   a,h]
+	lsr.w	#8,d5
+	CLEAR_XC_FLAG                              	| [$5512: xor  a]
+	move.b	d6,d0                           	| [$5513: ld   a,l]
+	move.b	d0,d1                           	| [$5514: ld   b,a]
+	move.b	(A2),d0                    	| [$5515: ld   a,(ix+$00)]
+	abcd	d1,d0                            	| [$5518: add  a,b + daa]
+	move.b	d0,(A2)                    	| [$551a: ld   (ix+$00),a]
+											| [$551e: ld   b,a]
+	move.b	(0x01,a2),d0                    	| [$551f: ld   a,(ix+$01)]
+	abcd	d5,d0 								| [ adc  a,b+daa ]
+	move.b	d0,(0x01,a2)                    	| [$5524: ld   (ix+$01),a]
+	move.b	(0x02,a2),d0                    	| [$5527: ld   a,(ix+$02)]
+	moveq	#0,d7
+	abcd	d7,d0				| [adc  a,$00 + daa]
+	move.b	d0,(0x02,a2)                    	| [$552d: ld   (ix+$02),a]
+	rts                                    	| [$5530: ret]
 l_5531:
-	lea	player_2_score_6179,a2         	| [$$5531: ld   ix,player_2_score_6179]
-	jra	l_5512                             	| [$$5535: jr   $$5512]
-l_5537:
-	move.b	(0x02,a3),d0                    	| [$$5537: ld   a,(iy+$$02)]
-	move.b	d0,d1                           	| [$$553a: ld   b,a]
-	move.b	(0x02,a2),d0                    	| [$$553b: ld   a,(ix+$$02)]
-	jbsr	l_554e                            	| [$$553e: call $$554E]
-	move.b	(0x03,a3),d0                    	| [$$5541: ld   a,(iy+$$03)]
-	move.b	d0,d1                           	| [$$5544: ld   b,a]
-	move.b	(0x03,a2),d0                    	| [$$5545: ld   a,(ix+$$03)]
-	jbsr	l_554e                            	| [$$5548: call $$554E]
-	move.b	#0x01,d0                        	| [$$554b: ld   a,$$01]
-	rts                                    	| [$$554d: ret]
-l_554e:
-	move.b	d0,d2                           	| [$$554e: ld   c,a]
-	add.b	#0x0B,d0                         	| [$$554f: add  a,$$0B]
-	cmp.b	d1,d0                            	| [$$5551: cp   b]
-	jcs	l_555b                             	| [$$5552: jr   c,$$555B]
-	move.b	d2,d0                           	| [$$5554: ld   a,c]
-	sub.b	#0x08,d0                         	| [$$5555: sub  $$08]
-	cmp.b	d1,d0                            	| [$$5557: cp   b]
-	jcc	l_555b                             	| [$$5558: jr   nc,$$555B]
-	rts                                    	| [$$555a: ret]
+	lea	player_2_score_6179,a2                	| [$5531: ld   ix,player_2_score_6179]
+	jra	l_5512                             	| [$5535: jr   $5512]
+
+* < in:	 ix:	 player "structure"
+* <             iy:	 guard "structure"
+guard_collision_5537:
+	move.b	(0x02,a3),d0                    	| [$5537: ld   a,(iy+$02)]  guard x
+	move.b	d0,d1                           	| [$553a: ld   b,a]
+	move.b	(0x02,a2),d0                    	| [$553b: ld   a,(ix+$02)]  player x
+	jbsr	within_bounds_554E                	| [$553e: call within_bounds_554E]
+	move.b	(0x03,a3),d0                    	| [$5541: ld   a,(iy+$03)] guard y
+	move.b	d0,d1                           	| [$5544: ld   b,a]
+	move.b	(0x03,a2),d0                    	| [$5545: ld   a,(ix+$03)]  player y
+	jbsr	within_bounds_554E                	| [$5548: call within_bounds_554E]
+	move.b	#0x01,d0                        	| [$554b: ld   a,$01] set flag to 1: collision with guard
+	rts                                    	| [$554d: ret]
+
+* check if a+11 > b and a-8 < b (kind of square collision if applied to both x and y)
+* in:	 a,b: values to compare
+* out:	 if both conditions are OK, returns, else pops the stack and exits from 5537
+within_bounds_554E:
+	move.b	d0,d2                           	| [$554e: ld   c,a]
+	add.b	#0x0B,d0                         	| [$554f: add  a,$0B]
+	cmp.b	d1,d0                            	| [$5551: cp   b]
+	jcs	l_555b                             	| [$5552: jr   c,$555B]
+	move.b	d2,d0                           	| [$5554: ld   a,c]
+	sub.b	#0x08,d0                         	| [$5555: sub  $08]
+	cmp.b	d1,d0                            	| [$5557: cp   b]
+	jcc	l_555b                             	| [$5558: jr   nc,$555B]
+	rts                                    	| [$555a: ret]
+* okay:	return from guard_collision_5537 directly (pop)
 l_555b:
-	move.w	(sp)+,d0                        	| [$$555b: pop  af]
-	clr.b	d0                               	| [$$555c: xor  a]
-	rts                                    	| [$$555d: ret]
+	addq.l	#4,a7                        	| [$555b: pop  af]
+	clr.b	d0                               	| [$555c: xor  a]
+	rts                                    	| [$555d: ret]
 
+* write text
+* < A1: text
+* < D6: screen address
+* < D7: attribute
 write_text_55f0:
-	move.b	#0xff,d1                        	| [$$55f0: ld   bc,$$FFE0] 65504
-	move.b	#0xe0,d2                        	| [$$55f0: ld   bc,$$FFE0] 65504
-	move.b	(a1),d0                         	| [$$55f3: ld   a,(de)]
-	cmp.b	#0x3F,d0                         	| [$$55f4: cp   $$3F]
-	bne.b	0f                               	| [...]
-	rts                                    	| [$$55f6: ret  z] [...]
+	                        	| [$55f0: ld   bc,$FFE0] 65504
+										| [$55f0: ld   bc,$FFE0] 65504
+	move.b	(a1)+,d0                         	| [$55f3: ld   a,(de)]
+	cmp.b	#0x3F,d0                         	| [$55f4: cp   $3F] end of string
+	bne.b	0f
+	rts                                    	| [$55f6: ret  z]
 0:
-	move.b	d0,(a0)                         	| [$$55f7: ld   (hl),a]
+	jbsr	osd_w_videoram                         	| [$55f7: ld   (hl),a]
 
-	move.l	a0,-(sp)                        	| [$$55f8: push hl]
-	move.b	d5,d0                           	| [$$55f9: ld   a,h]
-	add.b	#0x08,d0                         	| [$$55fa: add  a,$$08]
-	move.b	d0,d5                           	| [$$55fc: ld   h,a]
-	exg	d0,d7                              	| [$$55fd: ex   af,af']
-         ^^^ TODO review: wrong if carry is needed or D7 used in between!
-	move.b	d0,(a0)                         	| [$$55fe: ld   (hl),a]
-	exg	d0,d7                              	| [$$55ff: ex   af,af']
-         ^^^ TODO review: wrong if carry is needed or D7 used in between!
-	move.l	(sp)+,a0                        	| [$$5600: pop  hl]
-	addq.w	#1,a1                           	| [$$5601: inc  de]
-                  ^^^^^^ TODO: review move.w into address register
-	add.w	d1,a0                            	| [$$5602: add  hl,bc]
-                  ^^^^^^ TODO: review move.w into address register
-  ^^^^ TODO: review d1 computation above
-	jra	write_text_55f0                             	| [$$5603: jr   $$55F0]
+	                        	| [$55f8: push hl]
+	add.w	#0x0800,d6                           	| [$55f9: ld   a,h]
+	                           	| [$55fc: ld   h,a]
+	exg	d0,d7                              	| [$55fd: ex   af,af']
+	jbsr	osd_w_colorram                         	| [$55fe: ld   (hl),a]
+	exg	d0,d7                              	| [$55ff: ex   af,af']
+	                        	| [$5600: pop  hl]
+											| [$5601: inc  de]
+	sub.w	#0x820,d6                            	| [$5602: add  hl,bc] next char
+	jra	write_text_55f0                             	| [$5603: jr   $55F0]
 
 write_attribute_on_line_5605:
-	move.w	#0x0020,d3                      	| [$$5605: ld   de,$$0020] 32
-	move.b	#0x1C,d1                        	| [$$5608: ld   b,$$1C]
+	move.w	#0x0020,d3                      	| [$5605: ld   de,$0020] 32
+	move.b	#0x1C,d1                        	| [$5608: ld   b,$1C]
 l_560a:
-	move.b	d0,(a0)                         	| [$$560a: ld   (hl),a]
-	add.w	d3,a0                            	| [$$560b: add  hl,de]
-                  ^^^^^^ TODO: review move.w into address register
-  ^^^^ TODO: review d3 computation above
+	jbsr	osd_w_colorram                         	| [$560a: ld   (hl),a]
+	add.w	d3,d6                            	| [$560b: add  hl,de]
 	subq.b	#1,d1                           	| [...]
-	jne	l_560a                             	| [$$560c: djnz $$560A]
-	rts                                    	| [$$560e: ret]
+	jne	l_560a                             	| [$560c: djnz $560A]
+	rts                                    	| [$560e: ret]
 
 write_scores_and_time_560f:
-	lea	player_1_score_6176,a2         	| [$$560f: ld   ix,player_1_score_6176]
-	move.w	#0x92E1,d6                      	| [$$5613: ld   hl,$$92E1]
-	jbsr	write_numeric_value_3_bytes_563C  	| [$$5616: call write_numeric_value_3_bytes_563C]
-	lea	player_2_score_6179,a2         	| [$$5619: ld   ix,player_2_score_6179]
-	move.w	#0x9061,d6                      	| [$$561d: ld   hl,$$9061]
-	jbsr	write_numeric_value_3_bytes_563C  	| [$$5620: call write_numeric_value_3_bytes_563C]
-	lea	time_61E8,a2                   	| [$$5623: ld   ix,time_61E8]
-	move.w	#0x9201,d6                      	| [$$5627: ld   hl,$$9201]
-	move.b	#0x01,d1                        	| [$$562a: ld   b,$$01]
-	jbsr	l_5641                            	| [$$562c: call $$5641]
-	lea	unknown_61E9,a2                	| [$$562f: ld   ix,unknown_61E9]
-	move.w	#0x91C1,d6                      	| [$$5633: ld   hl,$$91C1]
-	move.b	#0x01,d1                        	| [$$5636: ld   b,$$01]
-	jbsr	l_5641                            	| [$$5638: call $$5641]
-	rts                                    	| [$$563b: ret]
+	lea	player_1_score_6176,a2                	| [$560f: ld   ix,player_1_score_6176]
+	move.w	#0x92E1,d6                      	| [$5613: ld   hl,$92E1]
+	jbsr	write_numeric_value_3_bytes_563C                            	| [$5616: call $563C]
+	lea	player_2_score_6179,a2                	| [$5619: ld   ix,player_2_score_6179]
+	move.w	#0x9061,d6                      	| [$561d: ld   hl,$9061]
+	jbsr	write_numeric_value_3_bytes_563C                            	| [$5620: call $563C]
+	lea	time_61E8,a2                   	| [$5623: ld   ix,time_61E8]
+	move.w	#0x9201,d6                      	| [$5627: ld   hl,$9201]
+	moveq	#0x01,d1                        	| [$562a: ld   b,$01]
+	jbsr	write_numeric_value_1_byte_5641                            	| [$562c: call $5641]
+	lea	unknown_61E9,a2                	| [$562f: ld   ix,unknown_61E9]
+	move.w	#0x91C1,d6                     	| [$5633: ld   hl,$91C1]
+	moveq	#0x01,d1                        	| [$5636: ld   b,$01]
+	jbsr	write_numeric_value_1_byte_5641                            	| [$5638: call $5641]
+	rts                                    	| [$563b: ret]
 
 write_numeric_value_3_bytes_563C:
-	move.b	#0x03,d1                        	| [$$563c: ld   b,$$03]
-	move.w	#0x0020,d3                      	| [$$563e: ld   de,$$0020] 32
-l_5641:
-	move.b	(A2),d0                    	| [$$5641: ld   a,(ix+$$00)]
-	jbsr	write_byte_value_564D             	| [$$5644: call write_byte_value_564D]
-	addq.w	#1,a2                           	| [$$5647: inc  ix]
-                  ^^^^^^ TODO: review move.w into address register
-	add.w	d3,a0                            	| [$$5649: add  hl,de]
-                  ^^^^^^ TODO: review move.w into address register
-  ^^^^ TODO: review d3 computation above
-	subq.b	#1,d1                           	| [...]
-	jne	l_5641                             	| [$$564a: djnz $$5641]
-	rts                                    	| [$$564c: ret]
+	moveq	#3,d1                        	| [$563c: ld   b,$03]
+write_numeric_value_1_byte_5641:
+	move.w	#0x0020,d3                      	| [$563e: ld   de,$0020] 32
+	subq.w	#1,d1
+0:
+	move.b	(a2)+,d0                    	| [$5641: ld   a,(ix+$00)]
 
 write_byte_value_564D:
-	move.w	d0,-(sp)                        	| [$$564d: push af]
-	and.b	#0x0F,d0                         	| [$$564e: and  $$0F]
-	move.b	d0,(a0)                         	| [$$5650: ld   (hl),a]
-	add.w	d3,a0                            	| [$$5651: add  hl,de]
-                  ^^^^^^ TODO: review move.w into address register
-  ^^^^ TODO: review d3 computation above
-	move.w	(sp)+,d0                        	| [$$5652: pop  af]
-	ror.b	#4,d0                            	| [$$5653: rrc  a] * 4
-	and.b	#0x0F,d0                         	| [$$565b: and  $$0F]
-	move.b	d0,(a0)                         	| [$$565d: ld   (hl),a]
-	rts                                    	| [$$565e: ret]
+	move.w	d0,-(sp)                        	| [$564d: push af]
+	and.b	#0x0F,d0                         	| [$564e: and  $0F]
+	jbsr	osd_w_videoram                         	| [$5650: ld   (hl),a]
+	add.w	d3,d6                            	| [$5651: add  hl,de]
+	move.w	(sp)+,d0                        	| [$5652: pop  af]
+	ror.b	#4,d0                            	| [$5653: rrc  a] * 4
+	and.b	#0x0F,d0                         	| [$565b: and  $0F]
+	jbsr	osd_w_videoram                         	| [$565d: ld   (hl),a]
+											| [$5647: inc  ix]
+	add.w	d3,d6                            	| [$5649: add  hl,de]
+	dbf		d1,0b                             	| [$564a: djnz $5641]
+	rts                                    	| [$564c: ret]
 
 
 
+ * in:	 d6 contains 16 bit hex value of the points to add
+ * $100 for 100 points, $500 for 500 etc...
 add_to_score_5C90:
-	move.b	gameplay_allowed_6054,d0        	| [$$5c90: ld   a,(gameplay_allowed_6054)]
-	cmp.b	#0x00,d0                         	| [$$5c93: cp   $$00]
-	bne.b	0f                               	| [...]
-	rts                                    	| [$$5c95: ret  z] [...]
+	move.b	gameplay_allowed_6054,d0        	| [$5c90: ld   a,(gameplay_allowed_6054)]
+	                         	| [$5c93: cp   $00]
+	bne.b	0f
+	rts                                    	| [$5c95: ret  z]
 0:
-	jbsr	l_5500                            	| [$$5c96: call $$5500]
-	rts                                    	| [$$5c99: ret]
-	jra	l_5e46                             	| [$$5c9a: jp   $$5E46]
-	cmp.b	#0x01,d0                         	| [$$5c9d: cp   $$01]
-	bne.b	0f                               	| [...]
-	rts                                    	| [$$5c9f: ret  z] [...]
+	jra	really_add_to_score_5500                            	| [$5c96: call $5500]
+	                                    	| [$5c99: ret]
+
+l_5c9a:
+	jra	l_5e46                             	| [$5c9a: jp   $5E46]
+
+l_5ca0:
+	lea	game_mem+0x5D44,a2                      	| [$5ca0: ld   ix,$5D44]
+	lea	player_struct_6580,a3          	| [$5ca4: ld   iy,player_struct_6580]
+	move.w	#0x0004,d3                      	| [$5ca8: ld   de,$0004] 4
+	move.b	unknown_6288,d0                 	| [$5cab: ld   a,(unknown_6288)]
+	                         	| [$5cae: cp   $00]
+	bne.b	0f
+	jbsr	l_5d2a                            	| [$5cb0: call z,$5D2A]
 0:
-	lea	game_mem+0x5D44,a2                      	| [$$5ca0: ld   ix,$$5D44]
-	lea	player_struct_6580,a3          	| [$$5ca4: ld   iy,player_struct_6580]
-	move.w	#0x0004,d3                      	| [$$5ca8: ld   de,$$0004] 4
-	move.b	unknown_6288,d0                 	| [$$5cab: ld   a,(unknown_6288)]
-	cmp.b	#0x00,d0                         	| [$$5cae: cp   $$00]
-	bne.b	0f                               	| [...]
-	jbsr	l_5d2a                            	| [$$5cb0: call z,$$5D2A]
-0:
-	move.b	unknown_6288,d0                 	| [$$5cb3: ld   a,(unknown_6288)]
+	move.b	unknown_6288,d0                 	| [$5cb3: ld   a,(unknown_6288)]
 l_5cb6:
-	cmp.b	#0x00,d0                         	| [$$5cb6: cp   $$00]
-	jeq	l_5cbf                             	| [$$5cb8: jr   z,$$5CBF]
-	add.w	d3,a2                            	| [$$5cba: add  ix,de]
-                  ^^^^^^ TODO: review move.w into address register
-  ^^^^ TODO: review d3 computation above
-	subq.b	#1,d0                           	| [$$5cbc: dec  a]
-	jra	l_5cb6                             	| [$$5cbd: jr   $$5CB6]
+	                         	| [$5cb6: cp   $00]
+	jeq	l_5cbf                             	| [$5cb8: jr   z,$5CBF]
+	add.w	d3,a2                            	| [$5cba: add  ix,de]
+	subq.b	#1,d0                           	| [$5cbc: dec  a]
+	jra	l_5cb6                             	| [$5cbd: jr   $5CB6]
 l_5cbf:
-	move.b	(0x03,a2),d0                    	| [$$5cbf: ld   a,(ix+$$03)]
-	cmp.b	#0xFF,d0                         	| [$$5cc2: cp   $$FF]
-	jeq	l_5d02                             	| [$$5cc4: jr   z,$$5D02]
-	cmp.b	#0xFE,d0                         	| [$$5cc6: cp   $$FE]
-	jeq	l_5d1c                             	| [$$5cc8: jp   z,$$5D1C]
-	move.b	d0,d1                           	| [$$5ccb: ld   b,a]
-	move.b	player_input_6026,d0            	| [$$5ccc: ld   a,(player_input_6026)]
-	and.b	#0x07,d0                         	| [$$5ccf: and  $$07]
-	or.b	d1,d0                             	| [$$5cd1: or   b]
-	move.b	d0,player_input_6026            	| [$$5cd2: ld   (player_input_6026),a]
-	move.b	(0x02,a3),d0                    	| [$$5cd5: ld   a,(iy+$$02)]
-	cmp.b	(A2),d0                     	| [$$5cd8: cp   (ix+$$00)]
-	beq.b	0f                               	| [...]
-	rts                                    	| [$$5cdb: ret  nz] [...]
+	move.b	(0x03,a2),d0                    	| [$5cbf: ld   a,(ix+$03)]
+	cmp.b	#0xFF,d0                         	| [$5cc2: cp   $FF]
+	jeq	l_5d02                             	| [$5cc4: jr   z,$5D02]
+	cmp.b	#0xFE,d0                         	| [$5cc6: cp   $FE]
+	jeq	l_5d1c                             	| [$5cc8: jp   z,$5D1C]
+	move.b	d0,d1                           	| [$5ccb: ld   b,a]
+	move.b	player_input_6026,d0            	| [$5ccc: ld   a,(player_input_6026)]
+	and.b	#0x07,d0                         	| [$5ccf: and  $07]
+	or.b	d1,d0                             	| [$5cd1: or   b]
+	move.b	d0,player_input_6026            	| [$5cd2: ld   (player_input_6026),a]
+	move.b	(0x02,a3),d0                    	| [$5cd5: ld   a,(iy+$02)]
+	cmp.b	(A2),d0                     	| [$5cd8: cp   (ix+$00)]
+	beq.b	0f                               	| [$5cdb: ret  nz] [...]
+	rts                                    	| [$5cdb: ret  nz]
 0:
-	move.b	(0x03,a3),d0                    	| [$$5cdc: ld   a,(iy+$$03)]
-	cmp.b	(0x01,a2),d0                     	| [$$5cdf: cp   (ix+$$01)]
-	beq.b	0f                               	| [...]
-	rts                                    	| [$$5ce2: ret  nz] [...]
+	move.b	(0x03,a3),d0                    	| [$5cdc: ld   a,(iy+$03)]
+	cmp.b	(0x01,a2),d0                     	| [$5cdf: cp   (ix+$01)]
+	beq.b	0f                               	| [$5ce2: ret  nz] [...]
+	rts                                    	| [$5ce2: ret  nz]
 0:
-	move.b	player_screen_600D,d0           	| [$$5ce3: ld   a,(player_screen_600D)]
-	cmp.b	(0x02,a2),d0                     	| [$$5ce6: cp   (ix+$$02)]
-	beq.b	0f                               	| [...]
-	rts                                    	| [$$5ce9: ret  nz] [...]
+	move.b	player_screen_600D,d0           	| [$5ce3: ld   a,(player_screen_600D)]
+	cmp.b	(0x02,a2),d0                     	| [$5ce6: cp   (ix+$02)]
+	beq.b	0f                               	| [$5ce9: ret  nz] [...]
+	rts                                    	| [$5ce9: ret  nz]
 0:
 l_5cea:
-	move.b	unknown_6288,d0                 	| [$$5cea: ld   a,(unknown_6288)]
-	addq.b	#1,d0                           	| [$$5ced: inc  a]
-	move.b	d0,unknown_6288                 	| [$$5cee: ld   (unknown_6288),a]
-	move.b	player_input_6026,d0            	| [$$5cf1: ld   a,(player_input_6026)]
-	and.b	#0x80,d0                         	| [$$5cf4: and  $$80]
-	cmp.b	#0x80,d0                         	| [$$5cf6: cp   $$80]
-	bne.b	0f                               	| [...]
-	rts                                    	| [$$5cf8: ret  z] [...]
+	move.b	unknown_6288,d0                 	| [$5cea: ld   a,(unknown_6288)]
+	addq.b	#1,d0                           	| [$5ced: inc  a]
+	move.b	d0,unknown_6288                 	| [$5cee: ld   (unknown_6288),a]
+	move.b	player_input_6026,d0            	| [$5cf1: ld   a,(player_input_6026)]
+	and.b	#0x80,d0                         	| [$5cf4: and  $80]
+	cmp.b	#0x80,d0                         	| [$5cf6: cp   $80]
+	bne.b	0f                               	| [$5cf8: ret  z] [...]
+	rts                                    	| [$5cf8: ret  z]
 0:
-	move.b	player_input_6026,d0            	| [$$5cf9: ld   a,(player_input_6026)]
-	and.b	#0x07,d0                         	| [$$5cfc: and  $$07]
-	move.b	d0,player_input_6026            	| [$$5cfe: ld   (player_input_6026),a]
-	rts                                    	| [$$5d01: ret]
+	move.b	player_input_6026,d0            	| [$5cf9: ld   a,(player_input_6026)]
+	and.b	#0x07,d0                         	| [$5cfc: and  $07]
+	move.b	d0,player_input_6026            	| [$5cfe: ld   (player_input_6026),a]
+	rts                                    	| [$5d01: ret]
 l_5d02:
-	move.b	#0x10,d0                        	| [$$5d02: ld   a,$$10]
-	move.b	d0,guard_1_y_6597               	| [$$5d04: ld   (guard_1_y_6597),a]
-	move.b	d0,guard_2_y_659B               	| [$$5d07: ld   (guard_2_y_659B),a]
-	move.b	#0xD0,d0                        	| [$$5d0a: ld   a,$$D0]
-	move.b	d0,guard_1_x_6596               	| [$$5d0c: ld   (guard_1_x_6596),a]
-	move.b	#0xE0,d0                        	| [$$5d0f: ld   a,$$E0]
-	jra	l_5e38                             	| [$$5d11: jp   $$5E38]
-	move.b	elevator_y_current_screen_6587,d0	| [$$5d14: ld   a,(elevator_y_current_screen_6587)]
-	cmp.b	#0x11,d0                         	| [$$5d17: cp   $$11]
-	beq.b	0f                               	| [...]
-	rts                                    	| [$$5d19: ret  nz] [...]
+	move.b	#0x10,d0                        	| [$5d02: ld   a,$10]
+	move.b	d0,guard_1_y_6597               	| [$5d04: ld   (guard_1_y_6597),a]
+	move.b	d0,guard_2_y_659B               	| [$5d07: ld   (guard_2_y_659B),a]
+	move.b	#0xD0,d0                        	| [$5d0a: ld   a,$D0]
+	move.b	d0,guard_1_x_6596               	| [$5d0c: ld   (guard_1_x_6596),a]
+	move.b	#0xE0,d0                        	| [$5d0f: ld   a,$E0]
+	jra	l_5e38                             	| [$5d11: jp   $5E38]
+l_5d14:
+	move.b	elevator_y_current_screen_6587,d0	| [$5d14: ld   a,(elevator_y_current_screen_6587)]
+	cmp.b	#0x11,d0                         	| [$5d17: cp   $11]  max height for elevator
+	beq.b	0f                               	| [$5d19: ret  nz] [...]
+	rts                                    	| [$5d19: ret  nz]
 0:
-	jra	l_5cea                             	| [$$5d1a: jr   $$5CEA]
+	jra	l_5cea                             	| [$5d1a: jr   $5CEA]
 l_5d1c:
-	move.b	wagon_data_658A,d0              	| [$$5d1c: ld   a,(wagon_data_658A)]
-	cmp.b	#0x7F,d0                         	| [$$5d1f: cp   $$7F]
-	beq.b	0f                               	| [...]
-	rts                                    	| [$$5d21: ret  nz] [...]
+	move.b	wagon_data_658A,d0              	| [$5d1c: ld   a,(wagon_data_658A)]
+	cmp.b	#0x7F,d0                         	| [$5d1f: cp   $7F]
+	beq.b	0f                               	| [$5d21: ret  nz] [...]
+	rts                                    	| [$5d21: ret  nz]
 0:
-	move.b	unknown_6019,d0                 	| [$$5d22: ld   a,(unknown_6019)]
-	cmp.b	#0x01,d0                         	| [$$5d25: cp   $$01]
-	beq.b	0f                               	| [...]
-	rts                                    	| [$$5d27: ret  nz] [...]
+	move.b	unknown_6019,d0                 	| [$5d22: ld   a,(unknown_6019)]
+	cmp.b	#0x01,d0                         	| [$5d25: cp   $01]
+	beq.b	0f                               	| [$5d27: ret  nz] [...]
+	rts                                    	| [$5d27: ret  nz]
 0:
-	jra	l_5cea                             	| [$$5d28: jr   $$5CEA]
+	jra	l_5cea                             	| [$5d28: jr   $5CEA]
 l_5d2a:
-	move.w	#0x91C2,d6                      	| [$$5d2a: ld   hl,$$91C2]
-	move.b	a0,barrow_screen_params_61C4    	| [$$5d2d: ld   (barrow_screen_params_61C4),hl]
-	move.b	a0,unknown_screen_address_61FA  	| [$$5d30: ld   (unknown_screen_address_61FA),hl]
-	move.b	#0x01,d0                        	| [$$5d33: ld   a,$$01]
-	move.b	d0,barrow_screen_61C6           	| [$$5d35: ld   (barrow_screen_61C6),a]
-	move.b	d0,unknown_61FC                 	| [$$5d38: ld   (unknown_61FC),a]
-	move.b	#0x03,d0                        	| [$$5d3b: ld   a,$$03]
-	move.b	d0,guard_1_screen_6099          	| [$$5d3d: ld   (guard_1_screen_6099),a]
-	move.b	d0,guard_2_screen_609A          	| [$$5d40: ld   (guard_2_screen_609A),a]
-	rts                                    	| [$$5d43: ret]
+	move.w	#0x91C2,d6                      	| [$5d2a: ld   hl,$91C2]
+	move.w	d6,barrow_screen_params_61C4	| [$5d2d: ld   (barrow_screen_params_61C4),hl]
+	move.w	d6,unknown_screen_address_61FA  	| [$5d30: ld   (unknown_screen_address_61FA),hl]
+	move.b	#0x01,d0                        	| [$5d33: ld   a,$01]
+	move.b	d0,barrow_screen_61C6                 	| [$5d35: ld   (barrow_screen_61C6),a]
+	move.b	d0,unknown_61FC                 	| [$5d38: ld   (unknown_61FC),a]
+ * make guards start at 3rd screen
+	move.b	#0x03,d0                        	| [$5d3b: ld   a,$03]
+	move.b	d0,guard_1_screen_6099          	| [$5d3d: ld   (guard_1_screen_6099),a]
+	move.b	d0,guard_2_screen_609A          	| [$5d40: ld   (guard_2_screen_609A),a]
+	rts                                    	| [$5d43: ret]
 
 startup_C000:
 	jra	l_c382                             	| [$$c000: jp   $$C382]
 l_c003:
 	jra	l_c393                             	| [$$c003: jp   $$C393]
 l_c006:
-ld   sp,stack_top_67F0
+	lea	stack_top_67F0,sp					| ld   sp,stack_top_67F0
 	move.b	#0x3F,d0                        	| [$$c009: ld   a,$$3F]
 	jbsr	change_attribute_everywhere_C3A3  	| [$$c00b: call change_attribute_everywhere_C3A3]
 	jbsr	clear_screen_C3B7                 	| [$$c00e: call clear_screen_C3B7]
-	move.b	#0x01,d0                        	| [$$c011: ld   a,$$01]
-	move.b	d0,0xA003                       	| [$$c013: ld   ($$A003),a]
-          ^^^^^^ TODO: review absolute 16-bit address write
+	jbsr	osd_enable_display                       	| [$$c011: ld   a,$$01]
+		                       	| [$$c013: ld   ($$A003),a]
 	lea	game_mem+0x1A8C,a0                      	| [$$c016: ld   hl,$$1A8C]
 	lea	high_score_table_6217,a1       	| [$$c019: ld   de,high_score_table_6217]
-	move.b	#0x00,d1                        	| [$$c01c: ld   bc,$$0050] 80
-	move.b	#0x50,d2                        	| [$$c01c: ld   bc,$$0050] 80
+	move.w	#0x50,d1                        	| [$$c01c: ld   bc,$$0050] 80
 	jbsr	ldir                              	| [$$c01f: ldir]
-     ^^^^ TODO: review special instruction inputs
-	lea	game_mem+0x5B68,a0                      	| [$$c021: ld   hl,$$5B68]
-	move.b	a0,ay_sound_pointer_6140        	| [$$c024: ld   (ay_sound_pointer_6140),hl]
-	clr.b	d0                               	| [$$c027: xor  a]
-	move.b	d0,ay_sound_start_6142          	| [$$c028: ld   (ay_sound_start_6142),a]
+
+	lea	high_score_table_6217,a0
+	jbsr	osd_read_high_scores
+
+												| [$$c021: ld   hl,$$5B68]
+											| [$$c024: ld   (ay_sound_pointer_6140),hl]
+												| [$$c027: xor  a]
+											| [$$c028: ld   (ay_sound_start_6142),a]
 	jra	l_ecc1                             	| [$$c02b: jp   $$ECC1]
 l_c02e:
 	move.b	must_play_music_6210,d0         	| [$$c02e: ld   a,(must_play_music_6210)]
@@ -4124,8 +4129,8 @@ l_c02e:
 	bcc.b	0f                               	| [...]
 	jbsr	l_c07c                            	| [$$c03f: call c,$$C07C]
 0:
-	clr.b	d0                               	| [$$c042: xor  a]
-	move.b	d0,flash_counter_626D           	| [$$c043: ld   (flash_counter_626D),a]
+                              	| [$$c042: xor  a]
+	clr.b	flash_counter_626D           	| [$$c043: ld   (flash_counter_626D),a]
 	rts                                    	| [$$c046: ret]
 l_c047:
 	move.b	unknown_626E,d0                 	| [$$c047: ld   a,(unknown_626E)]
@@ -4184,23 +4189,23 @@ l_c098:
 check_blocked_by_breakable_wall_C0A4:
 	movem.w	d1/d2,-(sp)                    	| [$$c0a4: push bc]
 
-	move.l	a0,-(sp)                        	| [$$c0a5: push hl]
-	movem.w	d3/d4,-(sp)                    	| [$$c0a6: push de]
-	move.l	a1,-(sp)                        	| [$$c0a6: push de]
+	movem.w	d3/d4/d6,-(sp)                        	| [$$c0a5: push hl]
+	                    	| [$$c0a6: push de]
+	                       	| [$$c0a6: push de]
 	clr.b	d0                               	| [$$c0a7: xor  a]
 	move.b	d0,way_clear_flag_600B          	| [$$c0a8: ld   (way_clear_flag_600B),a]
-	lea	game_mem+0x35D5,a1                      	| [$$c0ab: ld   de,$$35D5]
-	sub.w	d3,d5                            	| [$$c0ae: sbc  hl,de]
-     ^^^^ TODO: review compared/subbed registers
+	                      	| [$$c0ab: ld   de,$$35D5]
+	cmp.w	#0x35D5,d6                            	| [$$c0ae: sbc  hl,de]
+
 	jne	l_c0bc                             	| [$$c0b0: jr   nz,$$C0BC]
-	jbsr	l_c0df                            	| [$$c0b2: call $$C0DF]
+	jbsr	check_breakable_wall_present_c0df                            	| [$$c0b2: call $$C0DF]
 	jeq	l_c0bc                             	| [$$c0b5: jr   z,$$C0BC]
 	move.b	#0x02,d0                        	| [$$c0b7: ld   a,$$02]
 	move.b	d0,way_clear_flag_600B          	| [$$c0b9: ld   (way_clear_flag_600B),a]
 l_c0bc:
-	move.l	(sp)+,a1                        	| [$$c0bc: pop  de]
-	movem.w	(sp)+,d3/d4                    	| [$$c0bc: pop  de]
-	move.l	(sp)+,a0                        	| [$$c0bd: pop  hl]
+	movem.w	(sp)+,d3/d4/d6                        	| [$$c0bc: pop  de]
+	                    	| [$$c0bc: pop  de]
+	                        	| [$$c0bd: pop  hl]
 
 	movem.w	(sp)+,d1/d2                    	| [$$c0be: pop  bc]
 	rts                                    	| [$$c0bf: ret]
@@ -4208,31 +4213,38 @@ l_c0bc:
 check_breakable_wall_C0C0:
 	movem.w	d1/d2,-(sp)                    	| [$$c0c0: push bc]
 
-	move.l	a0,-(sp)                        	| [$$c0c1: push hl]
+                        	| [$$c0c1: push hl]
 	movem.w	d3/d4,-(sp)                    	| [$$c0c2: push de]
-	move.l	a1,-(sp)                        	| [$$c0c2: push de]
-	clr.b	d0                               	| [$$c0c3: xor  a]
-	move.b	d0,way_clear_flag_600B          	| [$$c0c4: ld   (way_clear_flag_600B),a]
-	lea	game_mem+0x3615,a1                      	| [$$c0c7: ld   de,$$3615]
-	sub.w	d3,d5                            	| [$$c0ca: sbc  hl,de]
-     ^^^^ TODO: review compared/subbed registers
+                        	| [$$c0c2: push de]
+                              	| [$$c0c3: xor  a]
+	clr.b	way_clear_flag_600B          	| [$$c0c4: ld   (way_clear_flag_600B),a]
+                     	| [$$c0c7: ld   de,$$3615]
+* logical address of the breakable wall (the only place
+* where wall needs to be checked is there)
+	cmp.w	#0x3615,d6                            	| [$$c0ca: sbc  hl,de]
+
 	jne	l_c0d8                             	| [$$c0cc: jr   nz,$$C0D8]
-	jbsr	l_c0df                            	| [$$c0ce: call $$C0DF]
+	jbsr	check_breakable_wall_present_c0df                            	| [$$c0ce: call $$C0DF]
 	jeq	l_c0d8                             	| [$$c0d1: jr   z,$$C0D8]
 	move.b	#0x02,d0                        	| [$$c0d3: ld   a,$$02]
 	move.b	d0,way_clear_flag_600B          	| [$$c0d5: ld   (way_clear_flag_600B),a]
 l_c0d8:
-	move.l	(sp)+,a1                        	| [$$c0d8: pop  de]
+                   	| [$$c0d8: pop  de]
 	movem.w	(sp)+,d3/d4                    	| [$$c0d8: pop  de]
-	move.l	(sp)+,a0                        	| [$$c0d9: pop  hl]
+                 	| [$$c0d9: pop  hl]
 
 	movem.w	(sp)+,d1/d2                    	| [$$c0da: pop  bc]
 	rts                                    	| [$$c0db: ret]
 l_c0dc:
-	move.l	(sp)+,a1                        	| [$$c0dc: pop  de]
+	                        	| [$$c0dc: pop  de]
 	movem.w	(sp)+,d3/d4                    	| [$$c0dc: pop  de]
 	jra	l_c0d8                             	| [$$c0dd: jr   $$C0D8]
-l_c0df:
+
+* all map walls are checked using ROM
+* but this one needs to be checked in RAM
+* as this wall can be broken
+
+check_breakable_wall_present_c0df:
 	move.b	player_screen_600D,d0           	| [$$c0df: ld   a,(player_screen_600D)]
 	cmp.b	#0x05,d0                         	| [$$c0e2: cp   $$05]
 	jne	l_c0dc                             	| [$$c0e4: jr   nz,$$C0DC]
@@ -4252,22 +4264,21 @@ l_c0f3:
 	move.b	d0,d2                           	| [$$c100: ld   c,a]
 	move.b	#0x08,d1                        	| [$$c101: ld   b,$$08]
 l_c103:
-	move.b	(a1),d0                         	| [$$c103: ld   a,(de)]
+	move.b	(a1)+,d0                         	| [$$c103: ld   a,(de)]
 	cmp.b	d2,d0                            	| [$$c104: cp   c]
 	jeq	l_c11b                             	| [$$c105: jr   z,$$C11B]
-	addq.w	#1,a1                           	| [$$c107: inc  de]
+	                           	| [$$c107: inc  de]
 	addq.w	#1,a3                           	| [$$c108: inc  iy]
 	subq.b	#1,d1                           	| [...]
 	jne	l_c103                             	| [$$c10a: djnz $$C103]
 
 	movem.w	(sp)+,d1/d2                    	| [$$c10c: pop  bc]
 l_c10d:
-	addq.w	#1,a4                           	| [$$c10d: inc  bc]
-                  ^^^^^^ TODO: review move.w into address register
-	move.b	(a4),d0                         	| [$$c10e: ld   a,(bc)]
-	addq.b	#1,d0                           	| [$$c10f: inc  a]
-	move.b	d0,(a4)                         	| [$$c110: ld   (bc),a]
-	subq.w	#1,a4                           	| [$$c111: dec  bc]
+	                           	| [$$c10d: inc  bc]
+	                         	| [$$c10e: ld   a,(bc)]
+	addq.b	#1,(1,a4)                           	| [$$c10f: inc  a]
+	                         	| [$$c110: ld   (bc),a]
+	                           	| [$$c111: dec  bc]
 	cmp.b	#0x03,d0                         	| [$$c112: cp   $$03]
 	bcc.b	0f                               	| [...]
 	rts                                    	| [$$c114: ret  c] [...]
@@ -4299,7 +4310,7 @@ l_c12a:
 	jbsr	l_c16d                            	| [$$c12e: call $$C16D]
 	move.b	d1,d0                           	| [$$c131: ld   a,b]
 	move.b	d0,unknown_600C                 	| [$$c132: ld   (unknown_600C),a]
-	cmp.b	#0x00,d0                         	| [$$c135: cp   $$00]
+	                         	| [$$c135: cp   $$00]
 	bne.b	0f                               	| [...]
 	rts                                    	| [$$c137: ret  z] [...]
 0:
@@ -4308,19 +4319,19 @@ l_c12a:
 	bne.b	0f                               	| [...]
 	rts                                    	| [$$c13d: ret  z] [...]
 0:
-	move.b	(a0),d0                         	| [$$c13e: ld   a,(hl)]
+	bsr		read_rom                         	| [$$c13e: ld   a,(hl)]
 	cmp.b	#0x51,d0                         	| [$$c13f: cp   $$51]
 	jeq	l_c14f                             	| [$$c141: jr   z,$$C14F]
 	move.b	d0,d2                           	| [$$c143: ld   c,a]
 	lea	game_mem+0x19E8,a1                      	| [$$c144: ld   de,$$19E8]
 	move.b	#0x30,d1                        	| [$$c147: ld   b,$$30]
 l_c149:
-	move.b	(a1),d0                         	| [$$c149: ld   a,(de)]
+	move.b	(a1)+,d0                         	| [$$c149: ld   a,(de)]
 	cmp.b	d2,d0                            	| [$$c14a: cp   c]
 	bne.b	0f                               	| [...]
 	rts                                    	| [$$c14b: ret  z] [...]
 0:
-	addq.w	#1,a1                           	| [$$c14c: inc  de]
+	                           	| [$$c14c: inc  de]
 	subq.b	#1,d1                           	| [...]
 	jne	l_c149                             	| [$$c14d: djnz $$C149]
 l_c14f:
@@ -4345,25 +4356,27 @@ l_c16d:
 	move.b	(0x03,a2),d0                    	| [$$c16d: ld   a,(ix+$$03)]
 	rol.b	#5,d0                            	| [$$c170: rlc  a] * 5
 	clr.b	d1                               	| [$$c17a: ld   b,$$00]
-	rol.b	#1,d0                            	| [$$c17c: rlc  a]
+	CLEAR_XC_FLAG
+	roxl.b	#1,d0                            	| [$$c17c: rlc  a]
 	roxl.b	#1,d1                           	| [$$c17e: rl   b]
-      ^^^^^^ TODO: review cpu X flag
-	rol.b	#1,d0                            	| [$$c180: rlc  a]
+	roxl.b	#1,d0                            	| [$$c180: rlc  a]
 	roxl.b	#1,d1                           	| [$$c182: rl   b]
-      ^^^^^^ TODO: review cpu X flag
-	rol.b	#1,d0                            	| [$$c184: rlc  a]
+	roxl.b	#1,d0                            	| [$$c184: rlc  a]
 	roxl.b	#1,d1                           	| [$$c186: rl   b]
-      ^^^^^^ TODO: review cpu X flag
 	rts                                    	| [$$c188: ret]
-l_c189:
+display_screen_x_c189:
 	jbsr	l_c3cd                            	| [$$c189: call $$C3CD]
 	move.b	#0x3F,d0                        	| [$$c18c: ld   a,$$3F]
 	jbsr	change_attribute_everywhere_C3A3  	| [$$c18e: call change_attribute_everywhere_C3A3]
 	            	| [$$c191: ld   a,(io_read_shit_B800)]
 	lea	game_mem+0x3400,a0                      	| [$$c194: ld   hl,$$3400]
-	lea	l_9000,a1                      	| [$$c197: ld   de,$$9000]
-	move.w	#0x04,d1                        	| [$$c19a: ld   bc,$$0400] 1024
-	jbsr	ldir                              	| [$$c19d: ldir]
+	move.w	#0x9000,d6                      	| [$$c197: ld   de,$$9000]
+	move.w	#0x400-1,d1                        	| [$$c19a: ld   bc,$$0400] 1024
+0:
+	move.b	(a0)+,d0
+	jbsr	osd_w_videoram
+	addq.w	#1,d6
+	dbf		d1,0b   | [$2673: ldir]
 	move.w	#0x9882,d6                      	| [$$c19f: ld   hl,$$9882]
 	move.b	#0x06,d1                        	| [$$c1a2: ld   b,$$06]
 	jbsr	l_c361                            	| [$$c1a4: call $$C361]
@@ -4372,10 +4385,10 @@ l_c189:
 	jbsr	l_c30e                            	| [$$c1ad: call $$C30E]
 	            	| [$$c1b0: ld   a,(io_read_shit_B800)]
 	jbsr	l_f8de                            	| [$$c1b3: call $$F8DE]
-	jbsr	l_ca7e                            	| [$$c1b6: call $$CA7E]
+	jbsr	display_player_1_and_2_text_ca7e                            	| [$$c1b6: call $$CA7E]
 	jbsr	l_d0f3                            	| [$$c1b9: call $$D0F3]
 	move.b	#0x63,d0                        	| [$$c1bc: ld   a,$$63]
-out  ($$58),a
+**out  ($$58),a
 	rts                                    	| [$$c1c0: ret]
 l_c1c1:
 	jbsr	l_c3cd                            	| [$$c1c1: call $$C3CD]
@@ -4383,10 +4396,15 @@ l_c1c1:
 	jbsr	change_attribute_everywhere_C3A3  	| [$$c1c6: call change_attribute_everywhere_C3A3]
 	            	| [$$c1c9: ld   a,(io_read_shit_B800)]
 	lea	game_mem+0x3000,a0                      	| [$$c1cc: ld   hl,$$3000]
-	lea	l_9000,a1                      	| [$$c1cf: ld   de,$$9000]
-	move.w	#0x04,d1                        	| [$$c1d2: ld   bc,$$0400] 1024
-								| [$$c1d2: ld   bc,$$0400] 1024
-	jbsr	ldir                              	| [$$c1d5: ldir]
+	move.w	#0x9000,d6                      	| [$$c1cf: ld   de,$$9000]
+	move.w	#0x400-1,d1                        	| [$$c1d2: ld   bc,$$0400] 1024
+0:
+	move.b	(a0)+,d0
+	jbsr	osd_w_videoram
+	addq.w	#1,d6
+	dbf		d1,0b   | [$c1d5: ldir]
+							
+
 	move.w	#0x9302,d6                      	| [$$c1d7: ld   hl,$$9302]
 	jbsr	l_c338                            	| [$$c1da: call $$C338]
 	move.w	#0x9862,d6                      	| [$$c1dd: ld   hl,$$9862]
@@ -4412,18 +4430,22 @@ l_c1c1:
 	                           	| [$$c203: inc  hl]
 	            	| [$$c204: ld   a,(io_read_shit_B800)]
 	jbsr	l_f8de                            	| [$$c207: call $$F8DE]
-	jbsr	l_ca7e                            	| [$$c20a: call $$CA7E]
+	jbsr	display_player_1_and_2_text_ca7e                            	| [$$c20a: call $$CA7E]
 	rts                                    	| [$$c20d: ret]
-l_c20e:
+display_screen_3_c20e:
 	jbsr	l_c3cd                            	| [$$c20e: call $$C3CD]
 	move.b	#0x3F,d0                        	| [$$c211: ld   a,$$3F]
 	jbsr	change_attribute_everywhere_C3A3  	| [$$c213: call change_attribute_everywhere_C3A3]
 	            	| [$$c216: ld   a,(io_read_shit_B800)]
 	lea	game_mem+0x4800,a0                      	| [$$c219: ld   hl,$$4800]
-	lea	l_9000,a1                      	| [$$c21c: ld   de,$$9000]
-	move.w	#0x04,d1                        	| [$$c21f: ld   bc,$$0400] 1024
-	jbsr	ldir                              	| [$$c222: ldir]
-     ^^^^ TODO: review special instruction inputs
+	move.w	#0x9000,d6                      	| [$$c21c: ld   de,$$9000]
+	move.w	#0x0400-1,d1                        	| [$$c21f: ld   bc,$$0400] 1024
+                    	| [$$c222: ldir]
+0:
+	move.b	(a0)+,d0
+	jbsr	osd_w_videoram
+	addq.w	#1,d6
+	dbf		d1,0b
 	move.w	#0x9362,d6                      	| [$$c224: ld   hl,$$9362]
 	jbsr	l_c338                            	| [$$c227: call $$C338]
 	move.w	#0x9842,d6                      	| [$$c22a: ld   hl,$$9842]
@@ -4441,7 +4463,7 @@ l_c20e:
  	jbsr	l_d0dd                            	| [$$c247: call $$D0DD]
 	            	| [$$c24a: ld   a,(io_read_shit_B800)]
 	jbsr	osd_read_dipswitches                       	| [$$c24d: ld   a,($$B000)]
-       ^^^^^^ TODO: review absolute 16-bit address read
+
 	and.b	#0x20,d0                         	| [$$c250: and  $$20]
 	cmp.b	#0x20,d0                         	| [$$c252: cp   $$20]
 	jne	l_c265                             	| [$$c254: jr   nz,$$C265]
@@ -4451,16 +4473,14 @@ l_c20e:
 l_c25d:
 	jbsr	osd_w_videoram                         	| [$$c25d: ld   (hl),a]
 	move.w	#0x0020,d3                      	| [$$c25e: ld   de,$$0020] 32
-	add.w	d3,a0                            	| [$$c261: add  hl,de]
-                  ^^^^^^ TODO: review move.w into address register
-  ^^^^ TODO: review d3 computation above
+	add.w	d3,d6                            	| [$$c261: add  hl,de]
 	addq.b	#1,d0                           	| [$$c262: inc  a]
 	subq.b	#1,d1                           	| [...]
 	jne	l_c25d                             	| [$$c263: djnz $$C25D]
 l_c265:
 	jbsr	l_c30e                            	| [$$c265: call $$C30E]
 	jbsr	l_f8de                            	| [$$c268: call $$F8DE]
-	jbsr	l_ca7e                            	| [$$c26b: call $$CA7E]
+	jbsr	display_player_1_and_2_text_ca7e                            	| [$$c26b: call $$CA7E]
 	jbsr	l_d0f3                            	| [$$c26e: call $$D0F3]
 	rts                                    	| [$$c271: ret]
 l_c272:
@@ -4469,11 +4489,16 @@ l_c272:
 	jbsr	change_attribute_everywhere_C3A3  	| [$$c277: call change_attribute_everywhere_C3A3]
 	            	| [$$c27a: ld   a,(io_read_shit_B800)]
 	lea	game_mem+0x4400,a0                      	| [$$c27d: ld   hl,$$4400]
-	lea	l_9000,a1                      	| [$$c280: ld   de,$$9000]
-	move.b	#0x04,d1                        	| [$$c283: ld   bc,$$0400] 1024
-	move.b	#0x00,d2                        	| [$$c283: ld   bc,$$0400] 1024
-	jbsr	ldir                              	| [$$c286: ldir]
-     ^^^^ TODO: review special instruction inputs
+	move.w	#0x9000,d6                      	| [$$c280: ld   de,$$9000]
+	                        	| [$$c283: ld   bc,$$0400] 1024
+0:
+	move.b	(a0)+,d0
+	jbsr	osd_w_videoram
+	addq.w	#1,d6
+	dbf		d1,0b
+
+         	| [$$c283: ld   bc,$$0400] 1024
+	                              	| [$$c286: ldir]
 	move.w	#0x9182,d6                      	| [$$c288: ld   hl,$$9182]
 	jbsr	l_c338                            	| [$$c28b: call $$C338]
 	move.w	#0x9882,d6                      	| [$$c28e: ld   hl,$$9882]
@@ -4483,33 +4508,30 @@ l_c272:
 	move.b	#0x09,d1                        	| [$$c299: ld   b,$$09]
 	jbsr	l_c361                            	| [$$c29b: call $$C361]
 	move.b	#0xBE,d0                        	| [$$c29e: ld   a,$$BE]
-	move.b	d0,0x930E                       	| [$$c2a0: ld   ($$930E),a]
+	move.w	#0x930E,d6                       	| [$$c2a0: ld   ($$930E),a]
+	jbsr	osd_w_videoram
           ^^^^^^ TODO: review absolute 16-bit address write
 	addq.b	#1,d0                           	| [$$c2a3: inc  a]
-	move.b	d0,0x930F                       	| [$$c2a4: ld   ($$930F),a]
-          ^^^^^^ TODO: review absolute 16-bit address write
+	move.w	#0x930F,d6                       	| [$$c2a4: ld   ($$930F),a]
+	jbsr	osd_w_videoram
 	move.b	#0x24,d0                        	| [$$c2a7: ld   a,$$24]
 	move.w	#0x9B2C,d6                      	| [$$c2a9: ld   hl,$$9B2C]
 	move.w	#0x001E,d3                      	| [$$c2ac: ld   de,$$001E] 30
 	move.b	#0x03,d1                        	| [$$c2af: ld   b,$$03]
 l_c2b1:
-	move.b	d0,(a0)                         	| [$$c2b1: ld   (hl),a]
-	addq.w	#1,a0                           	| [$$c2b2: inc  hl]
-                  ^^^^^^ TODO: review move.w into address register
-	move.b	d0,(a0)                         	| [$$c2b3: ld   (hl),a]
-	addq.w	#1,a0                           	| [$$c2b4: inc  hl]
-                  ^^^^^^ TODO: review move.w into address register
-	move.b	d0,(a0)                         	| [$$c2b5: ld   (hl),a]
-	add.w	d3,a0                            	| [$$c2b6: add  hl,de]
-                  ^^^^^^ TODO: review move.w into address register
-  ^^^^ TODO: review d3 computation above
+	jbsr	osd_w_colorram                         	| [$$c2b1: ld   (hl),a]
+	addq.w	#1,d6                           	| [$$c2b2: inc  hl]
+	jbsr	osd_w_colorram                         	| [$$c2b3: ld   (hl),a]
+	addq.w	#1,d6                           	| [$$c2b4: inc  hl]
+	jbsr	osd_w_colorram                         	| [$$c2b5: ld   (hl),a]
+	add.w	d3,d6                            	| [$$c2b6: add  hl,de]
 	subq.b	#1,d1                           	| [...]
 	jne	l_c2b1                             	| [$$c2b7: djnz $$C2B1]
 	jbsr	l_d0dd                            	| [$$c2b9: call $$D0DD]
 	            	| [$$c2bc: ld   a,(io_read_shit_B800)]
 	jbsr	l_c30e                            	| [$$c2bf: call $$C30E]
 	jbsr	l_f8de                            	| [$$c2c2: call $$F8DE]
-	jbsr	l_ca7e                            	| [$$c2c5: call $$CA7E]
+	jbsr	display_player_1_and_2_text_ca7e                            	| [$$c2c5: call $$CA7E]
 	rts                                    	| [$$c2c8: ret]
 
 display_maze_C2C9:
@@ -4518,12 +4540,16 @@ display_maze_C2C9:
 	jbsr	change_attribute_everywhere_C3A3  	| [$$c2ce: call change_attribute_everywhere_C3A3]
 	            	| [$$c2d1: ld   a,(io_read_shit_B800)]
 	lea	game_mem+0x4000,a0                      	| [$$c2d4: ld   hl,$$4000]
-	lea	l_9000,a1                      	| [$$c2d7: ld   de,$$9000]
-	move.b	#0x04,d1                        	| [$$c2da: ld   bc,$$0400] 1024
-	move.b	#0x00,d2                        	| [$$c2da: ld   bc,$$0400] 1024
-	jbsr	ldir                              	| [$$c2dd: ldir]
-     ^^^^ TODO: review special instruction inputs
-	move.w	#0x9182,d6                      	| [$$c2df: ld   hl,$$9182]
+	move.w	#0x9000,d6                      	| [$$c2d7: ld   de,$$9000]
+	move.w	#0x400-1,d1                        	| [$$c2da: ld   bc,$$0400] 1024
+0:
+	move.b	(a0)+,d0
+	jbsr	osd_w_videoram	| [$2860: ldir]
+	addq.w	#1,d6
+	dbf		d1,0b
+	                        	| [$$c2da: ld   bc,$$0400] 1024
+	                              	| [$$c2dd: ldir]
+ 	move.w	#0x9182,d6                      	| [$$c2df: ld   hl,$$9182]
 	jbsr	l_c338                            	| [$$c2e2: call $$C338]
 	move.w	#0x9842,d6                      	| [$$c2e5: ld   hl,$$9842]
 	move.b	#0x07,d1                        	| [$$c2e8: ld   b,$$07]
@@ -4535,9 +4561,9 @@ display_maze_C2C9:
 	            	| [$$c2f8: ld   a,(io_read_shit_B800)]
 	jbsr	l_c30e                            	| [$$c2fb: call $$C30E]
 	jbsr	l_f8de                            	| [$$c2fe: call $$F8DE]
-	jbsr	l_ca7e                            	| [$$c301: call $$CA7E]
+	jbsr	display_player_1_and_2_text_ca7e                            	| [$$c301: call $$CA7E]
 	move.b	must_play_music_6210,d0         	| [$$c304: ld   a,(must_play_music_6210)]
-	cmp.b	#0x00,d0                         	| [$$c307: cp   $$00]
+	                         	| [$$c307: cp   $$00]
 	bne.b	0f                               	| [...]
 	rts                                    	| [$$c309: ret  z] [...]
 0:
@@ -4560,52 +4586,43 @@ init_guard_directions_and_wagons_C314:
 	lea	game_mem+0x1A1B,a0                      	| [$$c326: ld   hl,$$1A1B]
 	            	| [$$c329: ld   a,(io_read_shit_B800)]
 	lea	wagon_1_struct_6588,a1         	| [$$c32c: ld   de,wagon_1_struct_6588]
-	move.b	#0x00,d1                        	| [$$c32f: ld   bc,$$0014] 20
-	move.b	#0x14,d2                        	| [$$c32f: ld   bc,$$0014] 20
+	move.w	#0x14,d1                        	| [$$c32f: ld   bc,$$0014] 20
 	jbsr	ldir                              	| [$$c332: ldir]
-     ^^^^ TODO: review special instruction inputs
 	jbsr	l_f9a3                            	| [$$c334: call $$F9A3]
 	rts                                    	| [$$c337: ret]
 l_c338:
 	move.b	#0x55,d0                        	| [$$c338: ld   a,$$55]
-	move.b	d0,(a0)                         	| [$$c33a: ld   (hl),a]
-	addq.w	#1,a0                           	| [$$c33b: inc  hl]
-                  ^^^^^^ TODO: review move.w into address register
+	jbsr	osd_w_videoram                         	| [$$c33a: ld   (hl),a]
+	addq.w	#1,d6                           	| [$$c33b: inc  hl]
 	move.b	#0x51,d0                        	| [$$c33c: ld   a,$$51]
-	move.b	d0,(a0)                         	| [$$c33e: ld   (hl),a]
-	addq.w	#1,a0                           	| [$$c33f: inc  hl]
-                  ^^^^^^ TODO: review move.w into address register
+	jbsr	osd_w_videoram                         	| [$$c33e: ld   (hl),a]
+	addq.w	#1,d6                           	| [$$c33f: inc  hl]
 	move.b	#0x57,d0                        	| [$$c340: ld   a,$$57]
-	move.b	d0,(a0)                         	| [$$c342: ld   (hl),a]
+	jbsr	osd_w_videoram                         	| [$$c342: ld   (hl),a]
 	move.w	#0x001F,d3                      	| [$$c343: ld   de,$$001F] 31
-	add.w	d3,a0                            	| [$$c346: add  hl,de]
-                  ^^^^^^ TODO: review move.w into address register
-  ^^^^ TODO: review d3 computation above
+	add.w	d3,d6                            	| [$$c346: add  hl,de]
 	move.b	#0x52,d0                        	| [$$c347: ld   a,$$52]
-	move.b	d0,(a0)                         	| [$$c349: ld   (hl),a]
-	subq.w	#1,a0                           	| [$$c34a: dec  hl]
-                  ^^^^^^ TODO: review move.w into address register
+	jbsr	osd_w_videoram                         	| [$$c349: ld   (hl),a]
+	subq.w	#1,d6                           	| [$$c34a: dec  hl]
 	move.b	#0x56,d0                        	| [$$c34b: ld   a,$$56]
-	move.b	d0,(a0)                         	| [$$c34d: ld   (hl),a]
-	move.b	d5,d0                           	| [$$c34e: ld   a,h]
-	add.b	#0x08,d0                         	| [$$c34f: add  a,$$08]
-	move.b	d0,d5                           	| [$$c351: ld   h,a]
+	jbsr	osd_w_videoram                         	| [$$c34d: ld   (hl),a]
+	add.w	#0x800,d6
+	                           	| [$$c34e: ld   a,h]
+	                         	| [$$c34f: add  a,$$08]
+	                           	| [$$c351: ld   h,a]
 	move.b	#0x32,d0                        	| [$$c352: ld   a,$$32]
-	move.b	d0,(a0)                         	| [$$c354: ld   (hl),a]
-	addq.w	#1,a0                           	| [$$c355: inc  hl]
-                  ^^^^^^ TODO: review move.w into address register
-	move.b	d0,(a0)                         	| [$$c356: ld   (hl),a]
-	lea	l_FFE1,a1                      	| [$$c357: ld   de,$$FFE1]
-	add.w	d3,a0                            	| [$$c35a: add  hl,de]
-                  ^^^^^^ TODO: review move.w into address register
-  ^^^^ TODO: review d3 computation above
-	move.b	d0,(a0)                         	| [$$c35b: ld   (hl),a]
-	subq.w	#1,a0                           	| [$$c35c: dec  hl]
-                  ^^^^^^ TODO: review move.w into address register
-	move.b	d0,(a0)                         	| [$$c35d: ld   (hl),a]
-	subq.w	#1,a0                           	| [$$c35e: dec  hl]
-                  ^^^^^^ TODO: review move.w into address register
-	move.b	d0,(a0)                         	| [$$c35f: ld   (hl),a]
+	jbsr	osd_w_colorram                         	| [$$c354: ld   (hl),a]
+	addq.w	#1,d6                           	| [$$c355: inc  hl]
+ 
+	jbsr	osd_w_colorram                         	| [$$c356: ld   (hl),a]
+	                      	| [$$c357: ld   de,$$FFE1]
+	sub.w	#0x1F,a0                            	| [$$c35a: add  hl,de]
+
+	jbsr	osd_w_colorram                         	| [$$c35b: ld   (hl),a]
+	subq.w	#1,d6                           	| [$$c35c: dec  hl]
+	jbsr	osd_w_colorram                         	| [$$c35d: ld   (hl),a]
+	subq.w	#1,d6                           	| [$$c35e: dec  hl]
+ 	jbsr	osd_w_colorram                         	| [$$c35f: ld   (hl),a]
 	rts                                    	| [$$c360: ret]
 l_c361:
 	move.b	#0x38,d0                        	| [$$c361: ld   a,$$38]
@@ -4614,10 +4631,8 @@ l_c361:
 l_c366:
 	move.w	#0x0020,d3                      	| [$$c366: ld   de,$$0020] 32
 l_c369:
-	move.b	d0,(a0)                         	| [$$c369: ld   (hl),a]
-	add.w	d3,a0                            	| [$$c36a: add  hl,de]
-                  ^^^^^^ TODO: review move.w into address register
-  ^^^^ TODO: review d3 computation above
+	jbsr		osd_w_colorram                         	| [$$c369: ld   (hl),a]
+	add.w	d3,d6                            	| [$$c36a: add  hl,de]
 	subq.b	#1,d1                           	| [...]
 	jne	l_c369                             	| [$$c36b: djnz $$C369]
 	rts                                    	| [$$c36d: ret]
@@ -4625,37 +4640,27 @@ l_c36e:
 	move.b	#0x2F,d0                        	| [$$c36e: ld   a,$$2F]
 	jra	l_c366                             	| [$$c370: jr   $$C366]
 	rts                                    	| [$$c372: ret]
-l_c373:
-	movem.w	d1/d2,-(sp)                    	| [$$c373: push bc]
-	move.b	#0xff,d1                        	| [$$c374: ld   bc,$$FFE0] 65504
-	move.b	#0xe0,d2                        	| [$$c374: ld   bc,$$FFE0] 65504
-	move.b	d0,(a0)                         	| [$$c377: ld   (hl),a]
-	add.w	d1,a0                            	| [$$c378: add  hl,bc]
-                  ^^^^^^ TODO: review move.w into address register
-  ^^^^ TODO: review d1 computation above
-
-	movem.w	(sp)+,d1/d2                    	| [$$c379: pop  bc]
+draw_repeated_char_c373:
+	                    	| [$$c373: push bc]
+	                        	| [$$c374: ld   bc,$$FFE0] 65504
+	jbsr		osd_w_videoram                        	| [$$c377: ld   (hl),a]
+	sub.w	#0x20,d6                            	| [$$c378: add  hl,bc]
+ 
+	                    	| [$$c379: pop  bc]
 	subq.b	#1,d1                           	| [...]
-	jne	l_c373                             	| [$$c37a: djnz $$C373]
+	jne	draw_repeated_char_c373                             	| [$$c37a: djnz $$C373]
 	rts                                    	| [$$c37c: ret]
-l_c37d:
-	move.b	d0,(a0)                         	| [$$c37d: ld   (hl),a]
-	addq.w	#1,a0                           	| [$$c37e: inc  hl]
-                  ^^^^^^ TODO: review move.w into address register
-	subq.b	#1,d1                           	| [...]
-	jne	l_c37d                             	| [$$c37f: djnz $$C37D]
-	rts                                    	| [$$c381: ret]
 
 l_c382:
 	move.b	#0x08,d1                        	| [$$c382: ld   b,$$08]
+	* clear ram
 	lea	number_of_credits_6000,a0      	| [$$c384: ld   hl,number_of_credits_6000]
 	clr.b	d0                               	| [$$c387: xor  a]
 l_c388:
 	move.b	d0,d2                           	| [$$c388: ld   c,a]
 l_c389:
-	move.b	d0,(a0)                         	| [$$c389: ld   (hl),a]
-	addq.w	#1,a0                           	| [$$c38a: inc  hl]
-                  ^^^^^^ TODO: review move.w into address register
+	move.b	d0,(a0)+                         	| [$$c389: ld   (hl),a]
+                          	| [$$c38a: inc  hl]
 	subq.b	#1,d2                           	| [$$c38b: dec  c]
 	jne	l_c389                             	| [$$c38c: jr   nz,$$C389]
 	subq.b	#1,d1                           	| [...]
@@ -4667,27 +4672,42 @@ l_c393:
 l_c398:
 	move.b	d0,d2                           	| [$$c398: ld   c,a]
 l_c399:
-	move.b	d0,(a0)                         	| [$$c399: ld   (hl),a]
-	addq.w	#1,a0                           	| [$$c39a: inc  hl]
-                  ^^^^^^ TODO: review move.w into address register
-	subq.b	#1,d2                           	| [$$c39b: dec  c]
+	move.b	d0,(a0)+                         	| [$$c399: ld   (hl),a]
+	                           	| [$$c39a: inc  hl]
+ 	subq.b	#1,d2                           	| [$$c39b: dec  c]
 	jne	l_c399                             	| [$$c39c: jr   nz,$$C399]
 	subq.b	#1,d1                           	| [...]
 	jne	l_c398                             	| [$$c39e: djnz $$C398]
 	jra	l_c006                             	| [$$c3a0: jp   $$C006]
 
 change_attribute_everywhere_C3A3:
-	move.b	#0x08,d1                        	| [$$c3a3: ld   b,$$08]
+	* 8 is too much as it writes beyond $9C00
+	* changing to 4
+	* set all attributes to passed d0
+	move.b	#0x04,d1                        	| [$$c3a3: ld   b,$$08]
 	move.w	#0x9800,d6                      	| [$$c3a5: ld   hl,$$9800]
-l_c3a8:
+0:
 	clr.b	d2                               	| [$$c3a8: ld   c,$$00]
-l_c3aa:
-	move.b	d0,(a0)                         	| [$$c3aa: ld   (hl),a]
-	addq.w	#1,a0                           	| [$$c3ab: inc  hl]
-                  ^^^^^^ TODO: review move.w into address register
-	move.w	d0,-(sp)                        	| [$$c3ac: push af]
+1:
+	jbsr	osd_w_colorram                         	| [$$c3aa: ld   (hl),a]
+	addq.w	#1,d6                           	| [$$c3ab: inc  hl]
+	* kick watchdog
+	                        	| [$$c3ac: push af]
 	            	| [$$c3ad: ld   a,(io_read_shit_B800)]
-	move.w	(sp)+,d0                        	| [$$c3b0: pop  af]
+	subq.b	#1,d2                           	| [$29fa: dec  c]
+	jne	1b                             	| [$29fb: jr   nz,$29F3]
+	subq.b	#1,d1                           	| [...]
+	jne	0b                             	| [$29fd: djnz $29F1]
+	rts                                    	| [$29ff: ret]
+	* had to separate both routines
+	* as one writes to color ram and the other one
+	* writes to RAM with A0
+l_c3aa:
+	clr.b	d2                               	| [$29f1: ld   c,$00]
+l_c3a8:
+	move.b	d0,(a0)+                         	| [$29f3: ld   (hl),a]
+	                           	| [$29f4: inc  hl]
+	* kick watchdog
 	subq.b	#1,d2                           	| [$$c3b1: dec  c]
 	jne	l_c3aa                             	| [$$c3b2: jr   nz,$$C3AA]
 	subq.b	#1,d1                           	| [...]
@@ -4701,12 +4721,11 @@ clear_screen_C3B7:
 l_c3be:
 	clr.b	d2                               	| [$$c3be: ld   c,$$00]
 l_c3c0:
-	move.b	d0,(a0)                         	| [$$c3c0: ld   (hl),a]
-	addq.w	#1,a0                           	| [$$c3c1: inc  hl]
-                  ^^^^^^ TODO: review move.w into address register
-	move.w	d0,-(sp)                        	| [$$c3c2: push af]
+	jbsr	osd_w_videoram                         	| [$$c3c0: ld   (hl),a]
+	addq.w	#1,d6                           	| [$$c3c1: inc  hl]
+ 	                        	| [$$c3c2: push af]
 	            	| [$$c3c3: ld   a,(io_read_shit_B800)]
-	move.w	(sp)+,d0                        	| [$$c3c6: pop  af]
+	                        	| [$$c3c6: pop  af]
 	subq.b	#1,d2                           	| [$$c3c7: dec  c]
 	jne	l_c3c0                             	| [$$c3c8: jr   nz,$$C3C0]
 	subq.b	#1,d1                           	| [...]
@@ -4714,28 +4733,26 @@ l_c3c0:
 	rts                                    	| [$$c3cc: ret]
 l_c3cd:
 	move.b	#0xE0,d0                        	| [$$c3cd: ld   a,$$E0]
-	move.b	#0xE0,d0                        	| [$$c3cf: ld   a,$$E0]
+	                        	| [$$c3cf: ld   a,$$E0]
 	move.w	#0x93E4,d6                      	| [$$c3d1: ld   hl,$$93E4]
 	move.b	#0x1B,d1                        	| [$$c3d4: ld   b,$$1B]
 l_c3d6:
 
-	move.l	a0,-(sp)                        	| [$$c3d6: push hl]
+	move.w	d6,-(sp)                        	| [$$c3d6: push hl]
 	movem.w	d1/d2,-(sp)                    	| [$$c3d7: push bc]
 	move.b	#0x20,d1                        	| [$$c3d8: ld   b,$$20]
-	jbsr	l_c373                            	| [$$c3da: call $$C373]
+	jbsr	draw_repeated_char_c373                            	| [$$c3da: call $$C373]
 
 	movem.w	(sp)+,d1/d2                    	| [$$c3dd: pop  bc]
-	move.l	(sp)+,a0                        	| [$$c3de: pop  hl]
-	addq.w	#1,a0                           	| [$$c3df: inc  hl]
-                  ^^^^^^ TODO: review move.w into address register
-	subq.b	#1,d1                           	| [...]
+	move.w	(sp)+,d6                        	| [$$c3de: pop  hl]
+	addq.w	#1,d6                           	| [$$c3df: inc  hl]
+ 	subq.b	#1,d1                           	| [...]
 	jne	l_c3d6                             	| [$$c3e0: djnz $$C3D6]
 	rts                                    	| [$$c3e2: ret]
 
 l_c3e3:
-	clr.b	d0                               	| [$$c3e3: ld   a,$$00]
-	move.b	d0,0xA003                       	| [$$c3e5: ld   ($$A003),a]
-          ^^^^^^ TODO: review absolute 16-bit address write
+	jbsr	osd_disable_display                               	| [$$c3e3: ld   a,$$00]
+	                       	| [$$c3e5: ld   ($$A003),a]
 	move.b	#0x04,d1                        	| [$$c3e8: ld   b,$$04]
 	move.b	#0xE0,d0                        	| [$$c3ea: ld   a,$$E0]
 	move.w	#0x9000,d6                      	| [$$c3ec: ld   hl,$$9000]
@@ -4746,6 +4763,7 @@ l_c3e3:
 	cmp.b	#0x01,d0                         	| [$$c3fa: cp   $$01]
 	jeq	l_c407                             	| [$$c3fc: jr   z,$$C407]
 	lea	game_mem+0x56C3,a1                      	| [$$c3fe: ld   de,$$56C3]
+	* write "PUSH START BUTTON" to screen
 	move.w	#0x93AF,d6                      	| [$$c401: ld   hl,$$93AF]
 	jbsr	display_localized_text_CA67       	| [$$c404: call display_localized_text_CA67]
 l_c407:
@@ -4753,10 +4771,9 @@ l_c407:
 	lea	player_struct_6580,a0          	| [$$c409: ld   hl,player_struct_6580]
 	clr.b	d0                               	| [$$c40c: ld   a,$$00]
 	jbsr	l_c3a8                            	| [$$c40e: call $$C3A8]
-	jbsr	l_ca7e                            	| [$$c411: call $$CA7E]
-	move.b	#0x01,d0                        	| [$$c414: ld   a,$$01]
-	move.b	d0,0xA003                       	| [$$c416: ld   ($$A003),a]
-          ^^^^^^ TODO: review absolute 16-bit address write
+	jbsr	display_player_1_and_2_text_ca7e                            	| [$$c411: call $$CA7E]
+	                        	| [$$c414: ld   a,$$01]
+	jbsr	osd_enable_display                       	| [$$c416: ld   ($$A003),a]
 	rts                                    	| [$$c419: ret]
 l_c41a:
 	lea	player_1_score_6176,a2         	| [$$c41a: ld   ix,player_1_score_6176]
@@ -4765,20 +4782,20 @@ l_c41a:
 l_c421:
 	nop                                    	| [$$c421: nop]
 	addq.w	#1,a2                           	| [$$c422: inc  ix]
-                  ^^^^^^ TODO: review move.w into address register
-	subq.b	#1,d1                           	| [...]
+ 	subq.b	#1,d1                           	| [...]
 	jne	l_c421                             	| [$$c424: djnz $$C421]
 	rts                                    	| [$$c426: ret]
 l_c427:
-	move.b	flipped_dip_switches_copy_6163,d0	| [$$c427: ld   a,(flipped_dip_switches_copy_6163)]
-	and.b	#0x80,d0                         	| [$$c42a: and  $$80]
-	cmp.b	#0x00,d0                         	| [$$c42c: cp   $$00]
-	jeq	l_c439                             	| [$$c42e: jr   z,$$C439]
-	move.b	current_player_617C,d0          	| [$$c430: ld   a,(current_player_617C)]
-	not.b	d0                               	| [$$c433: cpl]
-	and.b	#0x01,d0                         	| [$$c434: and  $$01]
-	jbsr	l_d8e2                            	| [$$c436: call $$D8E2]
-l_c439:
+	* cocktail mode
+*	move.b	flipped_dip_switches_copy_6163,d0	| [$$c427: ld   a,(flipped_dip_switches_copy_6163)]
+*	and.b	#0x80,d0                         	| [$$c42a: and  $$80]
+*	cmp.b	#0x00,d0                         	| [$$c42c: cp   $$00]
+*	jeq	l_c439                             	| [$$c42e: jr   z,$$C439]
+*	move.b	current_player_617C,d0          	| [$$c430: ld   a,(current_player_617C)]
+*	not.b	d0                               	| [$$c433: cpl]
+*	and.b	#0x01,d0                         	| [$$c434: and  $$01]
+*	jbsr	l_d8e2                            	| [$$c436: call $$D8E2]
+*l_c439:
 	lea	bags_coordinates_609C,a2       	| [$$c439: ld   ix,bags_coordinates_609C]
 	lea	bags_coordinates_617F,a3       	| [$$c43d: ld   iy,bags_coordinates_617F]
 	move.b	#0x3B,d1                        	| [$$c441: ld   b,$$3B]
@@ -4814,9 +4831,7 @@ l_c47e:
 	move.w	(sp)+,d0                        	| [$$c488: pop  af]
 	move.b	d0,(A3)                    	| [$$c489: ld   (iy+$$00),a]
 	addq.w	#1,a2                           	| [$$c48c: inc  ix]
-                  ^^^^^^ TODO: review move.w into address register
 	addq.w	#1,a3                           	| [$$c48e: inc  iy]
-                  ^^^^^^ TODO: review move.w into address register
 	subq.b	#1,d1                           	| [...]
 	jne	l_c47e                             	| [$$c490: djnz $$C47E]
 	rts                                    	| [$$c492: ret]
@@ -4847,6 +4862,15 @@ l_c4a8:
 	move.b	#0x01,d0                        	| [$$c4b9: ld   a,$$01]
 	rts                                    	| [$$c4bb: ret]
 
+* guard does not know where player is (not visible)
+* check if guard must wait for the elevator
+
+ * params:
+*  current_guard_screen_index_6098:	current guard screen
+*  a2:	player struct
+*  a3:	current guard struct
+*  d3:	current guard screen address
+*  a0:	address to store bool flag "guard is in the elevator" (603B/607B)
 guard_wait_for_elevator_test_C4BC:
 	move.b	current_guard_screen_index_6098,d0	| [$$c4bc: ld   a,(current_guard_screen_index_6098)]
 	cmp.b	#0x05,d0                         	| [$$c4bf: cp   $$05]
@@ -4861,33 +4885,31 @@ guard_wait_for_elevator_test_C4BC:
 	move.l	a3,-(sp)                        	| [$$c4cd: push iy]
 	lea	game_mem+0x1BD1,a3                      	| [$$c4cf: ld   iy,$$1BD1]
 l_c4d3:
-	move.b	(A3),d0                    	| [$$c4d3: ld   a,(iy+$$00)]
-	move.b	d0,d5                           	| [$$c4d6: ld   h,a]
-	move.b	(0x01,a3),d0                    	| [$$c4d7: ld   a,(iy+$$01)]
-	move.b	d0,d6                           	| [$$c4da: ld   l,a]
-	clr.b	d0                               	| [$$c4db: xor  a]
-	sub.w	d3,d5                            	| [$$c4dc: sbc  hl,de]
-     ^^^^ TODO: review compared/subbed registers
-	jeq	l_c4f8                             	| [$$c4de: jr   z,$$C4F8]
+	LOAD_AX_BE_WORD_DY	a3,d6                    	| [$$c4d3: ld   a,(iy+$$00)]
+	                           	| [$$c4d6: ld   h,a]
+	                    	| [$$c4d7: ld   a,(iy+$$01)]
+	                           	| [$$c4da: ld   l,a]
+	                               	| [$$c4db: xor  a]
+	cmp.w	d3,d6                            	| [$$c4dc: sbc  hl,de]
+ 	jeq	l_c4f8                             	| [$$c4de: jr   z,$$C4F8]
 	addq.w	#3,a3                           	| [$$c4e0: inc  iy] * 3
-                  ^^^^^^ TODO: review move.w into address register
 	move.b	(0x02,a3),d0                    	| [$$c4e6: ld   a,(iy+$$02)]
 	cmp.b	#0xFF,d0                         	| [$$c4e9: cp   $$FF]
 	jne	l_c4d3                             	| [$$c4eb: jr   nz,$$C4D3]
-	move.w	unknown_pointer_6146,a0     	| [$$c4ed: ld   hl,(unknown_pointer_6146)]
-                  ^^^^^^ TODO: review move.w into address register
-	clr.b	d0                               	| [$$c4f0: xor  a]
-	move.b	d0,(a0)                         	| [$$c4f1: ld   (hl),a]
+* not over an elevator waiting point
+	move.l	unknown_pointer_6146,a0     	| [$$c4ed: ld   hl,(unknown_pointer_6146)]
+	clr.b	(a0)                               	| [$$c4f0: xor  a]
+	                      	| [$$c4f1: ld   (hl),a]
 l_c4f2:
 	move.l	(sp)+,a3                        	| [$$c4f2: pop  iy]
 	move.l	(sp)+,a0                        	| [$$c4f4: pop  hl]
 	jra	l_c55a                             	| [$$c4f5: jp   $$C55A]
+ * guard facing the elevator waiting point
 l_c4f8:
 	move.b	#0x01,d0                        	| [$$c4f8: ld   a,$$01]
-	move.w	unknown_pointer_6146,a0     	| [$$c4fa: ld   hl,(unknown_pointer_6146)]
-                  ^^^^^^ TODO: review move.w into address register
+	move.l	unknown_pointer_6146,a0     	| [$$c4fa: ld   hl,(unknown_pointer_6146)]
 	move.b	(a0),d0                         	| [$$c4fd: ld   a,(hl)]
-	cmp.b	#0x00,d0                         	| [$$c4fe: cp   $$00]
+	                         	| [$$c4fe: cp   $$00]
 	jne	l_c4f2                             	| [$$c500: jp   nz,$$C4F2]
 	jbsr	l_c597                            	| [$$c503: call $$C597]
 	move.l	(sp)+,a3                        	| [$$c506: pop  iy]
@@ -4895,23 +4917,32 @@ l_c4f8:
 	move.b	(0x03,a3),d0                    	| [$$c509: ld   a,(iy+$$03)]
 	cmp.b	d1,d0                            	| [$$c50c: cp   b]
 	jeq	l_c58c                             	| [$$c50d: jp   z,$$C58C]
-	move.w	unknown_pointer_6146,a0     	| [$$c510: ld   hl,(unknown_pointer_6146)]
-                  ^^^^^^ TODO: review move.w into address register
-	addq.w	#4,a0                           	| [$$c513: inc  hl] * 4
+	move.l	unknown_pointer_6146,a0     	| [$$c510: ld   hl,(unknown_pointer_6146)]
+	                           	| [$$c513: inc  hl] * 4
                   ^^^^^^ TODO: review move.w into address register
 	move.b	#0x01,d0                        	| [$$c517: ld   a,$$01]
-	move.b	d0,(a0)                         	| [$$c519: ld   (hl),a]
+	move.b	d0,(4,a0)                         	| [$$c519: ld   (hl),a]
 	move.l	(sp)+,a0                        	| [$$c51a: pop  hl]
-	movem.w	d3/d4,-(sp)                    	| [$$c51b: push de]
-	move.l	a1,-(sp)                        	| [$$c51b: push de]
-	move.w	#0x001C,d3                      	| [$$c51c: ld   de,$$001C] 28
-	add.w	d3,a0                            	| [$$c51f: add  hl,de]
-                  ^^^^^^ TODO: review move.w into address register
-  ^^^^ TODO: review d3 computation above
-	move.l	(sp)+,a1                        	| [$$c520: pop  de]
-	movem.w	(sp)+,d3/d4                    	| [$$c520: pop  de]
+	* HL pointed on 603B or 607B
+	                        	| [$$c51b: push de]
+	                      	| [$$c51c: ld   de,$$001C] 28
+	                           	| [$$c51f: add  hl,de]
+
+	                    	| [$$c520: pop  de]
 	clr.b	d0                               	| [$$c521: xor  a]
-	move.b	d0,(a0)                         	| [$$c522: ld   (hl),a]
+	* clear guard not moving timeout counter while waiting for the elevator
+	* to avoid that the immobile guard watchdog triggers and resets guard position
+	* rework code as it was adding offsets but now there are 32 bit pointers
+	* instead of 16... much cleaner that way
+	cmp.l	#guard_1_in_elevator_603B,a0
+	bne.b	0f
+	clr.b	guard_1_not_moving_timeout_counter_6057                    	| [$2b5b: ld   (hl),a]
+	bra.b	1f
+0:
+	* guard 2 in elevator
+	clr.b	guard_2_not_moving_timeout_counter_6097                    	| [$2b5b: ld   (hl),a]
+1:
+
 	move.b	(0x07,a2),d0                    	| [$$c523: ld   a,(ix+$$07)]
 	subq.b	#1,d0                           	| [$$c526: dec  a]
 	cmp.b	(0x03,a3),d0                     	| [$$c527: cp   (iy+$$03)]
@@ -4919,8 +4950,7 @@ l_c4f8:
 	subq.b	#1,d0                           	| [$$c52c: dec  a]
 	cmp.b	(0x03,a3),d0                     	| [$$c52d: cp   (iy+$$03)]
 	jeq	l_c538                             	| [$$c530: jr   z,$$C538]
-	move.w	guard_direction_pointer_6095,a0	| [$$c532: ld   hl,(guard_direction_pointer_6095)]
-                  ^^^^^^ TODO: review move.w into address register
+	move.l	guard_direction_pointer_6095,a0	| [$$c532: ld   hl,(guard_direction_pointer_6095)]
 	clr.b	d0                               	| [$$c535: xor  a]
 	move.b	d0,(a0)                         	| [$$c536: ld   (hl),a]
 	rts                                    	| [$$c537: ret]
@@ -4930,8 +4960,7 @@ l_c538:
 	bne.b	0f                               	| [...]
 	rts                                    	| [$$c53d: ret  z] [...]
 0:
-	move.w	unknown_pointer_6146,a0     	| [$$c53e: ld   hl,(unknown_pointer_6146)]
-                  ^^^^^^ TODO: review move.w into address register
+	move.l	unknown_pointer_6146,a0     	| [$$c53e: ld   hl,(unknown_pointer_6146)]
 	addq.w	#4,a0                           	| [$$c541: inc  hl] * 4
                   ^^^^^^ TODO: review move.w into address register
 	clr.b	d0                               	| [$$c545: xor  a]
@@ -5783,7 +5812,7 @@ l_ca79:
 	move.w	(sp)+,d0                        	| [$$ca79: pop  af]
 	jbsr	l_55d9                            	| [$$ca7a: call $$55D9]
 	rts                                    	| [$$ca7d: ret]
-l_ca7e:
+display_player_1_and_2_text_ca7e:
 	lea	game_mem+0x575A,a1                      	| [$$ca7e: ld   de,$$575A]
 	move.w	#0x93A0,d6                      	| [$$ca81: ld   hl,$$93A0]
 	jbsr	display_localized_text_CA67       	| [$$ca84: call display_localized_text_CA67]
@@ -6097,7 +6126,7 @@ l_cc35:
 	move.b	player_screen_600D,d0           	| [$$cc35: ld   a,(player_screen_600D)]
 	cmp.b	#0x02,d0                         	| [$$cc38: cp   $$02]
 	jne	l_cc52                             	| [$$cc3a: jr   nz,$$CC52]
-	jbsr	l_c20e                            	| [$$cc3c: call $$C20E]
+	jbsr	display_screen_3_c20e                            	| [$$cc3c: call $$C20E]
 	move.b	#0x03,d0                        	| [$$cc3f: ld   a,$$03]
 	move.b	d0,player_screen_600D           	| [$$cc41: ld   (player_screen_600D),a]
 	jbsr	draw_object_tiles_FD72            	| [$$cc44: call draw_object_tiles_FD72]
@@ -6121,7 +6150,7 @@ l_cc6f:
 	move.b	player_screen_600D,d0           	| [$$cc6f: ld   a,(player_screen_600D)]
 	cmp.b	#0x04,d0                         	| [$$cc72: cp   $$04]
 	jne	l_cc8c                             	| [$$cc74: jr   nz,$$CC8C]
-	jbsr	l_c189                            	| [$$cc76: call $$C189]
+	jbsr	display_screen_x_c189                            	| [$$cc76: call $$C189]
 	move.b	#0x05,d0                        	| [$$cc79: ld   a,$$05]
 	move.b	d0,player_screen_600D           	| [$$cc7b: ld   (player_screen_600D),a]
 	jbsr	draw_object_tiles_FD72            	| [$$cc7e: call draw_object_tiles_FD72]
@@ -6169,7 +6198,7 @@ l_ccd7:
 	jne	l_ccf9                             	| [$$ccd9: jr   nz,$$CCF9]
 	lea	game_mem+0x4442,a2                      	| [$$ccdb: ld   ix,$$4442]
 	move.b	a2,unknown_6281                 	| [$$ccdf: ld   (unknown_6281),ix]
-	jbsr	l_c20e                            	| [$$cce3: call $$C20E]
+	jbsr	display_screen_3_c20e                            	| [$$cce3: call $$C20E]
 	move.b	#0x03,d0                        	| [$$cce6: ld   a,$$03]
 	move.b	d0,player_screen_600D           	| [$$cce8: ld   (player_screen_600D),a]
 	move.b	#0xE3,d0                        	| [$$cceb: ld   a,$$E3]
