@@ -5719,12 +5719,8 @@ D321: 3E 20       ld   a,$20
 D323: 12          ld   (de),a
 D324: D1          pop  de
 D325: C9          ret
-D326: FB          ei
-D327: FA F9 F8    jp   m,$F8F9
-D32A: F7          rst  $30
-D32B: F6 F5       or   $F5
-D32D: F4 2A 91    call p,$912A
-D330: 60          ld   h,b
+
+D32E: 2A 91 60    ld   hl,($6091)                                     2A 91 60
 D331: 22 FF 61    ld   (unknown_61FF),hl
 D334: 2A 93 60    ld   hl,(guard_struct_pointer_6093)
 D337: 22 01 62    ld   (unknown_pointer_6201),hl
@@ -5877,16 +5873,7 @@ D471: C8          ret  z
 D472: AF          xor  a
 D473: 32 08 60    ld   (unknown_6008),a
 D476: C9          ret
-D477: E0          ret  po
-D478: FB          ei
-D479: B3          or   e
-D47A: B2          or   d
-D47B: B1          or   c
-D47C: B0          or   b
-D47D: 4C          ld   c,h
-D47E: 4D          ld   c,l
-D47F: 4E          ld   c,(hl)
-D480: 4F          ld   c,a
+
 D481: 7E          ld   a,(hl)
 D482: E5          push hl
 D483: C5          push bc
@@ -5896,20 +5883,7 @@ D48A: ED B1       cpir
 D48C: C1          pop  bc
 D48D: E1          pop  hl
 D48E: C9          ret
-D48F: FF          rst  $38
-D490: FE FD       cp   $FD
-D492: FC FB FA    call m,$FAFB
-D495: F9          ld   sp,hl
-D496: E2 E1 E0    jp   po,$E0E1
-D499: DF          rst  $18
-D49A: DE 4C       sbc  a,$4C
-D49C: 4D          ld   c,l
-D49D: 4E          ld   c,(hl)
-D49E: 4F          ld   c,a
-D49F: B3          or   e
-D4A0: B2          or   d
-D4A1: B1          or   c
-D4A2: B0          or   b
+
 D4A3: 2A 15 62    ld   hl,(guard_struct_pointer_6215)
 D4A6: 3E 22       ld   a,$22
 D4A8: 77          ld   (hl),a

@@ -1,3 +1,5 @@
+- cd43: check d3/D4 values (twice)
 - suspicious : @246e
-- guard_wait_for_elevator_test_2AFA vs guard_wait_for_elevator_test_C4BC
+- new code unknown_609F D1AE
+- resync with l_d9cc
 z80 conv: review move.w into address register inc hl/dec hl => subq.w
