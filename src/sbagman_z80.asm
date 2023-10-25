@@ -6487,7 +6487,7 @@ DA54: C9          ret
 DA55: 3A 34 63    ld   a,(unknown_6334)
 DA58: FE 01       cp   $01
 DA5A: C8          ret  z
-DA5B: 2A 26 63    ld   hl,(unknown_6326)
+DA5B: 2A 26 63    ld   hl,(screen_base_logical_address_6326)
 DA5E: 7E          ld   a,(hl)
 DA5F: FE D4       cp   $D4
 DA61: 28 07       jr   z,$DA6A
@@ -6677,10 +6677,10 @@ DBEA: FE 01       cp   $01
 DBEC: C0          ret  nz
 DBED: AF          xor  a
 DBEE: 32 51 63    ld   (unknown_6351),a
-DBF1: 2A 26 63    ld   hl,(unknown_6326)
+DBF1: 2A 26 63    ld   hl,(screen_base_logical_address_6326)
 DBF4: 22 F6 61    ld   (picked_up_object_screen_address_61F6),hl
 DBF7: CD F3 F3    call $F3F3
-DBFA: 2A 26 63    ld   hl,(unknown_6326)
+DBFA: 2A 26 63    ld   hl,(screen_base_logical_address_6326)
 DBFD: 11 40 00    ld   de,$0040
 DC00: 19          add  hl,de
 DC01: 22 F8 62    ld   (unknown_62F8),hl
@@ -6959,85 +6959,7 @@ DEA2: 80          add  a,b
 DEA3: 67          ld   h,a
 DEA4: D1          pop  de
 DEA5: C9          ret
-DEA6: 00          nop
-DEA7: 50          ld   d,b
-DEA8: 4C          ld   c,h
-DEA9: 48          ld   c,b
-DEAA: 60          ld   h,b
-DEAB: 5C          ld   e,h
-DEAC: E5          push hl
-DEAD: 7C          ld   a,h
-DEAE: C6 08       add  a,$08
-DEB0: 67          ld   h,a
-DEB1: 3E 38       ld   a,$38
-DEB3: 77          ld   (hl),a
-DEB4: E1          pop  hl
-DEB5: C9          ret
-DEB6: E0          ret  po
-DEB7: 7D          ld   a,l
-DEB8: 7C          ld   a,h
-DEB9: 7B          ld   a,e
-DEBA: E0          ret  po
-DEBB: 79          ld   a,c
-DEBC: 78          ld   a,b
-DEBD: 77          ld   (hl),a
-DEBE: 76          halt
-DEBF: 75          ld   (hl),l
-DEC0: 74          ld   (hl),h
-DEC1: 73          ld   (hl),e
-DEC2: 72          ld   (hl),d
-DEC3: 71          ld   (hl),c
-DEC4: 70          ld   (hl),b
-DEC5: 6F          ld   l,a
-DEC6: 6E          ld   l,(hl)
-DEC7: 6D          ld   l,l
-DEC8: 6C          ld   l,h
-DEC9: 6B          ld   l,e
-DECA: 6A          ld   l,d
-DECB: 69          ld   l,c
-DECC: 68          ld   l,b
-DECD: 67          ld   h,a
-DECE: 6E          ld   l,(hl)
-DECF: 6D          ld   l,l
-DED0: 6C          ld   l,h
-DED1: 6B          ld   l,e
-DED2: 6A          ld   l,d
-DED3: 69          ld   l,c
-DED4: 68          ld   l,b
-DED5: 67          ld   h,a
-DED6: 76          halt
-DED7: 75          ld   (hl),l
-DED8: 74          ld   (hl),h
-DED9: 73          ld   (hl),e
-DEDA: 72          ld   (hl),d
-DEDB: 71          ld   (hl),c
-DEDC: 70          ld   (hl),b
-DEDD: 6F          ld   l,a
-DEDE: 76          halt
-DEDF: 75          ld   (hl),l
-DEE0: 74          ld   (hl),h
-DEE1: 73          ld   (hl),e
-DEE2: 72          ld   (hl),d
-DEE3: 71          ld   (hl),c
-DEE4: 70          ld   (hl),b
-DEE5: 6F          ld   l,a
-DEE6: E0          ret  po
-DEE7: 7D          ld   a,l
-DEE8: 7C          ld   a,h
-DEE9: 7B          ld   a,e
-DEEA: E0          ret  po
-DEEB: 79          ld   a,c
-DEEC: 78          ld   a,b
-DEED: 77          ld   (hl),a
-DEEE: E0          ret  po
-DEEF: E0          ret  po
-DEF0: E0          ret  po
-DEF1: E0          ret  po
-DEF2: E0          ret  po
-DEF3: E0          ret  po
-DEF4: E0          ret  po
-DEF5: E0          ret  po
-DEF6: FF          rst  $38
+
 DEF7: 3A 43 63    ld   a,(unknown_6343)
 DEFA: FE 01       cp   $01
 DEFC: C8          ret  z
@@ -7064,27 +6986,7 @@ DF24: 32 8E 93    ld   ($938E),a
 DF27: 3E 08       ld   a,$08
 DF29: 32 8E 9B    ld   ($9B8E),a
 DF2C: C9          ret
-DF2D: 78          ld   a,b
-DF2E: 7C          ld   a,h
-DF2F: 74          ld   (hl),h
-DF30: 72          ld   (hl),d
-DF31: 6E          ld   l,(hl)
-DF32: 6A          ld   l,d
-DF33: 76          halt
-DF34: 7E          ld   a,(hl)
-DF35: 7A          ld   a,d
-DF36: E0          ret  po
-DF37: E0          ret  po
-DF38: E0          ret  po
-DF39: E0          ret  po
-DF3A: E0          ret  po
-DF3B: E0          ret  po
-DF3C: E0          ret  po
-DF3D: E0          ret  po
-DF3E: E0          ret  po
-DF3F: E0          ret  po
-DF40: E0          ret  po
-DF41: FF          rst  $38
+
 DF42: DD 21 80 65 ld   ix,player_struct_6580
 DF46: FD 21 E5 62 ld   iy,unknown_62E5
 DF4A: 3A 0D 60    ld   a,(player_screen_600D)
@@ -7805,7 +7707,7 @@ E5AA: 32 FA 62    ld   (unknown_62FA),a
 E5AD: 32 FB 62    ld   (unknown_62FB),a
 E5B0: 32 23 63    ld   (unknown_6323),a
 E5B3: 32 24 63    ld   (unknown_6324),a
-E5B6: 32 26 63    ld   (unknown_6326),a
+E5B6: 32 26 63    ld   (screen_base_logical_address_6326),a
 E5B9: 32 27 63    ld   (unknown_6327),a
 E5BC: 32 E5 62    ld   (unknown_62E5),a
 E5BF: 32 E9 62    ld   (unknown_62E9),a
@@ -10795,7 +10697,7 @@ FECF: E1          pop  hl
 FED0: C8          ret  z
 FED1: 3A 0D 60    ld   a,(player_screen_600D)
 FED4: CD B2 F2    call $F2B2
-FED7: 22 26 63    ld   (unknown_6326),hl
+FED7: 22 26 63    ld   (screen_base_logical_address_6326),hl
 FEDA: 3E 24       ld   a,$24
 FEDC: 08          ex   af,af'
 FEDD: 3E D4       ld   a,$D4

@@ -147,6 +147,7 @@ start:
 		.global osd_w_videoram
 		.global osd_w_colorram
 		.global osd_r_videoram
+		.global osd_r_colorram
 		.global osd_update_sprites
 		.global osd_read_dipswitches
 		.global osd_read_inputs
@@ -1766,6 +1767,27 @@ seed:
 	dc.l	0x12345678
 
 	
+* d6=screen address
+osd_r_colorram:
+	movem.l	a0/d6,-(a7)
+	sub.w	#SCREEN_ADDRESS+0x800,d6
+	bmi.b	0f
+	cmp.w	#0x400,d6
+	bcs.b	1f
+0:
+	* should not happen
+	blitz
+	clr.b	d0
+	move.b	D2,d2
+	nop
+	bra.b	2f
+1:
+	lea		bg_colorram,a0
+	move.b	(a0,d6.w),d0
+2:
+	movem.l	(a7)+,a0/d6
+	rts
+
 * d6=screen address
 osd_r_videoram:
 	movem.l	a0/d6,-(a7)
