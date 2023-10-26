@@ -6973,14 +6973,14 @@ DF08: 32 F0 62    ld   (unknown_62F0),a
 DF0B: 3A 0D 60    ld   a,(player_screen_600D)
 DF0E: FE 02       cp   $02
 DF10: C0          ret  nz
-DF11: 2A F1 62    ld   hl,(unknown_62F1)
+DF11: 2A F1 62    ld   hl,(unknown_rom_address_62F1)
 DF14: 23          inc  hl
-DF15: 22 F1 62    ld   (unknown_62F1),hl
+DF15: 22 F1 62    ld   (unknown_rom_address_62F1),hl
 DF18: 7E          ld   a,(hl)
 DF19: FE FF       cp   $FF
 DF1B: 20 07       jr   nz,$DF24
 DF1D: 21 2D DF    ld   hl,$DF2D
-DF20: 22 F1 62    ld   (unknown_62F1),hl
+DF20: 22 F1 62    ld   (unknown_rom_address_62F1),hl
 DF23: 7E          ld   a,(hl)
 DF24: 32 8E 93    ld   ($938E),a
 DF27: 3E 08       ld   a,$08
@@ -7038,7 +7038,7 @@ DFBB: 32 26 91    ld   ($9126),a
 DFBE: C9          ret
 DFBF: CD 8D DF    call $DF8D
 DFC2: 21 2D DF    ld   hl,$DF2D
-DFC5: 22 F1 62    ld   (unknown_62F1),hl
+DFC5: 22 F1 62    ld   (unknown_rom_address_62F1),hl
 DFC8: 21 63 92    ld   hl,$9263
 DFCB: 22 0E 63    ld   (unknown_630E),hl
 DFCE: 3E 01       ld   a,$01
@@ -7061,53 +7061,7 @@ DFFA: 3E 05       ld   a,$05
 DFFC: 32 20 63    ld   (unknown_6320),a
 DFFF: CD 8C E5    call $E58C
 E002: C9          ret
-E003: FE AC       cp   $AC
-E005: A8          xor  b
-E006: A4          and  h
-E007: A0          and  b
-E008: 9C          sbc  a,h
-E009: 98          sbc  a,b
-E00A: 94          sub  h
-E00B: 90          sub  b
-E00C: AE          xor  (hl)
-E00D: AA          xor  d
-E00E: A6          and  (hl)
-E00F: A2          and  d
-E010: 9E          sbc  a,(hl)
-E011: 9A          sbc  a,d
-E012: 96          sub  (hl)
-E013: 92          sub  d
-E014: FF          rst  $38
-E015: 00          nop
-E016: 00          nop
-E017: 00          nop
-E018: 00          nop
-E019: 00          nop
-E01A: 00          nop
-E01B: 00          nop
-E01C: 00          nop
-E01D: 00          nop
-E01E: 01 00 00    ld   bc,$0000
-E021: 00          nop
-E022: 00          nop
-E023: 00          nop
-E024: 00          nop
-E025: 00          nop
-E026: 01 01 00    ld   bc,$0001
-E029: 00          nop
-E02A: 00          nop
-E02B: 00          nop
-E02C: 00          nop
-E02D: 00          nop
-E02E: 00          nop
-E02F: 01 00 00    ld   bc,$0000
-E032: 00          nop
-E033: 00          nop
-E034: 00          nop
-E035: 00          nop
-E036: 00          nop
-E037: 00          nop
-E038: 00          nop
+
 E039: CD 8D DF    call $DF8D
 E03C: 2A DD 62    ld   hl,(unknown_62DD)
 E03F: 7D          ld   a,l
@@ -7462,61 +7416,7 @@ E321: DD 21 94 65 ld   ix,guard_1_struct_6594
 E325: FD 21 C4 62 ld   iy,unknown_62C4
 E329: CD 87 E4    call $E487
 E32C: C9          ret
-E32D: 92          sub  d
-E32E: C0          ret  nz
-E32F: 02          ld   (bc),a
-E330: 40          ld   b,b
-E331: 81          add  a,c
-E332: C0          ret  nz
-E333: 02          ld   (bc),a
-E334: 80          add  a,b
-E335: 5A          ld   e,d
-E336: C0          ret  nz
-E337: 02          ld   (bc),a
-E338: 40          ld   b,b
-E339: 49          ld   c,c
-E33A: C0          ret  nz
-E33B: 02          ld   (bc),a
-E33C: 80          add  a,b
-E33D: A2          and  d
-E33E: 68          ld   l,b
-E33F: 02          ld   (bc),a
-E340: 40          ld   b,b
-E341: 90          sub  b
-E342: 68          ld   l,b
-E343: 02          ld   (bc),a
-E344: 80          add  a,b
-E345: 92          sub  d
-E346: 80          add  a,b
-E347: 03          inc  bc
-E348: 40          ld   b,b
-E349: 7A          ld   a,d
-E34A: 80          add  a,b
-E34B: 03          inc  bc
-E34C: 80          add  a,b
-E34D: 32 50 04    ld   ($0450),a
-E350: 40          ld   b,b
-E351: 20 50       jr   nz,$E3A3
-E353: 04          inc  b
-E354: 80          add  a,b
-E355: 38 70       jr   c,$E3C7
-E357: 04          inc  b
-E358: 80          add  a,b
-E359: B8          cp   b
-E35A: 18 04       jr   $E360
-E35C: 80          add  a,b
-E35D: B8          cp   b
-E35E: 70          ld   (hl),b
-E35F: 04          inc  b
-E360: 80          add  a,b
-E361: C2 18 04    jp   nz,$0418
-E364: 40          ld   b,b
-E365: C2 70 04    jp   nz,$0470
-E368: 40          ld   b,b
-E369: FF          rst  $38
-E36A: FF          rst  $38
-E36B: FF          rst  $38
-E36C: FF          rst  $38
+
 E36D: DD 21 94 65 ld   ix,guard_1_struct_6594
 E371: FD 21 C4 62 ld   iy,unknown_62C4
 E375: ED 5B 38 60 ld   de,(guard_1_logical_address_6038)

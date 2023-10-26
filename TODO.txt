@@ -1,5 +1,9 @@
 - cd43: check d3/D4 values (twice)
 - suspicious : @246e
 - new code unknown_609F D1AE
-- resync with l_d9cc
+- debug: l_f4f2
+- check TODO
+
+- sync fe54 with bagman (is_background_tile_for_object_drop_CFF3)
+
 z80 conv: review move.w into address register inc hl/dec hl => subq.w

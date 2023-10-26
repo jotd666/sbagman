@@ -193,6 +193,8 @@
 	.global	unknown_628A
 	.global	unknown_628C
 	.global	unknown_6290
+	.global	unknown_pointer_62DB
+	.global	unknown_screen_pointer_62DD
 	.global	elevator_struct_6584
 	.global	wagon_1_struct_6588
 	.global	unknown_658B
@@ -213,6 +215,11 @@
 	.global	unknown_65B4
 	.global	stack_top_67F0
 	.global	wagon_data_658A
+	.global	unknown_screen_pointer_630E
+	.global	unknown_screen_pointer_6315
+	.global	unknown_screen_pointer_6318
+	.global	unknown_screen_pointer_631B
+	.global	unknown_screen_pointer_631E
 
 number_of_credits_6000:
 	ds.b	4
@@ -600,6 +607,12 @@ unknown_628C:
 	ds.b	4
 unknown_6290:
 	ds.b	752
+	.align	2
+unknown_pointer_62DB:
+	ds.l	1
+unknown_screen_pointer_62DD:
+	ds.l	1
+	
 player_struct_6580:
 	ds.b	2
 player_x_6582:
@@ -662,6 +675,19 @@ previous_guard_1_struct_65B8:
 	ds.b	4
 previous_guard_2_struct_65BC:
 	ds.b	564
+	.align	2
+unknown_screen_pointer_630E:
+	ds.w	1
+unknown_screen_pointer_6315:
+	ds.w	1
+unknown_screen_pointer_6318:
+	ds.w	1
+unknown_screen_pointer_631B:
+	ds.w	1
+unknown_screen_pointer_631E:
+	ds.w	1
+unknown_62AD:
+	ds.w	1
 	.align	2
 	* more stack!
 	ds.l	0x1000
