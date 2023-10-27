@@ -4028,6 +4028,36 @@ l_555b:
 	clr.b	d0                               	| [$555c: xor  a]
 	rts                                    	| [$555d: ret]
 
+* display ASCII text on line until code 0x3F is reached
+* < a1: pointer on text
+* < d6: start address of screen
+
+display_text_55d9:
+	move.w	#-0x20,d1                        	| [$55d9: ld   bc,$FFE0] 65504
+												| [$55d9: ld   bc,$FFE0] 65504
+	move.b	(a1),d0                         	| [$55dc: ld   a,(de)]
+	cmp.b	#0x3F,d0                         	| [$55dd: cp   $3F]
+	bne.b	0f
+	rts                                    	| [$55df: ret  z]
+0:
+	* subtract 0x30, now numbers are in tiles 0-9, letters follow with
+	* a gap in between
+	sub.b	#0x30,d0                         	| [$55e0: sub  $30]
+	jbsr	osd_w_videoram                         	| [$55e2: ld   (hl),a]
+
+	move.w	d6,-(sp)                        	| [$55e3: push hl]
+												| [$55e4: ld   a,h]
+	add.w	#0x0800,d6                         	| [$55e5: add  a,$08]
+										| [$55e7: ld   h,a]
+	* bank 0, lower end of tiles and color table 0
+	clr.b	d0                               	| [$55e8: ld   a,$00]
+	jbsr	osd_w_colorram                         	| [$55ea: ld   (hl),a]
+	move.w	(sp)+,d6                        	| [$55eb: pop  hl]
+	addq.w	#1,a1                           	| [$55ec: inc  de]
+	add.w	d1,d6                            	| [$55ed: add  hl,bc]
+	jra	display_text_55d9                             	| [$55ee: jr   $55D9]
+
+
 * write text
 * < A1: text
 * < D6: screen address
@@ -11543,7 +11573,7 @@ restore_background_tile_F465:
 												| [$1930: ld   d,a]
 												| [$1931: ld   a,l]
 												| [$1932: ld   e,a]
-	jbsr	compute_backbuffer_tile_address_1945                          	| [$1933: call $1945]
+	jbsr	compute_backbuffer_tile_address_F47B                          	| [$1933: call $1945]
 
 	* D3 points to ROM now, copy tile data back to screen
 	and.l	#0xFFFF,d3
@@ -11575,6 +11605,7 @@ compute_backbuffer_tile_address_F47B:
 	moveq	#0,d3
 	rts
 1:
+	.endif
 
 	move.b	player_screen_600D,d0           	| [$f47b: ld   a,(player_screen_600D)]
 	cmp.b	#0x01,d0                         	| [$f47e: cp   $01]
@@ -11715,7 +11746,7 @@ l_f510:
 l_f534:
 
 	move.l	a2,-(sp)                        	| [$f534: push ix]
-	move.b	a3,unknown_pointer_604B         	| [$f536: ld   (unknown_pointer_604B),iy]
+	move.l	a3,unknown_pointer_604B         	| [$f536: ld   (unknown_pointer_604B),iy]
 	move.b	current_guard_screen_index_6098,d0	| [$f53a: ld   a,(current_guard_screen_index_6098)]
 	move.b	d0,d1                           	| [$f53d: ld   b,a]
 	move.b	player_screen_600D,d0           	| [$f53e: ld   a,(player_screen_600D)]
@@ -11749,12 +11780,10 @@ l_f551:
 	cmp.b	d1,d0                            	| [$f576: cp   b]
 	                        	| [$f577: push af]
 	bcs.b	0f                               	| [...]
-      ^^^^^^ TODO: review cpu flags (move.w,bcs.b)
 	jbsr	guard_goes_left_F649              	| [$f578: call nc,guard_goes_left_F649]
 	bra.b	1f                               	| [...]
 0:
 	                        	| [$f57b: pop  af]
-      ^^^^^^ TODO: review cpu flags (move.w,bcc.b)
 	jbsr	guard_goes_right_F652             	| [$f57c: call c,guard_goes_right_F652]
 1:
 	move.b	player_y_6583,d0                	| [$f57f: ld   a,(player_y_6583)]
@@ -11766,10 +11795,10 @@ l_f551:
 	cmp.b	d1,d0                            	| [$f58a: cp   b]
 	bcc.b	0f                               	| [...]
 	jbsr	guard_goes_down_F664              	| [$f58c: call c,guard_goes_down_F664]
-	bra.b	1f                               	| [...]
+	jra	1f                               	| [...]
 0:
 	jbsr	guard_goes_up_F65B                	| [$f590: call nc,guard_goes_up_F65B]
-0:
+1:
 	jra	l_f5ed                             	| [$f593: jr   $F5ED]
 l_f595:
 	jbsr  osd_get_random       	| [$f595: ld   a,(interrupt_control_A000)]
@@ -11842,7 +11871,7 @@ l_f5ed:
 	move.w	guard_logical_address_6091,d6	| [$f604: ld   hl,(guard_logical_address_6091)]
 	move.b	d0,stored_logical_address_6044  	| [$f607: ld   (stored_logical_address_6044),a]
 	lea	guard_1_struct_6594,a3         	| [$f60a: ld   iy,guard_1_struct_6594]
-	move.b	a3,guard_struct_pointer_6093    	| [$f60e: ld   (guard_struct_pointer_6093),iy]
+	move.l	a3,guard_struct_pointer_6093    	| [$f60e: ld   (guard_struct_pointer_6093),iy]
 	move.l	guard_direction_pointer_6095,a0	| [$f612: ld   hl,(guard_direction_pointer_6095)] contains guard direction pointer unknown_6027 or unknown_6067
 	ror.b	#1,d0                            	| [$f602: rrc  a]
 	jcc	l_f61c                             	| [$f615: jr   nc,$F61C]
@@ -11882,28 +11911,28 @@ guard_goes_left_F649:
 	or.b	#0x04,d0                          	| [$f64c: or   $04]
 	move.b	d0,(0x15,a2)                    	| [$f64e: ld   (ix+$15),a]
 	rts                                    	| [$f651: ret]
-guard_goes_right_f652:
+guard_goes_right_F652:
 	move.b	(0x15,a2),d0                    	| [$f652: ld   a,(ix+$15)]
 	or.b	#0x08,d0                          	| [$f655: or   $08]
 	move.b	d0,(0x15,a2)                    	| [$f657: ld   (ix+$15),a]
 	rts                                    	| [$f65a: ret]
-guard_goes_up_f65b:
+guard_goes_up_F65b:
 	move.b	(0x15,a2),d0                    	| [$f65b: ld   a,(ix+$15)]
 	or.b	#0x01,d0                          	| [$f65e: or   $01]
 	move.b	d0,(0x15,a2)                    	| [$f660: ld   (ix+$15),a]
 	rts                                    	| [$f663: ret]
-guard_goes_down_f664:
+guard_goes_down_F664:
 	move.b	(0x15,a2),d0                    	| [$f664: ld   a,(ix+$15)]
 	or.b	#0x02,d0                          	| [$f667: or   $02]
 	move.b	d0,(0x15,a2)                    	| [$f669: ld   (ix+$15),a]
 	rts                                    	| [$f66c: ret]
 l_f66d:
 	move.w	guard_1_logical_address_6038,d6	| [$f66d: ld   hl,(guard_1_logical_address_6038)]
-	move.b	d6,guard_logical_address_6091   	| [$f670: ld   (guard_logical_address_6091),hl]
+	move.w	d6,guard_logical_address_6091   	| [$f670: ld   (guard_logical_address_6091),hl]
 	lea	guard_1_struct_6594,a3         	| [$f673: ld   iy,guard_1_struct_6594]
 	move.l	a3,guard_struct_pointer_6093    	| [$f677: ld   (guard_struct_pointer_6093),iy]
 	lea	guard_1_direction_6027,a0      	| [$f67b: ld   hl,guard_1_direction_6027]
-	move.b	a0,guard_direction_pointer_6095 	| [$f67e: ld   (guard_direction_pointer_6095),hl]
+	move.l	a0,guard_direction_pointer_6095 	| [$f67e: ld   (guard_direction_pointer_6095),hl]
 	move.b	guard_1_sees_player_right_603C,d0	| [$f681: ld   a,(guard_1_sees_player_right_603C)]
 	                         	| [$f684: cp   $00]
 	beq.b	0f                               	| [...]
@@ -12135,7 +12164,7 @@ l_f7f7:
 	clr.b	(a2)                               	| [$f7f7: xor  a]
                   	| [$f7f8: ld   (ix+$00),a]
 	add.w	d1,d6					| [adc  hl,bc]
-	bsr		read_rom                         	| [$f7fd: ld   a,(hl)]
+	jbsr		read_rom                         	| [$f7fd: ld   a,(hl)]
 	movem.w	d1/d2,-(sp)                    	| [$f7fe: push bc]
 	move.b	#0x15,d1                        	| [$f7ff: ld   b,$15]
  * 15 tests
@@ -12306,7 +12335,7 @@ l_f8f7:
 	move.b	#0x01,d0                        	| [$f8fe: ld   a,$01]
 	move.b	d0,fatal_fall_height_reached_604E	| [$f900: ld   (fatal_fall_height_reached_604E),a]
 	move.w	player_logical_address_6009,d6	| [$f903: ld   hl,(player_logical_address_6009)]
- 	bsr		read_rom                          	| [$f906: ld   a,(hl)]
+ 	jbsr		read_rom                          	| [$f906: ld   a,(hl)]
 	cmp.b	#0xF8,d0                         	| [$f907: cp   $F8]
 
 	move.l	a0,-(sp)                        	| [$f909: push hl]
@@ -12659,7 +12688,7 @@ prepare_cleared_screen_FB98:
  	rts                                    	| [$fbb7: ret]
 choose_guard_random_direction_FBB8:
 	jbsr  osd_get_random       	| [$fbb8: ld   a,(interrupt_control_A000)]
-	direction_table_5970(pc),a0                      	| [$fbbb: ld   hl,$5970]
+	lea		direction_table_5970(pc),a0                      	| [$fbbb: ld   hl,$5970]
 	and.b	#0x03,d0                         	| [$fbbe: and  $03]
 	                            	| [$fbc0: add  a,l]
 	                           	| [$fbc1: ld   l,a]
@@ -12825,7 +12854,7 @@ drop_object_FC55:
 	tst.b	d0                         	| [$fc90: cp   $00]
 	jeq	l_d3a7                             	| [$fc92: jp   z,$D3A7]
 	movem.w	(sp)+,d5/d6                         	| [$fc95: pop  hl]
-	bsr	read_rom                          	| [$fc96: ld   a,(hl)]
+	jbsr	read_rom                          	| [$fc96: ld   a,(hl)]
 
 	movem.w	d5/d6,-(sp)                        	| [$fc99: push hl]
 	cmp.b	#0xE0,d0                         	| [$fc97: cp   $E0]
@@ -12838,7 +12867,7 @@ drop_object_FC55:
 	movem.w	(sp)+,d5/d6                       	| [$fca7: pop  hl]
 * hl is the same here as in 21F3 so test cannot be true, ever
 * I'm disabling this
-*	bsr	read_rom                         	| [$2205: ld   a,(hl)]
+*	jbsr	read_rom                         	| [$2205: ld   a,(hl)]
 *	cmp.b	#0xE0,d0                         	| [$2206: cp   $E0]
 *	bne.b	0f
 *	rts                                    	| [$2208: ret  z]
@@ -12886,7 +12915,7 @@ l_fcd3:
 l_fce7:
 	subq.w	#1,d6                           	| [$fce7: dec  hl]
 	movem.w	d1/d2,-(sp)                    	| [$fce8: push bc]
-	bsr		read_rom                         	| [$fce9: ld   a,(hl)]
+	jbsr		read_rom                         	| [$fce9: ld   a,(hl)]
 
 	move.l	a0,-(sp)                        	| [$fcea: push hl]
 	jbsr	l_f4f2                            	| [$fceb: call $F4F2]
@@ -13090,26 +13119,23 @@ l_fe24:
 	move.b	(0x02,a3),d0                    	| [$fe3b: ld   a,(iy+$02)]
 	cmp.b	d1,d0                            	| [$fe3e: cp   b]
 	jne	l_fe63                             	| [$fe3f: jr   nz,$FE63]
-	move.b	(A3),d6                    	| [$fe41: ld   l,(iy+$00)]
-	move.b	(0x01,a3),d5                    	| [$fe44: ld   h,(iy+$01)]
-	move.b	(a0),d0                         	| [$fe47: ld   a,(hl)]
+	LOAD_AX_BE_WORD_DY	a3,d6
+	              	| [$fe41: ld   l,(iy+$00)]
+	                   	| [$fe44: ld   h,(iy+$01)]
+	jbsr		read_rom                         	| [$fe47: ld   a,(hl)]
 	jbsr	is_background_tile_for_object_drop_CFF3	| [$fe48: call is_background_tile_for_object_drop_CFF3]
 	jne	l_fe63                             	| [$fe4b: jr   nz,$FE63]
 
-	move.l	a0,-(sp)                        	| [$fe4d: push hl]
+	move.w	d6,-(sp)                        	| [$fe4d: push hl]
 	movem.w	d3/d4,-(sp)                    	| [$fe4e: push de]
-	move.l	a1,-(sp)                        	| [$fe4e: push de]
 	                      	| [$fe4f: ld   de,$0020] 32
-	add.w	#0x20,d3                            	| [$fe52: add  hl,de]
+	add.w	#0x20,d6                            	| [$fe52: add  hl,de]
 	
-  ^^^^ TODO: review d3 computation above
-	move.b	(a0),d0                         	| [$fe53: ld   a,(hl)]
+	jbsr		read_rom                         	| [$fe53: ld   a,(hl)]
 	jbsr	is_background_tile_for_object_drop_CFF3	| [$fe54: call is_background_tile_for_object_drop_CFF3]
-	move.l	(sp)+,a1                        	| [$fe57: pop  de]
 	movem.w	(sp)+,d3/d4                    	| [$fe57: pop  de]
-	move.l	(sp)+,a0                        	| [$fe58: pop  hl]
+	movem.w	(sp)+,d6                        	| [$fe58: pop  hl]
 	jne	l_fe63                             	| [$fe59: jr   nz,$FE63]
-      ^^^^^^ TODO: review cpu flags (move.l,jne)
 	move.b	#0x24,d0                        	| [$fe5b: ld   a,$24]
 	exg	d0,d7                              	| [$fe5d: ex   af,af']
 
@@ -13124,48 +13150,40 @@ l_fe6c:
 
 	move.l	a3,-(sp)                        	| [$fe6d: push iy]
 	movem.w	d3/d4,-(sp)                    	| [$fe6f: push de]
-	move.l	a1,-(sp)                        	| [$fe6f: push de]
 	jbsr	l_dbb5                            	| [$fe70: call $DBB5]
-	move.b	(a1),d0                         	| [$fe73: ld   a,(de)]
-	move.b	d0,d6                           	| [$fe74: ld   l,a]
-	addq.w	#1,a1                           	| [$fe75: inc  de]
-                  ^^^^^^ TODO: review move.w into address register
-	move.b	(a1),d0                         	| [$fe76: ld   a,(de)]
-	move.b	d0,d5                           	| [$fe77: ld   h,a]
-	subq.w	#1,a1                           	| [$fe78: dec  de]
-                  ^^^^^^ TODO: review move.w into address register
+	LOAD_AX_BE_WORD_DY	a1,d6
+		| [$fe73: ld   a,(de)]
+		| [$fe74: ld   l,a]
+		| [$fe75: inc  de]
+
+		| [$fe76: ld   a,(de)]
+		| [$fe77: ld   h,a]
+		| [$fe78: dec  de]
 	move.b	player_screen_600D,d0           	| [$fe79: ld   a,(player_screen_600D)]
-	move.l	(sp)+,a3                        	| [$fe7c: pop  iy]
+	move.l	(sp),a3                        	| [$fe7c: pop  iy]
 	cmp.b	(0x02,a3),d0                     	| [$fe7e: cp   (iy+$02)]
 
-	move.l	a3,-(sp)                        	| [$fe81: push iy]
+	                        	| [$fe81: push iy]
 	jne	l_fea1                             	| [$fe83: jr   nz,$FEA1]
-      ^^^^^^ TODO: review cpu flags (move.l,jne)
-	move.b	(a0),d0                         	| [$fe85: ld   a,(hl)]
+	jbsr		read_rom                         	| [$fe85: ld   a,(hl)]
 	jbsr	is_background_tile_for_object_drop_CFF3	| [$fe86: call is_background_tile_for_object_drop_CFF3]
 	jne	l_fea1                             	| [$fe89: jr   nz,$FEA1]
 
-	move.l	a0,-(sp)                        	| [$fe8b: push hl]
+	move.w	d6,-(sp)                        	| [$fe8b: push hl]
 	movem.w	d3/d4,-(sp)                    	| [$fe8c: push de]
-	move.l	a1,-(sp)                        	| [$fe8c: push de]
 	move.w	#0x0020,d3                      	| [$fe8d: ld   de,$0020] 32
-	add.w	d3,a0                            	| [$fe90: add  hl,de]
-                  ^^^^^^ TODO: review move.w into address register
-  ^^^^ TODO: review d3 computation above
-	move.b	(a0),d0                         	| [$fe91: ld   a,(hl)]
+	add.w	d3,d6                            	| [$fe90: add  hl,de]
+	jbsr		read_rom                         	| [$fe91: ld   a,(hl)]
 	jbsr	is_background_tile_for_object_drop_CFF3	| [$fe92: call is_background_tile_for_object_drop_CFF3]
-	move.l	(sp)+,a1                        	| [$fe95: pop  de]
 	movem.w	(sp)+,d3/d4                    	| [$fe95: pop  de]
-	move.l	(sp)+,a0                        	| [$fe96: pop  hl]
+	movem.w	(sp)+,d6                        	| [$fe96: pop  hl]
 	jne	l_fea1                             	| [$fe97: jr   nz,$FEA1]
-      ^^^^^^ TODO: review cpu flags (move.l,jne)
 	move.b	#0x24,d0                        	| [$fe99: ld   a,$24]
 	exg	d0,d7                              	| [$fe9b: ex   af,af']
 
 	move.b	#0xD4,d0                        	| [$fe9c: ld   a,$D4]
 	jbsr	draw_object_tiles_CE7C            	| [$fe9e: call draw_object_tiles_CE7C]
 l_fea1:
-	move.l	(sp)+,a1                        	| [$fea1: pop  de]
 	movem.w	(sp)+,d3/d4                    	| [$fea1: pop  de]
 	move.l	(sp)+,a3                        	| [$fea2: pop  iy]
 
@@ -13176,7 +13194,7 @@ l_fea1:
 	rts                                    	| [$fead: ret]
 l_feae:
 	move.b	unknown_6334,d0                 	| [$feae: ld   a,(unknown_6334)]
-	cmp.b	#0x00,d0                         	| [$feb1: cp   $00]
+	                         	| [$feb1: cp   $00]
 	bne.b	0f                               	| [...]
 	rts                                    	| [$feb3: ret  z] [...]
 0:
@@ -13185,7 +13203,7 @@ l_feae:
 	move.b	player_screen_600D,d0           	| [$febc: ld   a,(player_screen_600D)]
 	move.b	d0,current_guard_screen_index_6098	| [$febf: ld   (current_guard_screen_index_6098),a]
 	jbsr	compute_logical_address_from_xy_EAEF	| [$fec2: call compute_logical_address_from_xy_EAEF]
-	bsr		read_rom                         	| [$fec5: ld   a,(hl)]
+	jbsr		read_rom                         	| [$fec5: ld   a,(hl)]
 
 	move.w	d6,-(sp)                        	| [$fec6: push hl]
 	lea	game_mem+0x21E3,a0                      	| [$fec7: ld   hl,$21E3]
@@ -13225,3 +13243,5 @@ l_ff2f:
 	move.b	#0x0D,d0                        	| [$ff32: ld   a,$0D]
 	jra	guard_move_if_fast_enough_06EE     	| [$ff34: jp   guard_move_if_fast_enough_06EE]
 
+direction_table_5970:
+	dc.b	0x80,0x40,0x20,0x10

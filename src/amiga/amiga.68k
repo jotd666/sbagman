@@ -554,9 +554,9 @@ save_highscores:
     rts
     
 	
-* To get the core to run, you just need to jump to bagman_reset after
+* To get the core to run, you just need to jump to sbagman_reset after
 * you've initialised the platform (Amiga) stuff. That essentially does a
-* Z80 reset. You also need to call bagman_im1_irq from the Amiga vblank
+* Z80 reset. You also need to call sbagman_im1_irq from the Amiga vblank
 * routine. They are the only 2 entry points required for the core to run,
 * even if there's no other I/O.
 
@@ -567,7 +567,7 @@ demo_game:
 		bsr			platform_init					| amiga-specific init
 		
 0:	
-		jmp			bagman_reset					| pass control to the bagman core
+		jmp			sbagman_reset					| pass control to the sbagman core
 		
 	
 				
@@ -629,7 +629,7 @@ _vblank:
 
 	sub.w	d1,delay_timer
 	
-	jbsr		bagman_irq
+	jbsr		sbagman_irq
 	.ifne  OPT_ENABLE_DOUBLE_BUFFERING_BG
 	bsr		switch_screen_buffers
 	.endif
@@ -832,7 +832,7 @@ osd_update_sprites:
 	bne.b	24f
 	tst.l	d3
 	bne.b	24f
-	* all black sprites would hide bagman sprites & tiles
+	* all black sprites would hide sbagman sprites & tiles
 	* we want to hide them instead (no need to change palette)
 	* inherited from pengo, probably not required
 	move.l	#blank_sprite,d4
@@ -868,7 +868,7 @@ osd_update_sprites:
 
 * priorities are from last to first
 test_sprites_demo:
-* guard chasing bagman+barrow
+* guard chasing sbagman+barrow
 	.byte	0x3A,0x28,0x9D,0xC1,0x00,0x00,0x00,0x38,0x1E,0x08,0x90,0xC1,0x00,0x00,0x00,0xE1
 	.byte	0x00,0x00,0x00,0x41,0x00,0x00,0x00,0xC9,0x2E,0x0C,0x30,0xC1,0x00,0x00,0x00,0x00
 
@@ -974,7 +974,7 @@ alloc_sprite:
 	* (only happens in demo screens)
 	*
 	* the strategy globally works because during game, all 4 enemies
-	* share the same palette. bagman uses another one, and ice block
+	* share the same palette. sbagman uses another one, and ice block
 	* another one too. Blinking stunned enemies can be a problem
 	* because of the extra blue color
 	*
@@ -1050,7 +1050,7 @@ osd_sound_start:
 	* music
 4:
 	* don't play if game not in play
-	* could have been handled at generic bagman.68k level
+	* could have been handled at generic sbagman.68k level
 	* but it's way simpler here. I suppose than the real game
 	* just turns music volume off to get away with it
 	*tst.b	game_playing_8817
@@ -1072,7 +1072,7 @@ osd_sound_start:
 	bsr		osd_sound_stop
     lea _custom,a6
  	movem.l	d0/a0,-(a7)
-    lea	bagman_tunes,a0
+    lea	sbagman_tunes,a0
 	move.b	d1,music_track_start_number
 	move.w	d1,d0
     sub.l   a1,a1		| samples are in the module
@@ -2268,7 +2268,7 @@ graphicsname:
 	.ascii	"graphics.library"
 	.byte	0
 normal_hiscorename:
-	.asciz	"bagman.high"
+	.asciz	"sbagman.high"
 floppy_file:
 	.ascii	"floppy"
 	.byte	0
@@ -2284,7 +2284,7 @@ palette:
 	.include "palette_cluts.68k"
 	
 	
-	* on amiga, this file is included in bagman.68k file
+	* on amiga, this file is included in sbagman.68k file
 	* so the assembler can optimize by using PC-relative addressing
 	* whenever possible (and it does)
 	.ifndef	RELEASE
