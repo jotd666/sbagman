@@ -1742,7 +1742,7 @@ can_player_climb_up_0E36:
 0EBA: 3A 58 61    ld   a,(has_bag_6158)
 0EBD: FE 00       cp   $00
 0EBF: C8          ret  z
-0EC0: 3A 41 63    ld   a,(unknown_6341)
+0EC0: 3A 41 63    ld   a,(is_key_hunt_phase_6341)
 0EC3: FE 01       cp   $01
 0EC5: 28 0C       jr   z,$0ED3
 0EC7: 3E 3F       ld   a,$3F
@@ -2007,7 +2007,7 @@ handle_player_object_carry_10C6:
 10C6: 3A 58 61    ld   a,(has_bag_6158)
 10C9: FE 00       cp   $00
 10CB: C8          ret  z
-10CC: 3A 41 63    ld   a,(unknown_6341)
+10CC: 3A 41 63    ld   a,(is_key_hunt_phase_6341)
 10CF: FE 01       cp   $01
 10D1: 20 04       jr   nz,$10D7
 10D3: CD 37 EC    call $EC37
@@ -2585,7 +2585,7 @@ play_intro_1218:
 1615: 21 E4 61    ld   hl,unknown_61E4
 1618: 35          dec  (hl)
 1619: 35          dec  (hl)
-161A: CD D9 D4    call can_pick_bag_D4D9
+161A: CD D9 D4    call is_ay_sound_playing_D4D9
 161D: 20 0A       jr   nz,$1629
 161F: 21 68 5B    ld   hl,$5B68
 1622: 22 40 61    ld   (ay_sound_pointer_6140),hl
@@ -2626,9 +2626,8 @@ play_intro_1218:
 1675: 3A D3 60    ld   a,(unknown_60D3)
 1678: 32 5F 92    ld   ($925F),a
 167B: C9          ret
-167C: 01 01 01    ld   bc,$0101
-167F: 00          nop
-1680: 01 00 79    ld   bc,$7900
+
+1682: 79          ld   a,c                                            
 1683: 21 E5 61    ld   hl,unknown_61E5
 1686: 86          add  a,(hl)
 1687: 77          ld   (hl),a
@@ -2726,7 +2725,7 @@ read_player_controls_1689:
 173A: E6 03       and  $03
 173C: 32 26 60    ld   (player_input_6026),a
 173F: DD 21 20 18 ld   ix,$1820
-1743: 3A 41 63    ld   a,(unknown_6341)
+1743: 3A 41 63    ld   a,(is_key_hunt_phase_6341)
 1746: FE 01       cp   $01
 1748: 28 04       jr   z,$174E
 174A: DD 21 48 18 ld   ix,$1848
@@ -2820,7 +2819,8 @@ read_player_controls_1689:
 181A: 3E 0C       ld   a,$0C
 181C: 32 7D 62    ld   (unknown_627D),a
 181F: C9          ret
-
+ 
+1918: 7A          ld   a,d                                            
 1919: FD 21 4E 22 ld   iy,$224E
 191D: FE 34       cp   $34
 191F: D8          ret  c
@@ -3330,6 +3330,21 @@ add_to_score_5C90:
 5D3D: 32 99 60    ld   (guard_1_screen_6099),a
 5D40: 32 9A 60    ld   (guard_2_screen_609A),a
 5D43: C9          ret
+
+5E38: 32 9A 65     ld   ($659A),a                                      
+5E3B: 3E 03        ld   a,$03                                          
+5E3D: 32 99 60     ld   ($6099),a                                      
+5E40: 32 9A 60     ld   ($609A),a                                      
+5E43: C3 14 5D     jp   $5D14                                          
+
+5E46: 3A 54 60    ld   a,(gameplay_allowed_6054)                                      
+5E49: FE 01       cp   $01                                            
+5E4B: C8          ret  z                                              
+5E4C: 3A 26 60    ld   a,(player_input_6026)                                      
+5E4F: E6 07       and  $07                                            
+5E51: 32 26 60    ld   (player_input_6026),a                                      
+5E54: C3 A0 5C    jp   $5CA0                                          
+
 
 startup_C000:
 C000: C3 82 C3    jp   $C382
@@ -3892,10 +3907,10 @@ C465: 3A 7D 62    ld   a,(unknown_627D)
 C468: 32 90 62    ld   (unknown_6290),a
 C46B: F1          pop  af
 C46C: 32 7D 62    ld   (unknown_627D),a
-C46F: 3A 41 63    ld   a,(unknown_6341)
+C46F: 3A 41 63    ld   a,(is_key_hunt_phase_6341)
 C472: F5          push af
 C473: 3A 40 63    ld   a,(unknown_6340)
-C476: 32 41 63    ld   (unknown_6341),a
+C476: 32 41 63    ld   (is_key_hunt_phase_6341),a
 C479: F1          pop  af
 C47A: 32 40 63    ld   (unknown_6340),a
 C47D: C9          ret
@@ -4696,7 +4711,7 @@ CACC: 47          ld   b,a
 CACD: DD 7E 02    ld   a,(ix+$02)
 CAD0: B8          cp   b
 CAD1: C0          ret  nz
-CAD2: 3A 41 63    ld   a,(unknown_6341)
+CAD2: 3A 41 63    ld   a,(is_key_hunt_phase_6341)
 CAD5: FE 01       cp   $01
 CAD7: 28 47       jr   z,$CB20
 CAD9: 3E D0       ld   a,$D0
@@ -5317,7 +5332,7 @@ CFBD: 3A D3 60    ld   a,(unknown_60D3)
 CFC0: 3C          inc  a
 CFC1: 32 D3 60    ld   (unknown_60D3),a
 CFC4: AF          xor  a
-CFC5: 32 41 63    ld   (unknown_6341),a
+CFC5: 32 41 63    ld   (is_key_hunt_phase_6341),a
 CFC8: 11 9C 60    ld   de,bags_coordinates_609C
 CFCB: 21 15 1B    ld   hl,$1B15
 * a is always 0 there!
@@ -5463,7 +5478,7 @@ D0E9: 11 05 57    ld   de,$5705
 D0EC: 21 40 92    ld   hl,$9240
 D0EF: CD 67 CA    call display_localized_text_CA67
 D0F2: C9          ret
-D0F3: CD D9 D4    call can_pick_bag_D4D9
+D0F3: CD D9 D4    call is_ay_sound_playing_D4D9
 D0F6: C0          ret  nz
 D0F7: 3A 53 63    ld   a,(unknown_6353)
 D0FA: 3C          inc  a
@@ -5498,7 +5513,7 @@ D12F: CD 69 D2    call check_remaining_bags_D269
 D132: 79          ld   a,c
 D133: FE 00       cp   $00
 D135: C8          ret  z
-D136: 3A 41 63    ld   a,(unknown_6341)
+D136: 3A 41 63    ld   a,(is_key_hunt_phase_6341)
 D139: FE 01       cp   $01
 D13B: CA D0 D1    jp   z,$D1D0
 D13E: 3E 00       ld   a,$00
@@ -5521,7 +5536,7 @@ D168: 32 32 63    ld   (unknown_6332),a
 D16B: 32 42 63    ld   (unknown_6342),a
 D16E: F3          di
 D16F: 3E 01       ld   a,$01
-D171: 32 41 63    ld   (unknown_6341),a
+D171: 32 41 63    ld   (is_key_hunt_phase_6341),a
 D174: CD 51 F9    call init_new_game_F951
 D177: CD 14 C3    call init_guard_directions_and_wagons_C314
 D17A: CD BF DF    call $DFBF
@@ -5565,7 +5580,7 @@ D1E0: 32 0E 93    ld   ($930E),a
 D1E3: 32 0F 93    ld   ($930F),a
 D1E6: 3E 01       ld   a,$01
 D1E8: 32 43 63    ld   (unknown_6343),a
-D1EB: 32 41 63    ld   (unknown_6341),a
+D1EB: 32 41 63    ld   (is_key_hunt_phase_6341),a
 D1EE: 3E E0       ld   a,$E0
 D1F0: 32 8E 93    ld   ($938E),a
 D1F3: 3E 05       ld   a,$05
@@ -5581,7 +5596,7 @@ D207: 3E 00       ld   a,$00
 D209: 32 43 63    ld   (unknown_6343),a
 D20C: 32 53 60    ld   (game_locked_6053),a
 D20F: 3E 01       ld   a,$01
-D211: 32 41 63    ld   (unknown_6341),a
+D211: 32 41 63    ld   (is_key_hunt_phase_6341),a
 D214: 32 03 A0    ld   ($A003),a
 D217: 32 32 63    ld   (unknown_6332),a
 D21A: 32 42 63    ld   (unknown_6342),a
@@ -5598,7 +5613,7 @@ D236: CD 2A D8    call $D82A
 D239: AF          xor  a
 D23A: 32 32 63    ld   (unknown_6332),a
 D23D: 32 42 63    ld   (unknown_6342),a
-D240: 32 41 63    ld   (unknown_6341),a
+D240: 32 41 63    ld   (is_key_hunt_phase_6341),a
 D243: 3E 01       ld   a,$01
 D245: 32 54 60    ld   (gameplay_allowed_6054),a
 D248: 3A 56 60    ld   a,(lives_6056)
@@ -5912,7 +5927,7 @@ D4D4: AF          xor  a
 D4D5: 32 53 61    ld   (unknown_6153),a
 D4D8: C9          ret
 
-can_pick_bag_D4D9:
+is_ay_sound_playing_D4D9:
 D4D9: DD E5       push ix
 D4DB: DD 2A 40 61 ld   ix,(ay_sound_pointer_6140)
 D4DF: DD 7E 03    ld   a,(ix+$03)
@@ -6018,7 +6033,7 @@ D5CD: 32 9F 65    ld   (sprite_object_y_659F),a
 D5D0: 3E 33       ld   a,$33
 D5D2: 32 9C 65    ld   (object_held_struct_659C),a
 D5D5: C9          ret
-D5D6: 3A 11 63    ld   a,(unknown_6311)
+D5D6: 3A 11 63    ld   a,(has_bomb_6311)
 D5D9: FE 00       cp   $00
 D5DB: C8          ret  z
 D5DC: 3A 80 65    ld   a,(player_struct_6580)
@@ -6190,7 +6205,7 @@ D743: C8          ret  z
 D744: 3A CF 61    ld   a,(has_pick_61CF)
 D747: FE 01       cp   $01
 D749: C8          ret  z
-D74A: 3A 11 63    ld   a,(unknown_6311)
+D74A: 3A 11 63    ld   a,(has_bomb_6311)
 D74D: FE 01       cp   $01
 D74F: C8          ret  z
 D750: 3A 58 61    ld   a,(has_bag_6158)
@@ -6223,7 +6238,7 @@ D799: 32 D3 62    ld   (unknown_62D3),a
 D79C: 32 BD 62    ld   (unknown_62BD),a
 D79F: 32 F6 61    ld   (picked_up_object_screen_address_61F6),a
 D7A2: 32 F7 61    ld   (unknown_61F7),a
-D7A5: 32 11 63    ld   (unknown_6311),a
+D7A5: 32 11 63    ld   (has_bomb_6311),a
 D7A8: C9          ret
 D7A9: 3A D3 60    ld   a,(unknown_60D3)
 D7AC: FE 02       cp   $02
@@ -6245,7 +6260,7 @@ D7D0: 32 14 60    ld   (unknown_6014),a
 D7D3: 32 1C 60    ld   (player_in_wagon_1_601C),a
 D7D6: 32 58 61    ld   (has_bag_6158),a
 D7D9: 32 40 63    ld   (unknown_6340),a
-D7DC: 32 41 63    ld   (unknown_6341),a
+D7DC: 32 41 63    ld   (is_key_hunt_phase_6341),a
 D7DF: 3E 01       ld   a,$01
 D7E1: 32 D3 60    ld   (unknown_60D3),a
 D7E4: 32 B6 61    ld   (unknown_61B6),a
@@ -6392,6 +6407,7 @@ D8F2: 3C          inc  a
 D8F3: 4F          ld   c,a
 D8F4: C9          ret
 
+D9B7: 2A 3D 63    ld   hl,($633D)                                     
 D9BA: 7E          ld   a,(hl)
 D9BB: FE 01       cp   $01
 D9BD: 20 0D       jr   nz,$D9CC
@@ -6559,7 +6575,7 @@ DACE: 28 28       jr   z,$DAF8
 DAD0: 3A 58 61    ld   a,(has_bag_6158)
 DAD3: FE 01       cp   $01
 DAD5: 28 21       jr   z,$DAF8
-DAD7: 3A 11 63    ld   a,(unknown_6311)
+DAD7: 3A 11 63    ld   a,(has_bomb_6311)
 DADA: FE 01       cp   $01
 DADC: CA 65 DB    jp   z,$DB65
 DADF: 01 C7 61    ld   bc,holds_barrow_61C7
@@ -6618,7 +6634,7 @@ DB65: 06 04       ld   b,$04
 DB67: FD 21 12 63 ld   iy,unknown_6312
 DB6B: C5          push bc
 DB6C: FD E5       push iy
-DB6E: 01 11 63    ld   bc,unknown_6311
+DB6E: 01 11 63    ld   bc,has_bomb_6311
 DB71: FD 21 0E 63 ld   iy,unknown_630E
 DB75: 3E 35       ld   a,$35
 DB77: FD 77 04    ld   (iy+$04),a
@@ -6635,7 +6651,7 @@ DB90: FD 23       inc  iy
 DB92: CD B5 DB    call $DBB5
 DB95: C1          pop  bc
 DB96: 10 D3       djnz $DB6B
-DB98: 01 11 63    ld   bc,unknown_6311
+DB98: 01 11 63    ld   bc,has_bomb_6311
 DB9B: FD 21 0E 63 ld   iy,unknown_630E
 DB9F: 3E 32       ld   a,$32
 DBA1: FD 77 04    ld   (iy+$04),a
@@ -8388,7 +8404,7 @@ EBFE: CD 55 FC    call drop_object_FC55
 EC01: FD E1       pop  iy
 EC03: C1          pop  bc
 EC04: C9          ret
-EC05: 3A 41 63    ld   a,(unknown_6341)
+EC05: 3A 41 63    ld   a,(is_key_hunt_phase_6341)
 EC08: FE 01       cp   $01
 EC0A: 28 14       jr   z,$EC20
 EC0C: 23          inc  hl
@@ -8899,7 +8915,7 @@ F111: CD 08 D7    call $D708
 F114: 3A 43 63    ld   a,(unknown_6343)
 F117: FE 01       cp   $01
 F119: CC 2F D1    call z,check_if_level_completed_D12F
-F11C: 3A 11 63    ld   a,(unknown_6311)
+F11C: 3A 11 63    ld   a,(has_bomb_6311)
 F11F: FE 01       cp   $01
 F121: 28 2F       jr   z,$F152
 F123: 3A 23 63    ld   a,(unknown_6323)
@@ -9055,7 +9071,7 @@ F273: CD C2 F2    call $F2C2
 F276: CD C2 F2    call $F2C2
 F279: 21 81 D9    ld   hl,$D981
 F27C: CD 84 EC    call play_sample_EC84
-F27F: CD D9 D4    call can_pick_bag_D4D9
+F27F: CD D9 D4    call is_ay_sound_playing_D4D9
 F282: 20 0A       jr   nz,$F28E
 F284: 21 78 5B    ld   hl,$5B78
 F287: 22 40 61    ld   (ay_sound_pointer_6140),hl
@@ -9111,7 +9127,7 @@ F2EA: C8          ret  z
 F2EB: 3A 59 61    ld   a,(bag_falling_6159)
 F2EE: FE 01       cp   $01
 F2F0: C8          ret  z
-F2F1: 3A 11 63    ld   a,(unknown_6311)
+F2F1: 3A 11 63    ld   a,(has_bomb_6311)
 F2F4: FE 01       cp   $01
 F2F6: C8          ret  z
 F2F7: 3A 5E 61    ld   a,(bag_sliding_615E)
@@ -9172,7 +9188,7 @@ F36A: CD 55 FC    call drop_object_FC55
 F36D: E1          pop  hl
 F36E: FD E1       pop  iy
 F370: DD 21 80 65 ld   ix,player_struct_6580
-F374: 3A 41 63    ld   a,(unknown_6341)
+F374: 3A 41 63    ld   a,(is_key_hunt_phase_6341)
 F377: FE 01       cp   $01
 F379: 20 1A       jr   nz,$F395
 F37B: 3E 31       ld   a,$31
@@ -9194,7 +9210,7 @@ F3A3: DD 77 1F    ld   (ix+$1f),a
 F3A6: DD 7E 02    ld   a,(ix+$02)
 F3A9: D6 08       sub  $08
 F3AB: DD 77 1E    ld   (ix+$1e),a
-F3AE: CD D9 D4    call can_pick_bag_D4D9
+F3AE: CD D9 D4    call is_ay_sound_playing_D4D9
 F3B1: 20 0A       jr   nz,$F3BD
 F3B3: 21 A8 5B    ld   hl,$5BA8
 F3B6: 22 40 61    ld   (ay_sound_pointer_6140),hl
@@ -9382,7 +9398,7 @@ F4F1: C9          ret
 F4F2: 21 84 23    ld   hl,$2384
 F4F5: 01 13 00    ld   bc,$0013
 F4F8: F5          push af
-F4F9: 3A 41 63    ld   a,(unknown_6341)
+F4F9: 3A 41 63    ld   a,(is_key_hunt_phase_6341)
 F4FC: FE 01       cp   $01
 F4FE: CB 1B       rr   e
 F500: F1          pop  af
@@ -9983,7 +9999,7 @@ F9CC: 3A C5 61    ld   a,(unknown_61C5)
 F9CF: FE 00       cp   $00
 F9D1: 28 01       jr   z,$F9D4
 F9D3: C9          ret
-F9D4: 3A 41 63    ld   a,(unknown_6341)
+F9D4: 3A 41 63    ld   a,(is_key_hunt_phase_6341)
 F9D7: FE 01       cp   $01
 F9D9: C8          ret  z
 F9DA: 21 C3 92    ld   hl,$92C3
@@ -10056,7 +10072,7 @@ FA7A: DD 77 03    ld   (ix+$03),a
 FA7D: AF          xor  a
 FA7E: 32 58 61    ld   (has_bag_6158),a
 FA81: 32 C7 61    ld   (holds_barrow_61C7),a
-FA84: 32 11 63    ld   (unknown_6311),a
+FA84: 32 11 63    ld   (has_bomb_6311),a
 FA87: CD BF DF    call $DFBF
 FA8A: 3A 7D 61    ld   a,(number_of_players_617D)
 FA8D: FE 01       cp   $01
@@ -10283,7 +10299,7 @@ FC55: DD 21 9C 65 ld   ix,object_held_struct_659C
 FC59: 3A 0D 60    ld   a,(player_screen_600D)
 FC5C: 32 98 60    ld   (current_guard_screen_index_6098),a
 FC5F: CD EF EA    call compute_logical_address_from_xy_EAEF
-FC62: 3A 11 63    ld   a,(unknown_6311)
+FC62: 3A 11 63    ld   a,(has_bomb_6311)
 FC65: FE 01       cp   $01
 FC67: CA E7 FC    jp   z,$FCE7
 FC6A: E5          push hl
@@ -10607,19 +10623,9 @@ FEE4: 32 34 63    ld   (unknown_6334),a
 FEE7: 3E FF       ld   a,$FF
 FEE9: 32 9F 65    ld   (sprite_object_y_659F),a
 FEEC: C9          ret
-FEED: 05          dec  b
-FEEE: 08          ex   af,af'
-FEEF: 4E          ld   c,(hl)
-FEF0: 20 48       jr   nz,$FF3A
-FEF2: 03          inc  bc
-FEF3: 41          ld   b,c
-FEF4: 30 08       jr   nc,$FEFE
-FEF6: 01 DC 08    ld   bc,$08DC
-FEF9: 0C          inc  c
-FEFA: 30 45       jr   nc,$FF41
-FEFC: 10 46       djnz $FF44
-FEFE: 31 4D FE    ld   sp,$FE4D
-FF01: 06 D8       ld   b,$D8
+
+FF00: FE 06       cp   $06                                            
+FF02: D8          ret  c                                              
 FF03: 06 0B       ld   b,$0B
 FF05: FE 07       cp   $07
 FF07: D8          ret  c

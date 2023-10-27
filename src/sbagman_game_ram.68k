@@ -221,6 +221,110 @@
 	.global	unknown_screen_pointer_631B
 	.global	unknown_screen_pointer_631E
 
+	.global	screen_base_logical_address_6326
+	.global	unknown_609F
+	.global	unknown_60A1
+	.global	unknown_60D3
+	.global	unknown_61B6
+	.global	unknown_61F7
+	.global	unknown_6293
+	.global	unknown_6294
+	.global	unknown_6295
+	.global	unknown_6297
+	.global	unknown_6298
+	.global	unknown_6299
+	.global	unknown_629B
+	.global	unknown_629C
+	.global	unknown_629D
+	.global	unknown_629F
+	.global	unknown_62A3
+	.global	unknown_62A4
+	.global	unknown_62A5
+	.global	unknown_62A7
+	.global	unknown_62AC
+	.global	unknown_62AF
+	.global	unknown_62B0
+	.global	unknown_62B2
+	.global	unknown_62B5
+	.global	unknown_62B6
+	.global	unknown_62B9
+	.global	unknown_62BA
+	.global	unknown_62BC
+	.global	unknown_62BD
+	.global	unknown_62C1
+	.global	unknown_62C4
+	.global	unknown_62CB
+	.global	unknown_62D2
+	.global	unknown_62D3
+	.global	unknown_62D6
+	.global	unknown_62DA
+	.global	unknown_62DF
+	.global	unknown_62E0
+	.global	unknown_62E1
+	.global	unknown_62E3
+	.global	unknown_62E5
+	.global	unknown_62E9
+	.global	unknown_62EA
+	.global	unknown_62ED
+	.global	unknown_62EE
+	.global	unknown_62F0
+	.global	unknown_62F5
+	.global	unknown_62F7
+	.global	unknown_62F9
+	.global	unknown_62FA
+	.global	unknown_62FB
+	.global	unknown_62FC
+	.global	unknown_6304
+	.global	unknown_630E
+	.global	unknown_6310
+	.global	has_bomb_6311
+	.global	unknown_6312
+	.global	unknown_6314
+	.global	unknown_6315
+	.global	unknown_6317
+	.global	unknown_631A
+	.global	unknown_631D
+	.global	unknown_6320
+	.global	unknown_6323
+	.global	unknown_6324
+	.global	unknown_6327
+	.global	unknown_632A
+	.global	unknown_632F
+	.global	unknown_6332
+	.global	unknown_6334
+	.global	unknown_6336
+	.global	unknown_6337
+	.global	unknown_6338
+	.global	unknown_633A
+	.global	unknown_6340
+	.global	is_key_hunt_phase_6341
+	.global	unknown_6342
+	.global	unknown_6343
+	.global	unknown_6345
+	.global	unknown_6346
+	.global	unknown_6348
+	.global	unknown_634A
+	.global	unknown_634C
+	.global	unknown_634D
+	.global	unknown_6351
+	.global	unknown_6352
+	.global	unknown_6353
+	.global	unknown_6356
+	.global	unknown_6358
+	.global	unknown_635B
+	.global	unknown_635D
+	.global	unknown_6360
+	.global	unknown_6586
+	.global	unknown_658D
+	.global	unknown_658E
+	.global	unknown_658F
+	.global	unknown_6595
+	.global	unknown_pointer_62F6
+	.global	unknown_pointer_633D
+	.global	unknown_rom_address_62F1
+	.global	unknown_screen_address_62F8
+	.global	unknown_699A
+	
 number_of_credits_6000:
 	ds.b	4
 fake_credit_digit_6004:
@@ -390,7 +494,14 @@ guard_2_screen_609A:
 unknown_609B:
 	ds.b	1
 bags_coordinates_609C:
-	ds.b	164
+	ds.b	3
+unknown_609F:
+	ds.b	2
+unknown_60A1:
+	ds.b	50
+unknown_60D3:
+	ds.b	200
+
 	.align	2
 ay_sound_pointer_6140:
 	ds.l	1
@@ -463,6 +574,8 @@ unknown_617E:
 	ds.b	1
 bags_coordinates_617F:
 	ds.b	62
+unknown_61B6:
+	ds.b	7
 unknown_61BD:
 	ds.b	3
 unknown_61C0:
@@ -606,13 +719,198 @@ unknown_628A:
 unknown_628C:
 	ds.b	4
 unknown_6290:
-	ds.b	752
+	ds.b	3
+unknown_6293:
+	ds.b	1
+unknown_6294:
+	ds.b	1
+unknown_6295:
+	ds.b	2
+unknown_6297:
+	ds.b	1
+unknown_6298:
+	ds.b	1
+unknown_6299:
+	ds.b	2
+unknown_629B:
+	ds.b	1
+unknown_629C:
+	ds.b	1
+unknown_629D:
+	ds.b	2
+unknown_629F:
+	ds.b	4
+unknown_62A3:
+	ds.b	1
+unknown_62A4:
+	ds.b	1
+unknown_62A5:
+	ds.b	2
+unknown_62A7:
+	ds.b	5
+unknown_62AC:
+	ds.b	3
+unknown_62AF:
+	ds.b	1
+unknown_62B0:
+	ds.b	2
+unknown_62B2:
+	ds.b	3
+unknown_62B5:
+	ds.b	1
+unknown_62B6:
+	ds.b	3
+unknown_62B9:
+	ds.b	1
+unknown_62BA:
+	ds.b	2
+unknown_62BC:
+	ds.b	1
+unknown_62BD:
+	ds.b	4
+unknown_62C1:
+	ds.b	3
+unknown_62C4:
+	ds.b	7
+unknown_62CB:
+	ds.b	7
+unknown_62D2:
+	ds.b	1
+unknown_62D3:
+	ds.b	3
+unknown_62D6:
+	ds.b	4
+unknown_62DA:
+	ds.b	1
 	.align	2
 unknown_pointer_62DB:
 	ds.l	1
 unknown_screen_pointer_62DD:
 	ds.l	1
-	
+
+unknown_62DF:
+	ds.b	1
+unknown_62E0:
+	ds.b	1
+unknown_62E1:
+	ds.b	2
+unknown_62E3:
+	ds.b	2
+unknown_62E5:
+	ds.b	4
+unknown_62E9:
+	ds.b	1
+unknown_62EA:
+	ds.b	3
+unknown_62ED:
+	ds.b	1
+unknown_62EE:
+	ds.b	2
+unknown_62F0:
+	ds.b	1
+unknown_rom_address_62F1:
+	ds.b	4
+unknown_62F5:
+	ds.b	1
+unknown_pointer_62F6:
+	ds.b	1
+unknown_62F7:
+	ds.b	1
+unknown_screen_address_62F8:
+	ds.b	1
+unknown_62F9:
+	ds.b	1
+unknown_62FA:
+	ds.b	1
+unknown_62FB:
+	ds.b	1
+unknown_62FC:
+	ds.b	8
+unknown_6304:
+	ds.b	10
+unknown_630E:
+	ds.b	2
+unknown_6310:
+	ds.b	1
+has_bomb_6311:
+	ds.b	1
+unknown_6312:
+	ds.b	2
+unknown_6314:
+	ds.b	1
+unknown_6315:
+	ds.b	2
+unknown_6317:
+	ds.b	3
+unknown_631A:
+	ds.b	3
+unknown_631D:
+	ds.b	3
+unknown_6320:
+	ds.b	3
+unknown_6323:
+	ds.b	1
+unknown_6324:
+	ds.b	2
+screen_base_logical_address_6326:
+	ds.b	1
+unknown_6327:
+	ds.b	3
+unknown_632A:
+	ds.b	5
+unknown_632F:
+	ds.b	3
+unknown_6332:
+	ds.b	2
+unknown_6334:
+	ds.b	2
+unknown_6336:
+	ds.b	1
+unknown_6337:
+	ds.b	1
+unknown_6338:
+	ds.b	2
+unknown_633A:
+	ds.b	3
+	.align		2
+unknown_pointer_633D:
+	ds.l	1
+unknown_6340:
+	ds.b	1
+is_key_hunt_phase_6341:
+	ds.b	1
+unknown_6342:
+	ds.b	1
+unknown_6343:
+	ds.b	2
+unknown_6345:
+	ds.b	1
+unknown_6346:
+	ds.b	2
+unknown_6348:
+	ds.b	2
+unknown_634A:
+	ds.b	2
+unknown_634C:
+	ds.b	1
+unknown_634D:
+	ds.b	4
+unknown_6351:
+	ds.b	1
+unknown_6352:
+	ds.b	1
+unknown_6353:
+	ds.b	3
+unknown_6356:
+	ds.b	2
+unknown_6358:
+	ds.b	3
+unknown_635B:
+	ds.b	2
+unknown_635D:
+	ds.b	3
+unknown_6360:
+	ds.b	0x220	
 player_struct_6580:
 	ds.b	2
 player_x_6582:
@@ -620,7 +918,10 @@ player_x_6582:
 player_y_6583:
 	ds.b	1
 elevator_struct_6584:
-	ds.b	3
+	ds.b	2
+unknown_6586:
+	ds.b	1
+	
 elevator_y_current_screen_6587:
 	ds.b	1
 wagon_1_struct_6588:
@@ -630,11 +931,20 @@ wagon_data_658A:
 unknown_658B:
 	ds.b	1
 wagon_2_shadow_sprite_658C:
-	ds.b	4
+	ds.b	1
+unknown_658D:
+	ds.b	1
+unknown_658E:
+	ds.b	1
+unknown_658F:
+	ds.b	1
+
 wagon_3_shadow_sprite_6590:
 	ds.b	4
 guard_1_struct_6594:
-	ds.b	2
+	ds.b	1
+unknown_6595:
+	ds.b	1
 guard_1_x_6596:
 	ds.b	1
 guard_1_y_6597:
@@ -688,8 +998,12 @@ unknown_screen_pointer_631E:
 	ds.w	1
 unknown_62AD:
 	ds.w	1
+
+
 	.align	2
 	* more stack!
 	ds.l	0x1000
 stack_top_67F0:
 	ds.b	15
+unknown_699A:
+	ds.b	1

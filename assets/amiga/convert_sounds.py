@@ -2,6 +2,7 @@ import subprocess,os,struct,glob,tempfile
 import shutil
 
 sox = "sox"
+gamename = "sbagman"
 
 if not shutil.which("sox"):
     raise Exception("sox command not in path, please install it")
@@ -85,7 +86,7 @@ def write_asm(contents,fw):
         n += 1
     fw.write("\n")
 
-music_module_label = "bagman_tunes"
+music_module_label = f"{gamename}_tunes"
 
 raw_file = os.path.join(tempfile.gettempdir(),"out.raw")
 with open(sndfile,"w") as fst,open(outfile,"w") as fw:
@@ -164,7 +165,7 @@ with open(sndfile,"w") as fst,open(outfile,"w") as fw:
             write_asm(contents,fw)
 
     # make sure next section will be aligned
-    with open(os.path.join(sound_dir,"bagman.mod"),"rb") as f:
+    with open(os.path.join(sound_dir,f"{gamename}.mod"),"rb") as f:
         contents = f.read()
     fw.write("{}:".format(music_module_label))
     write_asm(contents,fw)
