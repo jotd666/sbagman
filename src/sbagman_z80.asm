@@ -2250,7 +2250,7 @@ play_intro_1218:
 12E7: 32 CA 98    ld   ($98CA),a
 12EA: 21 6B 93    ld   hl,$936B
 12ED: 0E 1A       ld   c,$1A
-12EF: CD DD 23    call $23DD
+12EF: CD DD 23    call draw_big_bagman_23DD
 12F2: FB          ei
 12F3: ED 56       im   1
 12F5: FF          rst  $38
@@ -2401,7 +2401,7 @@ play_intro_1218:
 1490: DD 36 00 62 ld   (ix+$00),$62
 1494: 21 6B 93    ld   hl,$936B
 1497: 0E 1A       ld   c,$1A
-1499: CD DD 23    call $23DD
+1499: CD DD 23    call draw_big_bagman_23DD
 149C: 3E 30       ld   a,$30
 149E: 32 94 65    ld   (guard_1_struct_6594),a
 14A1: 3E 0C       ld   a,$0C
@@ -2423,7 +2423,7 @@ play_intro_1218:
 14C6: F3          di
 14C7: E5          push hl
 14C8: C5          push bc
-14C9: CD DD 23    call $23DD
+14C9: CD DD 23    call draw_big_bagman_23DD
 14CC: C1          pop  bc
 14CD: E1          pop  hl
 14CE: FB          ei
@@ -2911,6 +2911,7 @@ guide_guard_on_hidden_screen_193A:
 19D7: E1          pop  hl
 19D8: C3 44 F6    jp   $F644
 
+draw_big_bagman_23DD:
 23DD: 3E 01       ld   a,$01
 23DF: CD E2 D8    call $D8E2
 23E2: 06 12       ld   b,$12
@@ -3035,6 +3036,8 @@ guide_guard_on_hidden_screen_193A:
 2519: 47          ld   b,a
 251A: 78          ld   a,b
 251B: FE 00       cp   $00
+* this probably never returns as it would crash
+* as hl is not popped!
 251D: C8          ret  z
 251E: DD 7E 00    ld   a,(ix+$00)
 2521: 77          ld   (hl),a

@@ -2814,6 +2814,7 @@ guard_2_walk_movement_11EC:
 	rts                                    	| [$1217: ret]
 
 play_intro_1218:
+	
 	jbsr	osd_disable_vblank_interrupt
 	jbsr	osd_disable_display                               	| [$1219: ld   a,$00]
 	                       	| [$121b: ld   ($A003),a]
@@ -2827,16 +2828,16 @@ play_intro_1218:
 	move.b	d0,current_guard_screen_index_6098	| [$1231: ld   (current_guard_screen_index_6098),a]
 	move.b	d0,guard_1_screen_6099          	| [$1234: ld   (guard_1_screen_6099),a]
 	move.b	d0,guard_2_screen_609A          	| [$1237: ld   (guard_2_screen_609A),a]
-	clr.b	d0                               	| [$123a: xor  a]
-	move.b	d0,unknown_6008                 	| [$123b: ld   (unknown_6008),a]
-	move.b	d0,guard_1_in_elevator_6037     	| [$123e: ld   (guard_1_in_elevator_6037),a]
-	move.b	d0,fatal_fall_height_reached_604E	| [$1241: ld   (fatal_fall_height_reached_604E),a]
-	move.b	d0,guard_2_in_elevator_6077     	| [$1244: ld   (guard_2_in_elevator_6077),a]
-	move.b	d0,elevator_y_current_screen_6587	| [$1247: ld   (elevator_y_current_screen_6587),a]
-	move.b	d0,guard_2_x_659A               	| [$124a: ld   (guard_2_x_659A),a]
-	move.b	d0,guard_2_y_659B               	| [$124d: ld   (guard_2_y_659B),a]
-	move.b	d0,bag_falling_6159             	| [$1250: ld   (bag_falling_6159),a]
-	move.b	d0,has_pick_61CF                	| [$1253: ld   (has_pick_61CF),a]
+                              	| [$123a: xor  a]
+	clr.b	unknown_6008                 	| [$123b: ld   (unknown_6008),a]
+	clr.b	guard_1_in_elevator_6037     	| [$123e: ld   (guard_1_in_elevator_6037),a]
+	clr.b	fatal_fall_height_reached_604E	| [$1241: ld   (fatal_fall_height_reached_604E),a]
+	clr.b	guard_2_in_elevator_6077     	| [$1244: ld   (guard_2_in_elevator_6077),a]
+	clr.b	elevator_y_current_screen_6587	| [$1247: ld   (elevator_y_current_screen_6587),a]
+	clr.b	guard_2_x_659A               	| [$124a: ld   (guard_2_x_659A),a]
+	clr.b	guard_2_y_659B               	| [$124d: ld   (guard_2_y_659B),a]
+	clr.b	bag_falling_6159             	| [$1250: ld   (bag_falling_6159),a]
+	clr.b	has_pick_61CF                	| [$1253: ld   (has_pick_61CF),a]
 	clr.w	pickaxe_timer_duration_61E0  	| [$1256: ld   (pickaxe_timer_duration_61E0),a]
 											| [$1259: ld   (unknown_61E1),a]
 	move.b	#0x01,d0                        	| [$125c: ld   a,$01]
@@ -2881,7 +2882,7 @@ l_126e:
 	bne.b	0f                               	| [...]
 	rts                                    	| [$12a6: ret  z] [...]
 	
-	* intro pic
+	* VA presente
 0:
 	lea	game_mem+0x4C00,a1                      	| [$12a7: ld   de,$4C00]
 	move.w	#0x91A5,d6                      	| [$12aa: ld   hl,$91A5]
@@ -2905,6 +2906,8 @@ l_126e:
 	jbsr	write_text_55f0                            	| [$12d4: call $55F0]
 	                       	| [$12d7: ld   a,($B000)]
 
+	jbsr	osd_read_dipswitches
+	* change PRESENTE into PRESENTS
 	and.b	#0x20,d0                         	| [$12da: and  $20]
 	cmp.b	#0x20,d0                         	| [$12dc: cp   $20]
 	jne	l_12ea                             	| [$12de: jr   nz,$12EA]
@@ -2917,12 +2920,13 @@ l_126e:
 l_12ea:
 	move.w	#0x936B,d6                      	| [$12ea: ld   hl,$936B]
 	move.b	#0x1A,d2                        	| [$12ed: ld   c,$1A]
-	jbsr	l_23dd                            	| [$12ef: call $23DD]
+	jbsr	draw_big_bagman_23dd                            	| [$12ef: call $23DD]
 	jbsr	osd_enable_vblank_interrupt 				| ei
 	| im   1
 	**jbsr	rst_38                            	| [$12f5: rst  $38]
 	move.b	#0x02,d1                        	| [$12f6: ld   b,$02]
 l_12f8:
+	jbsr	osd_break
 	move.w	#0x4000,d7		| [$12f8: ld   de,$4000]
 	bsr		credit_inserted_loop
  	
@@ -3162,7 +3166,7 @@ l_140e:
 	WRITE_VIDEORAM	0
 	move.w	#0x936B,d6                      	| [$1494: ld   hl,$936B]
 	move.b	#0x1A,d2                        	| [$1497: ld   c,$1A]
-	jbsr	l_23dd                            	| [$1499: call $23DD]
+	jbsr	draw_big_bagman_23dd                            	| [$1499: call $23DD]
 	move.b	#0x30,d0                        	| [$149c: ld   a,$30]
 	move.b	d0,guard_1_struct_6594          	| [$149e: ld   (guard_1_struct_6594),a]
 	move.b	#0x0C,d0                        	| [$14a1: ld   a,$0C]
@@ -3187,12 +3191,12 @@ l_140e:
 l_14c6:
 	jbsr	osd_disable_vblank_interrupt			| di
 
-	move.l	a0,-(sp)                        	| [$14c7: push hl]
+	move.w	d6,-(sp)                        	| [$14c7: push hl]
 	movem.w	d1/d2,-(sp)                    	| [$14c8: push bc]
-	jbsr	l_23dd                            	| [$14c9: call $23DD]
+	jbsr	draw_big_bagman_23dd                            	| [$14c9: call $23DD]
 
 	movem.w	(sp)+,d1/d2                    	| [$14cc: pop  bc]
-	move.l	(sp)+,a0                        	| [$14cd: pop  hl]
+	move.w	(sp)+,d6                        	| [$14cd: pop  hl]
 	jbsr	osd_enable_vblank_interrupt						| ei
 							| im   1
 	*jbsr	rst_38                            	| [$14d1: rst  $38]
@@ -3823,73 +3827,79 @@ l_19d1:
 	move.l	(sp)+,a0                        	| [$19d7: pop  hl]
 	jra	l_f644                             	| [$19d8: jp   $F644]
 
-* TODO REVIEW THIS
-l_23dd:
+* < HL: screen address
+draw_big_bagman_23dd:
 	move.b	#0x01,d0                        	| [$23dd: ld   a,$01]
 	jbsr	l_d8e2                            	| [$23df: call $D8E2]
 	move.b	#0x12,d1                        	| [$23e2: ld   b,$12]
 
-	move.l	a0,-(sp)                        	| [$23e4: push hl]
-	move.l	(sp)+,a1                        	| [$23e5: pop  de]
-	movem.w	(sp)+,d3/d4                    	| [$23e5: pop  de]
-	move.b	d3,d0                           	| [$23e6: ld   a,d]
-	add.b	#0x08,d0                         	| [$23e7: add  a,$08]
-	move.b	d0,d3                           	| [$23e9: ld   d,a]
+	move.w	d6,d3                        	| [$23e4: push hl]
+	                        	| [$23e5: pop  de]
+	                           	| [$23e6: ld   a,d]
+	add.w	#0x0800,d3                         	| [$23e7: add  a,$08]
+	                           	| [$23e9: ld   d,a]
 	move.b	#0x2C,d0                        	| [$23ea: ld   a,$2C]
 
-	move.l	a0,-(sp)                        	| [$23ec: push hl]
+	move.w	d6,-(sp)                        	| [$23ec: push hl]
 l_23ed:
-	move.b	d0,(a1)+                         	| [$23ed: ld   (de),a]
-	move.b	#0xE0,(a0)+                      	| [$23ee: ld   (hl),$E0]
+	exg	d3,d6
+	jbsr	osd_w_colorram
+	addq.w	#1,d6
+	exg	d3,d6
+	                         	| [$23ed: ld   (de),a]
+	move.b	#0xE0,d0                      	| [$23ee: ld   (hl),$E0]
+	jbsr	osd_w_videoram
+	addq.w	#1,d6
                            	| [$23f0: inc  de]
 	                           	| [$23f1: inc  hl]
 	subq.b	#1,d1                           	| [...]
 	jne	l_23ed                             	| [$23f2: djnz $23ED]
-	move.l	(sp)+,a0                        	| [$23f4: pop  hl]
+	move.w	(sp)+,d6                        	| [$23f4: pop  hl]
 	lea	game_mem+0x254E,a2                      	| [$23f5: ld   ix,$254E]
-	                      	| [$23f9: ld   de,$FFE0]
-	sub.w	#0x20,a0                            	| [$23fc: add  hl,de]
+	* set D3 as it's used in 250F
+	move.w	#-0x20,d3                      	| [$23f9: ld   de,$FFE0]
+	sub.w	d3,d6                            	| [$23fc: add  hl,de]
 	move.b	#0x2C,d0                        	| [$23fd: ld   a,$2C]
 	exg	d0,d7                              	| [$23ff: ex   af,af']
-	jbsr	l_250f                            	| [$2400: call $250F]
+	jbsr	draw_big_bagman_row_250f                            	| [$2400: call $250F]
 	lea	game_mem+0x2557,a2                      	| [$2403: ld   ix,$2557]
-	jbsr	l_250f                            	| [$2407: call $250F]
+	jbsr	draw_big_bagman_row_250f                            	| [$2407: call $250F]
 	lea	game_mem+0x2561,a2                      	| [$240a: ld   ix,$2561]
-	jbsr	l_250f                            	| [$240e: call $250F]
+	jbsr	draw_big_bagman_row_250f                            	| [$240e: call $250F]
 	lea	game_mem+0x256B,a2                      	| [$2411: ld   ix,$256B]
-	jbsr	l_250f                            	| [$2415: call $250F]
+	jbsr	draw_big_bagman_row_250f                            	| [$2415: call $250F]
 	lea	game_mem+0x2577,a2                      	| [$2418: ld   ix,$2577]
-	jbsr	l_250f                            	| [$241c: call $250F]
+	jbsr	draw_big_bagman_row_250f                            	| [$241c: call $250F]
 	lea	game_mem+0x2586,a2                      	| [$241f: ld   ix,$2586]
-	jbsr	l_250f                            	| [$2423: call $250F]
+	jbsr	draw_big_bagman_row_250f                            	| [$2423: call $250F]
 	lea	game_mem+0x2597,a2                      	| [$2426: ld   ix,$2597]
-	jbsr	l_250f                            	| [$242a: call $250F]
+	jbsr	draw_big_bagman_row_250f                            	| [$242a: call $250F]
 	move.b	#0x28,d0                        	| [$242d: ld   a,$28]
 	exg	d0,d7                              	| [$242f: ex   af,af']
 	lea	game_mem+0x25A8,a2                      	| [$2430: ld   ix,$25A8]
-	jbsr	l_250f                            	| [$2434: call $250F]
+	jbsr	draw_big_bagman_row_250f                            	| [$2434: call $250F]
 	lea	game_mem+0x25B9,a2                      	| [$2437: ld   ix,$25B9]
-	jbsr	l_250f                            	| [$243b: call $250F]
+	jbsr	draw_big_bagman_row_250f                            	| [$243b: call $250F]
 	lea	game_mem+0x25CA,a2                      	| [$243e: ld   ix,$25CA]
-	jbsr	l_250f                            	| [$2442: call $250F]
+	jbsr	draw_big_bagman_row_250f                            	| [$2442: call $250F]
 	lea	game_mem+0x25DB,a2                      	| [$2445: ld   ix,$25DB]
-	jbsr	l_250f                            	| [$2449: call $250F]
+	jbsr	draw_big_bagman_row_250f                            	| [$2449: call $250F]
 	lea	game_mem+0x25F0,a2                      	| [$244c: ld   ix,$25F0]
-	jbsr	l_250f                            	| [$2450: call $250F]
+	jbsr	draw_big_bagman_row_250f                            	| [$2450: call $250F]
 	lea	game_mem+0x2605,a2                      	| [$2453: ld   ix,$2605]
-	jbsr	l_250f                            	| [$2457: call $250F]
+	jbsr	draw_big_bagman_row_250f                            	| [$2457: call $250F]
 	lea	game_mem+0x261A,a2                      	| [$245a: ld   ix,$261A]
-	jbsr	l_250f                            	| [$245e: call $250F]
+	jbsr	draw_big_bagman_row_250f                            	| [$245e: call $250F]
 	move.b	#0x18,d0                        	| [$2461: ld   a,$18]
 	exg	d0,d7                              	| [$2463: ex   af,af']
 	lea	game_mem+0x262F,a2                      	| [$2464: ld   ix,$262F]
-	jbsr	l_250f                            	| [$2468: call $250F]
+	jbsr	draw_big_bagman_row_250f                            	| [$2468: call $250F]
 	move.b	#0x1C,d0                        	| [$246b: ld   a,$1C]
 	exg	d0,d7                              	| [$246d: ex   af,af']
 	lea	game_mem+0x2533,a3                      	| [$246e: ld   iy,$2533]
-	* TODO: what is d1/D2 value here???
-	clr.b	d1                               	| [$2472: ld   b,$00]
-	add.w	d1,a3                            	| [$2474: add  iy,bc]
+	
+	and.w	#0x00FF,d2                               	| [$2472: ld   b,$00]
+	add.w	d2,a3                            	| [$2474: add  iy,bc]
 	move.b	(A3),d0                    	| [$2476: ld   a,(iy+$00)]
 	                         	| [$2479: cp   $00]
 	jeq	l_2497                             	| [$247b: jr   z,$2497]
@@ -3908,55 +3918,55 @@ l_23ed:
 	jra	l_2507                             	| [$2495: jr   $2507]
 l_2497:
 	lea	game_mem+0x2644,a2                      	| [$2497: ld   ix,$2644]
-	jbsr	l_250f                            	| [$249b: call $250F]
+	jbsr	draw_big_bagman_row_250f                            	| [$249b: call $250F]
 	lea	game_mem+0x2659,a2                      	| [$249e: ld   ix,$2659]
-	jbsr	l_250f                            	| [$24a2: call $250F]
+	jbsr	draw_big_bagman_row_250f                            	| [$24a2: call $250F]
 	lea	game_mem+0x2663,a2                      	| [$24a5: ld   ix,$2663]
-	jbsr	l_250f                            	| [$24a9: call $250F]
+	jbsr	draw_big_bagman_row_250f                            	| [$24a9: call $250F]
 	rts                                    	| [$24ac: ret]
 l_24ad:
 	lea	game_mem+0x2682,a2                      	| [$24ad: ld   ix,$2682]
-	jbsr	l_250f                            	| [$24b1: call $250F]
+	jbsr	draw_big_bagman_row_250f                            	| [$24b1: call $250F]
 	lea	game_mem+0x2697,a2                      	| [$24b4: ld   ix,$2697]
-	jbsr	l_250f                            	| [$24b8: call $250F]
+	jbsr	draw_big_bagman_row_250f                            	| [$24b8: call $250F]
 	lea	game_mem+0x26A3,a2                      	| [$24bb: ld   ix,$26A3]
-	jbsr	l_250f                            	| [$24bf: call $250F]
+	jbsr	draw_big_bagman_row_250f                            	| [$24bf: call $250F]
 	rts                                    	| [$24c2: ret]
 l_24c3:
 	lea	game_mem+0x26C2,a2                      	| [$24c3: ld   ix,$26C2]
-	jbsr	l_250f                            	| [$24c7: call $250F]
+	jbsr	draw_big_bagman_row_250f                            	| [$24c7: call $250F]
 	lea	game_mem+0x26D7,a2                      	| [$24ca: ld   ix,$26D7]
-	jbsr	l_250f                            	| [$24ce: call $250F]
+	jbsr	draw_big_bagman_row_250f                            	| [$24ce: call $250F]
 	lea	game_mem+0x26E2,a2                      	| [$24d1: ld   ix,$26E2]
-	jbsr	l_250f                            	| [$24d5: call $250F]
+	jbsr	draw_big_bagman_row_250f                            	| [$24d5: call $250F]
 	rts                                    	| [$24d8: ret]
 l_24d9:
 	lea	game_mem+0x2702,a2                      	| [$24d9: ld   ix,$2702]
-	jbsr	l_250f                            	| [$24dd: call $250F]
+	jbsr	draw_big_bagman_row_250f                            	| [$24dd: call $250F]
 	lea	game_mem+0x2717,a2                      	| [$24e0: ld   ix,$2717]
-	jbsr	l_250f                            	| [$24e4: call $250F]
+	jbsr	draw_big_bagman_row_250f                            	| [$24e4: call $250F]
 	lea	game_mem+0x2721,a2                      	| [$24e7: ld   ix,$2721]
-	jbsr	l_250f                            	| [$24eb: call $250F]
+	jbsr	draw_big_bagman_row_250f                            	| [$24eb: call $250F]
 	rts                                    	| [$24ee: ret]
 l_24ef:
 	lea	game_mem+0x266D,a2                      	| [$24ef: ld   ix,$266D]
-	jbsr	l_250f                            	| [$24f3: call $250F]
+	jbsr	draw_big_bagman_row_250f                            	| [$24f3: call $250F]
 	rts                                    	| [$24f6: ret]
 l_24f7:
 	lea	game_mem+0x26AD,a2                      	| [$24f7: ld   ix,$26AD]
-	jbsr	l_250f                            	| [$24fb: call $250F]
+	jbsr	draw_big_bagman_row_250f                            	| [$24fb: call $250F]
 	rts                                    	| [$24fe: ret]
 l_24ff:
 	lea	game_mem+0x26ED,a2                      	| [$24ff: ld   ix,$26ED]
-	jbsr	l_250f                            	| [$2503: call $250F]
+	jbsr	draw_big_bagman_row_250f                            	| [$2503: call $250F]
 	rts                                    	| [$2506: ret]
 l_2507:
 	lea	game_mem+0x272B,a2                      	| [$2507: ld   ix,$272B]
-	jbsr	l_250f                            	| [$250b: call $250F]
+	jbsr	draw_big_bagman_row_250f                            	| [$250b: call $250F]
 	rts                                    	| [$250e: ret]
-l_250f:
-
-	move.l	a0,-(sp)                        	| [$250f: push hl]
+	
+draw_big_bagman_row_250f:
+	move.w	d6,-(sp)                        	| [$250f: push hl]
 	move.b	(A2)+,d0                    	| [$2510: ld   a,(ix+$00)]
 	                           	| [$2513: inc  ix]
 	move.b	d2,d1                           	| [$2516: ld   b,c]
@@ -3967,25 +3977,27 @@ l_251a:
 	move.b	d1,d0                           	| [$251a: ld   a,b]
 	                         	| [$251b: cp   $00]
 	bne.b	0f                               	| [...]
+	* this cannot happen, or the game would crash since D6 is on the stack
+	illegal
 	rts                                    	| [$251d: ret  z] [...]
 0:
 	move.b	(A2),d0                    	| [$251e: ld   a,(ix+$00)]
-	move.b	d0,(a0)                         	| [$2521: ld   (hl),a]
+	jbsr	osd_w_videoram                         	| [$2521: ld   (hl),a]
 
-	move.l	a0,-(sp)                        	| [$2522: push hl]
-	move.b	d5,d0                           	| [$2523: ld   a,h]
-	add.b	#0x08,d0                         	| [$2524: add  a,$08]
-	move.b	d0,d5                           	| [$2526: ld   h,a]
+	move.w	d6,-(sp)                        	| [$2522: push hl]
+	                           	| [$2523: ld   a,h]
+	add.w	#0x0800,d6                         	| [$2524: add  a,$08]
+	                           	| [$2526: ld   h,a]
 	exg	d0,d7                              	| [$2527: ex   af,af']
-	move.b	d0,(a0)                         	| [$2528: ld   (hl),a]
+	jbsr	osd_w_colorram                         	| [$2528: ld   (hl),a]
 	exg	d0,d7                              	| [$2529: ex   af,af']
-	move.l	(sp)+,a0                        	| [$252a: pop  hl]
-	add.w	d3,a0                            	| [$252b: add  hl,de]
+	move.w	(sp)+,d6                        	| [$252a: pop  hl]
+	add.w	d3,d6                            	| [$252b: add  hl,de]
 	addq.w	#1,a2                           	| [$252c: inc  ix]
 	subq.b	#1,d1                           	| [...]
 	jne	l_251a                             	| [$252e: djnz $251A]
-	move.l	(sp)+,a0                        	| [$2530: pop  hl]
-	addq.w	#1,a0                           	| [$2531: inc  hl]
+	move.w	(sp)+,d6                        	| [$2530: pop  hl]
+	addq.w	#1,d6                           	| [$2531: inc  hl]
 	rts                                    	| [$2532: ret]
 
 

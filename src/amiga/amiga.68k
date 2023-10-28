@@ -253,7 +253,7 @@ _user:
 	move.l	d0,dip_switch_start_lives
 	bra.b	3f
 2:
-	move.l	#1,dip_switch_start_lives		| 3 lives default
+	move.l	#2,dip_switch_start_lives		| 3 lives default
 3:
 	
 
@@ -347,11 +347,7 @@ _user:
 	btst	#3,d0
 	sne		infinite_pickaxe_time_flag
 	
-	* we don't need extra joypad buttons, and that will save a few cycles
-	* because reading CD32 joypad is (relatively) costly. Usually it doesn't
-	* matter but I've seen issues (Shadow of the beast 3 for instance)
-	*
-	*jsr	 _detect_controller_types 
+	jsr	 _detect_controller_types 
 	clr.b	controller_joypad_0
 	clr.b	controller_joypad_1
 
@@ -570,6 +566,11 @@ demo_game:
 		jmp			sbagman_reset					| pass control to the sbagman core
 		
 	
+* just in case some hardware calls nmi
+_nmi:
+	move.w	#0x7FFF,_custom+intreq
+	move.w	#0x7FFF,_custom+intreq
+	rts
 				
 _vblank:
     movem.l d0-d7/a0-a6,-(a7)
@@ -658,23 +659,33 @@ osd_break:
 	
 
 	
-* speed regulation for game mainloop, the bigger, the faster
-* Slightly depends on PAL/NTSC.
-* tried to calibrated it the best possible by recording
-* the demo game on MAME and on this version and comparing
-* them. 12 makes a slightly slower game, 13 should be all right
 
-osd_get_sync_period:
-	move.w	#13,d0
-	rts
 	
 
 * < D0: number of 1/60Hz ticks
+* can work with interrupts enabled or disabled
 osd_wait:
 	move.w	d0,delay_timer
+	jbsr	osd_is_vblank_interrupt_enabled
+	tst.w	d0
+	jne		2f
+	* interrupts are disabled: timer isn't going to change
+	* wait using vertical blank interrupt request (we don't need it!)
+	
 0:
-	tst.w	delay_timer
+	move.w	#0x20,_custom+intreq
+	move.w	#0x20,_custom+intreq
+1:
+	move.w	_custom+intreqr,d0
+	btst	#5,d0
+	beq.b	1b
+	subq.w	#1,delay_timer
 	bne.b	0b
+	rts
+	
+2:
+	tst.w	delay_timer
+	bne.b	2b
 	rts
 	
 *osd_calibrate_display:
@@ -698,7 +709,7 @@ osd_update_sprites:
 	*lea		test_sprites,a0
 	
 	* clear host sprites
-	move.w	#NB_HOST_SPRITES-1,d0
+	moveq	#NB_HOST_SPRITES-1,d0
 
 	lea		host_sprites(pc),a2
 0:
@@ -1177,6 +1188,7 @@ store_system:
 	move.l	(0x70,a1),(a0)+
 	move.l	(0x74,a1),(a0)+
 	move.l	(0x78,a1),(a0)+
+	move.l	(0x7C,a1),(a0)+
 	rts
 
 restore_system:
@@ -1192,6 +1204,7 @@ restore_system:
 	move.l	(a0)+,(0x70,a1)
 	move.l	(a0)+,(0x74,a1)
 	move.l	(a0)+,(0x78,a1)
+	move.l	(a0)+,(0x7C,a1)
 
 
 	bclr	#6,0xbfee01
@@ -1316,6 +1329,8 @@ platform_init:
 	move.l	(a7)+,(0x68,a1)
 	pea		_vblank(pc)
 	move.l	(a7)+,(0x6C,a1)
+	pea		_nmi(pc)
+	move.l	(a7)+,(0x7C,a1)
 
 	* soundfx lib
 	lea		_custom,a6
@@ -1385,7 +1400,7 @@ wait_tof:
 * < D0: nonzero interrupts enabled
 osd_is_vblank_interrupt_enabled:
 	move.w	_custom+intenar,d0
-	and.w	#0x8000,d0
+	and.w	#0x0030,d0
 	rts
 	
 * 60Hz VBLANK interrupt (also keyboard)
@@ -1573,6 +1588,14 @@ update_bg_tile:
 	* color tile
 	and.w	#0xF,d1
 	
+	* special case parasite brown N when switching screens
+	cmp.w	#0x2E0,d0
+	bne.b	0f
+	cmp.b	#3,d1
+	beq.b	0f
+	* "N" of "PRESENTS", but not purple: skip
+	rts
+0:
 	cmp.w	#0x3C0,d6
 	bcc.b	0f
 	cmp.w	#0x40,d6
@@ -1819,6 +1842,8 @@ osd_read_dipswitches:
 	
 * reads most inputs in one call
 * bits 0-1    coins
+* bit 2: start game 1 player
+* bit 10: (added) start game 2 players
 
 osd_read_inputs:
 	moveq	#-1,d0
@@ -1837,10 +1862,10 @@ osd_read_inputs:
 	beq.b	0f
 	bclr	#2,d0
 0:
-*	tst.b	(2,a0)		| "2" key like in MAME
-*	beq.b	0f
-*	bclr	#6+16,d0
-*0:	
+	tst.b	(2,a0)		| "2" key like in MAME
+	beq.b	0f
+	bclr	#10,d0
+0:	
 	tst.b	(0x4F,a0)		| "<-" key
 	beq.b	0f
 	bclr	#3,d0
@@ -1883,10 +1908,13 @@ osd_read_inputs:
 	beq.b	0f
 	bclr	#7,d0
 0:
-* gameplay_allowed_6054?
-	tst.b	check_scenery_disabled_61ED
+	* test all those flags to see if normal controls
+	* could be used to insert coins/start game
+	tst.b	gameplay_allowed_6054
+	beq.b	1f			| demo mode: enable
+	tst.b	check_scenery_disabled_61ED		| intro: enable
 	bne.b	1f
-	tst.b	player_controls_blocked_61F2
+	tst.b	game_locked_6053		| start screen: enable
 	beq.b	3f
 1:
 	move.l	d2,-(a7)
@@ -1901,11 +1929,11 @@ osd_read_inputs:
 	beq.b	0f
 	bclr	#2,d0
 0:
-*	* game not in play, accept start 2P game with "down"
-*	btst	#JPB_BTN_DOWN,d1
-*	beq.b	0f
-*	bclr	#6+16,d0
-*0:
+	* game not in play, accept start 2P game with "down"
+	btst	#JPB_BTN_DOWN,d1
+	beq.b	0f
+	bclr	#10,d0
+0:
 	btst	#JPB_BTN_RED,d1
 	beq.b	0f
 	btst	#JPB_BTN_RED,d2
@@ -2078,8 +2106,12 @@ handle_keyboard:
 	
 toggle_pause:
 	* pause only within game
-	*tst.b	game_playing_8817
-	*beq.b	0f
+	tst.b	gameplay_allowed_6054
+	beq.b	0f
+	tst.b	check_scenery_disabled_61ED
+	bne.b	0f
+	tst.b	game_locked_6053
+	bne.b	0f
 	eor.b   #1,pause_flag
 0:
 	rts
@@ -2129,7 +2161,7 @@ old_intena:
 old_dmacon:
 	.long	0
 old_sysvectors:
-	ds.l	8
+	ds.l	10
 old_vbr:
 	.long	0
 old_syscoplist:
@@ -2185,7 +2217,7 @@ keyboard_table:
 
 	
 pause_flag:
-	dc.w	0
+	.word	0
 
 	* sound variables
 music_duration:
