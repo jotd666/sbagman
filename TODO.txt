@@ -1,9 +1,13 @@
+- reduce memory footprint (> 1MB!)
 - cd43: check d3/D4 values (twice)
 - suspicious : @246e
 - new code unknown_609F D1AE
 - debug: l_f4f2
-- check TODO
+- check TODO (sfx...)
 
 - sync fe54 with bagman (is_background_tile_for_object_drop_CFF3)
 
 z80 conv: review move.w into address register inc hl/dec hl => subq.w
+
+access fault A4 not initialized l_c10d
+also starts directly on first screen should show intro???

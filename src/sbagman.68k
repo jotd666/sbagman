@@ -1444,6 +1444,10 @@ l_0872:
 player_grip_handle_test_0884:
 
 	move.w	player_logical_address_6009,d6	| [$0884: ld   hl,(player_logical_address_6009)]
+	bne.b	0f
+	* jotd: can be null at times!
+	rts
+0:
 	subq.w	#3,d6                           	| [$0887: dec  hl] * 3
 	bsr		read_rom                         	| [$088a: ld   a,(hl)] check what's above player head on screen
 	cmp.b	#0xDC,d0                         	| [$088b: cp   $DC]
@@ -2851,7 +2855,7 @@ l_126e:
 	                         	| [$1272: add  a,$08]
 	                          	| [$1274: ld   h,a]
 	move.b	#4,d0                        	| [$1275: ld   a,$04]
-	jbsr	osd_w_videoram                         	| [$1277: ld   (hl),a]
+	jbsr	osd_w_colorram                         	| [$1277: ld   (hl),a]
 	movem.w	(sp)+,d0/d6                        	| [$1278: pop  af]
 	                        	| [$1279: pop  hl]
 	add.w	d3,d6                            	| [$127a: add  hl,de]
@@ -4484,22 +4488,22 @@ l_c10d:
 	rts                                    	| [$c114: ret  c] [...]
 0:
 	clr.b	d0                               	| [$c115: xor  a]
-	addq.w	#1,a4                           	| [$c116: inc  bc]
+	                           	| [$c116: inc  bc]
 	move.b	d0,(a4)                         	| [$c117: ld   (bc),a]
 	                           	| [$c118: dec  bc]
-	move.b	d0,-(a4)                         	| [$c119: ld   (bc),a]
+	move.b	d0,(1,a4)                         	| [$c119: ld   (bc),a]
 	rts                                    	| [$c11a: ret]
 l_c11b:
 
 	movem.w	(sp)+,d1/d2                    	| [$c11b: pop  bc]
 	move.b	(A3),d0                    	| [$c11c: ld   a,(iy+$00)]
 	move.b	d0,(0x03,a2)                    	| [$c11f: ld   (ix+$03),a]
-	move.b	#0x01,d0                        	| [$c122: ld   a,$01]
-	move.b	d0,(a4)                         	| [$c124: ld   (bc),a]
-	addq.w	#1,a4                           	| [$c125: inc  bc]
-	clr.b	d0                               	| [$c126: xor  a]
-	move.b	d0,(a4)                         	| [$c127: ld   (bc),a]
-	subq.w	#1,a4                           	| [$c128: dec  bc]
+	                        	| [$c122: ld   a,$01]
+	move.b	#1,(a4)                         	| [$c124: ld   (bc),a]
+	                          	| [$c125: inc  bc]
+	                              	| [$c126: xor  a]
+	clr.b	(1,a4)                         	| [$c127: ld   (bc),a]
+	                           	| [$c128: dec  bc]
 	rts                                    	| [$c129: ret]
 l_c12a:
 	move.b	(a0),d0                         	| [$c12a: ld   a,(hl)]
@@ -9084,9 +9088,7 @@ l_e169:
 	move.b	d0,unknown_62DF                 	| [$e16e: ld   (unknown_62DF),a]
 	rts                                    	| [$e171: ret]
 
-* this part needs debuggin!!
 l_e172:
-	jbsr	osd_break
 	
 	exg	d0,d7                              	| [$e172: ex   af,af']
 
@@ -9097,20 +9099,20 @@ l_e172:
 0:
 	exg	d0,d7                              	| [$e179: ex   af,af']
 
-	move.b	d0,(a0)                         	| [$e17a: ld   (hl),a]
+	jbsr	osd_w_videoram                         	| [$e17a: ld   (hl),a]
 	move.w	#0x0020,d3                      	| [$e17b: ld   de,$0020] 32
-	add.w	d3,a0                            	| [$e17e: add  hl,de]
+	add.w	d3,d6                            	| [$e17e: add  hl,de]
 
 	addq.b	#1,d0                           	| [$e17f: inc  a]
-	move.b	d0,(a0)                         	| [$e180: ld   (hl),a]
-	add.w	d3,a0                            	| [$e181: add  hl,de]
+	jbsr	osd_w_videoram                         	| [$e180: ld   (hl),a]
+	add.w	d3,d6                            	| [$e181: add  hl,de]
 
 	subq.b	#1,d0                           	| [$e182: dec  a]
-	move.b	d0,(a0)                         	| [$e183: ld   (hl),a]
-	add.w	d3,a0                            	| [$e184: add  hl,de]
+	jbsr	osd_w_videoram                         	| [$e183: ld   (hl),a]
+	add.w	d3,d6                            	| [$e184: add  hl,de]
 
 	addq.b	#1,d0                           	| [$e185: inc  a]
-	move.b	d0,(a0)                         	| [$e186: ld   (hl),a]
+	jbsr	osd_w_videoram                         	| [$e186: ld   (hl),a]
 	rts                                    	| [$e187: ret]
 l_e188:
 	move.b	player_screen_600D,d0           	| [$e188: ld   a,(player_screen_600D)]
