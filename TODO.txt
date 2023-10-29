@@ -1,3 +1,9 @@
+- access fault A4 not initialized l_c10d: probably same in original game
+- text story freezes (doesn't scroll)
+- missing tiles for big bagman animations
+  (enter them in script)
+- write a script to detect move.w to/from ram
+
 - reduce memory footprint (> 1MB!)
 - cd43: check d3/D4 values (twice)
 - suspicious : @246e
@@ -9,5 +15,3 @@
 
 z80 conv: review move.w into address register inc hl/dec hl => subq.w
 
-access fault A4 not initialized l_c10d
-also starts directly on first screen should show intro???

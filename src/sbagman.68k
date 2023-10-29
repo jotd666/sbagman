@@ -3182,6 +3182,7 @@ l_140e:
                            	| [$14b8: call $1542]
   	| [$14bb: dec  de]
   	| [$14bc: ld   a,d]
+	* big bagman scrolls to the right and disapppears
 	                         	| [$14bd: cp   $00]
 	                             	| [$14bf: jr   nz,$14B8]
 	move.w	#0x936B,d6                      	| [$14c1: ld   hl,$936B]
@@ -3221,10 +3222,7 @@ l_14c6:
 
    	move.w	#0x4000,d7	| [$14f1: ld   de,$4000]
 	bsr		credit_inserted_loop
- 
-      	
-
-                           	| [$14f4: call $1542]
+       	                          	| [$14f4: call $1542]
   	| [$14f7: dec  de]
   	| [$14f8: ld   a,d]
 	                         	| [$14f9: cp   $00]
@@ -3241,7 +3239,8 @@ l_14fd:
 	beq.b	0f                               	| [...]
 	rts                                    	| [$1511: ret  nz] [...]
 0:
-	clr.b	d0                               	| [$1512: ld   a,$00]
+	jbsr	osd_break
+ 	clr.b	d0                               	| [$1512: ld   a,$00]
 	jbsr	l_c3a8                            	| [$1514: call $C3A8]
 	move.b	#0x01,d0                        	| [$1517: ld   a,$01]
 	move.b	d0,unknown_6332                 	| [$1519: ld   (unknown_6332),a]
@@ -3265,6 +3264,7 @@ l_153a:
 credit_inserted_loop:
 	
 	lsr.w	#8,d7
+	lsr.w	#1,d7
 0:
 	bsr		check_if_credit_inserted_1542
 	move	#1,d0
@@ -3290,12 +3290,12 @@ check_if_credit_inserted_1542:
 	jra	l_14fd                             	| [$1557: jr   $14FD]
 
 l_1565:
-	jbsr	l_1572                            	| [$1565: call $1572]
+	jbsr	check_coin_input_1572                            	| [$1565: call $1572]
 	jbsr	l_158f                            	| [$1568: call $158F]
-	jbsr	l_15ac                            	| [$156b: call $15AC]
+	jbsr	check_coin_input_15ac                            	| [$156b: call $15AC]
 	jbsr	l_15c9                            	| [$156e: call $15C9]
 	rts                                    	| [$1571: ret]
-l_1572:
+check_coin_input_1572:
 	move.b	player_input_6026,d0            	| [$1572: ld   a,(player_input_6026)]
 	and.b	#0x01,d0                         	| [$1575: and  $01]
 	move.b	d0,d1                           	| [$1577: ld   b,a]
@@ -3311,6 +3311,7 @@ l_1572:
 	beq.b	0f                               	| [...]
 	rts                                    	| [$1586: ret  nz] [...]
 0:
+	* coin inserted
 	move.b	#0x01,d0                        	| [$1587: ld   a,$01]
 	move.b	#0x01,d2                        	| [$1589: ld   c,$01]
 	jbsr	l_15e6                            	| [$158b: call $15E6]
@@ -3335,7 +3336,7 @@ l_158f:
 	move.b	#0x02,d2                        	| [$15a6: ld   c,$02]
 	jbsr	l_15e6                            	| [$15a8: call $15E6]
 	rts                                    	| [$15ab: ret]
-l_15ac:
+check_coin_input_15ac:
 	move.b	coin_start_inputs_6051,d0       	| [$15ac: ld   a,(coin_start_inputs_6051)]
 	and.b	#0x01,d0                         	| [$15af: and  $01]
 	move.b	d0,d1                           	| [$15b1: ld   b,a]
@@ -3480,18 +3481,26 @@ read_player_controls_1689:
 *	clr.b	d0                               	| [$168f: xor  a]
 *	move.b	d0,0xA007                       	| [$1690: ld   ($A007),a]
 
-l_1693:
-	jbsr	l_16d9                            	| [$1693: call $16D9]
-	move.b	d0,d1                           	| [$1696: ld   b,a]
-	jbsr	l_16d9                            	| [$1697: call $16D9]
-	cmp.b	d1,d0                            	| [$169a: cp   b]
-	jeq	l_16a2                             	| [$169b: jr   z,$16A2]
-	move.b	d0,unknown_6360                 	| [$169d: ld   (unknown_6360),a]
-	jra	l_1693                             	| [$16a0: jr   $1693]
+* disabled that bug-avoiding code (hardware related?)
+* not present in Bagman read_player_controls_xxxx
+* seems that the program reads inputs twice, and compares if 
+* they're different, loops until they're the same...
+*l_1693:
+*	jbsr	l_16d9                            	| [$1693: call $16D9]
+*	move.b	d0,d1                           	| [$1696: ld   b,a]
+*	jbsr	l_16d9                            	| [$1697: call $16D9]
+*	cmp.b	d1,d0                            	| [$169a: cp   b]
+*	jeq	l_16a2                             	| [$169b: jr   z,$16A2]
+*	move.b	d0,unknown_6360                 	| [$169d: ld   (unknown_6360),a]
+*	jra	l_1693                             	| [$16a0: jr   $1693]
+
+* actually read the controls
+	jbsr	osd_read_inputs
+
 l_16a2:
 	not.b	d0                               	| [$16a2: cpl]
-	jbsr	l_16f0                            	| [$16a3: call $16F0]
-	jbsr	l_1705                            	| [$16a6: call $1705]
+	jbsr	restrict_controls_if_not_playing_16f0                            	| [$16a3: call $16F0]
+	**jbsr	handle_cocktail_1705                            	| [$16a6: call $1705]
 	move.b	d0,player_input_6026            	| [$16a9: ld   (player_input_6026),a]
 	move.b	coin_start_inputs_6051,d0       	| [$16ac: ld   a,(coin_start_inputs_6051)]
 	move.b	d0,coin_start_prev_inputs_6052  	| [$16af: ld   (coin_start_prev_inputs_6052),a]
@@ -3505,7 +3514,7 @@ l_16b2:
 	jra	l_16b2                             	| [$16bf: jr   $16B2]
 l_16c1:
 	not.b	d0                               	| [$16c1: cpl]
-	jbsr	l_16f0                            	| [$16c2: call $16F0]
+	jbsr	restrict_controls_if_not_playing_16f0                            	| [$16c2: call $16F0]
 	move.b	d0,coin_start_inputs_6051       	| [$16c5: ld   (coin_start_inputs_6051),a]
 	jbsr	osd_read_dipswitches                       	| [$16c8: ld   a,($B000)]
 	not.b	d0                               	| [$16cb: cpl]
@@ -3529,7 +3538,7 @@ l_16e9:
 *out  ($08),a
 *in   a,($0C)
 	rts                                    	| [$16ef: ret]
-l_16f0:
+restrict_controls_if_not_playing_16f0:
 	move.w	d0,-(sp)                        	| [$16f0: push af]
 	move.b	check_scenery_disabled_61ED,d0  	| [$16f1: ld   a,(check_scenery_disabled_61ED)]
 	cmp.b	#0x01,d0                         	| [$16f4: cp   $01]
@@ -3541,9 +3550,10 @@ l_16f0:
 	rts                                    	| [$1700: ret]
 l_1701:
 	move.w	(sp)+,d0                        	| [$1701: pop  af]
+	* keep only coin inputs
 	and.b	#0x03,d0                         	| [$1702: and  $03]
 	rts                                    	| [$1704: ret]
-l_1705:
+handle_cocktail_1705:
 	move.b	d0,d1                           	| [$1705: ld   b,a]
 	jbsr	osd_read_dipswitches                       	| [$1706: ld   a,($B000)]
 	not.b	d0                               	| [$1709: cpl]
@@ -3565,13 +3575,8 @@ l_171c:
 	and.b	#0x07,d0                         	| [$1723: and  $07]
 	or.b	d2,d0                             	| [$1725: or   c]
 	rts                                    	| [$1726: ret]
-	move.b	gameplay_allowed_6054,d0        	| [$1727: ld   a,(gameplay_allowed_6054)]
-	cmp.b	#0x00,d0                         	| [$172a: cp   $00]
-	bne.b	0f                               	| [...]
-	rts                                    	| [$172c: ret  z] [...]
-0:
-	jbsr	really_add_to_score_5500                            	| [$172d: call $5500]
-	rts                                    	| [$1730: ret]
+	
+
 l_1731:
 	move.b	gameplay_allowed_6054,d0        	| [$1731: ld   a,(gameplay_allowed_6054)]
 	cmp.b	#0x01,d0                         	| [$1734: cp   $01]
@@ -3857,7 +3862,7 @@ l_23ed:
 	lea	game_mem+0x254E,a2                      	| [$23f5: ld   ix,$254E]
 	* set D3 as it's used in 250F
 	move.w	#-0x20,d3                      	| [$23f9: ld   de,$FFE0]
-	sub.w	d3,d6                            	| [$23fc: add  hl,de]
+	add.w	d3,d6                            	| [$23fc: add  hl,de]
 	move.b	#0x2C,d0                        	| [$23fd: ld   a,$2C]
 	exg	d0,d7                              	| [$23ff: ex   af,af']
 	jbsr	draw_big_bagman_row_250f                            	| [$2400: call $250F]
@@ -3977,7 +3982,10 @@ l_251a:
 	                         	| [$251b: cp   $00]
 	bne.b	0f                               	| [...]
 	* this cannot happen, or the game would crash since D6 is on the stack
-	illegal
+	* actually it probably happens when big bagman scrolls out of the screen
+	* it works to fix d6 pop: no more crashes. I don't know how the original
+	* game handles this error, but it doesn't matter.
+	move.w	(sp)+,d6
 	rts                                    	| [$251d: ret  z] [...]
 0:
 	move.b	(A2),d0                    	| [$251e: ld   a,(ix+$00)]
@@ -4917,10 +4925,10 @@ change_attribute_everywhere_C3A3:
 	* had to separate both routines
 	* as one writes to color ram and the other one
 	* writes to RAM with A0
-l_c3aa:
-	clr.b	d2                               	| [$29f1: ld   c,$00]
 l_c3a8:
-	move.b	d0,(a0)+                         	| [$29f3: ld   (hl),a]
+	clr.b	d2                               	| [$c3a8: ld   c,$00]
+l_c3aa:
+	move.b	d0,(a0)+                         	| [$c3aa: ld   (hl),a]
 	                           	| [$29f4: inc  hl]
 	* kick watchdog
 	subq.b	#1,d2                           	| [$c3b1: dec  c]
@@ -7947,6 +7955,7 @@ l_d7c9:
 	rts                                    	| [$d7e7: ret]
 	
 scroll_text_up_d7e8:
+	jbsr	osd_break
 	move.l	a2,-(sp)                        	| [$d7e8: push ix]
 	move.w	d0,-(sp)                        	| [$d7ea: push af]
 	movem.w	d3/d4,-(sp)                    	| [$d7eb: push de]
@@ -7964,10 +7973,9 @@ l_d7fa:
 	movem.w	d1/d2,-(sp)                    	| [$d7fe: push bc]
 	move.b	#0x1F,d1                        	| [$d7ff: ld   b,$1F]
 l_d801:
-	move.w	d6,-(a7)
-	move.w	d5,d6
+	exg	d5,d6
 	jbsr	osd_r_videoram                    	| [$d801: ld   a,(ix+$00)]
-	move.w	(a7)+,d6
+	exg	d5,d6
 	move.b	d0,d2                           	| [$d804: ld   c,a]
 	jbsr	osd_r_videoram                    	| [$d805: ld   a,(ix+$00)]
 	cmp.b	d2,d0                            	| [$d808: cp   c]
@@ -8020,7 +8028,7 @@ l_d84d:
 	cmp.b	#0xFF,d0                         	| [$d850: cp   $FF]
 	jeq	l_d873                             	| [$d852: jr   z,$D873]
 	jbsr	l_d8a2                            	| [$d854: call $D8A2]
-	jbsr	l_d8d4                            	| [$d857: call $D8D4]
+	jbsr	wait_for_type_effect_d8d4                            	| [$d857: call $D8D4]
 	addq.w	#1,a2                           	| [$d85a: inc  ix]
  	move.b	(A2),d0                    	| [$d85c: ld   a,(ix+$00)]
 	cmp.b	#0xFE,d0                         	| [$d85f: cp   $FE]
@@ -8037,12 +8045,12 @@ l_d84d:
 0:
 	jra	l_d84d                             	| [$d871: jr   $D84D]
 l_d873:
-	jbsr	l_d8d4                            	| [$d873: call $D8D4]
-	jbsr	l_d8d4                            	| [$d876: call $D8D4]
-	jbsr	l_d8d4                            	| [$d879: call $D8D4]
-	jbsr	l_d8d4                            	| [$d87c: call $D8D4]
-	jbsr	l_d8d4                            	| [$d87f: call $D8D4]
-	jbsr	l_d8d4                            	| [$d882: call $D8D4]
+	jbsr	wait_for_type_effect_d8d4                            	| [$d873: call $D8D4]
+	jbsr	wait_for_type_effect_d8d4                            	| [$d876: call $D8D4]
+	jbsr	wait_for_type_effect_d8d4                            	| [$d879: call $D8D4]
+	jbsr	wait_for_type_effect_d8d4                            	| [$d87c: call $D8D4]
+	jbsr	wait_for_type_effect_d8d4                            	| [$d87f: call $D8D4]
+	jbsr	wait_for_type_effect_d8d4                            	| [$d882: call $D8D4]
 	rts                                    	| [$d885: ret]
 l_d886:
 	move.w	unknown_632F,d6             	| [$d886: ld   hl,(unknown_632F)]
@@ -8059,32 +8067,33 @@ l_d895:
 	move.w	(sp)+,d0                        	| [$d898: pop  af]
 	addq.w	#1,a2                           	| [$d899: inc  ix]
 	jbsr	scroll_text_up_d7e8                            	| [$d89b: call $D7E8]
-	jbsr	l_d8cd                            	| [$d89e: call $D8CD]
+	jbsr	small_wait_d8cd                            	| [$d89e: call $D8CD]
 	rts                                    	| [$d8a1: ret]
 l_d8a2:
 	move.b	(A2),d0                    	| [$d8a2: ld   a,(ix+$00)]
 	sub.b	#0x30,d0                         	| [$d8a5: sub  $30]
 	cmp.b	#0x0A,d0                         	| [$d8a7: cp   $0A]
 	bne.b	0f                               	| [...]
-	jbsr	l_d8d4                            	| [$d8a9: call z,$D8D4]
+	jbsr	wait_for_type_effect_d8d4                            	| [$d8a9: call z,$D8D4]
 0:
 	jbsr	osd_w_videoram                         	| [$d8ac: ld   (hl),a]
 	cmp.b	#0x0A,d0                         	| [$d8ad: cp   $0A]
 	beq.b	0f                               	| [...]
-	jbsr	l_d8c0                            	| [$d8af: call nz,$D8C0]
+	jbsr	play_type_sample_d8c0                            	| [$d8af: call nz,$D8C0]
 0:
 
 	move.w	d6,-(sp)                        	| [$d8b2: push hl]
 	                      	| [$d8b3: ld   de,$0800]
 	add.w	#0x800,d6                            	| [$d8b6: add  hl,de]
 	move.b	#0x04,d0                        	| [$d8b7: ld   a,$04]
-	jbsr	osd_w_videoram                         	| [$d8b9: ld   (hl),a]
+	jbsr	osd_w_colorram                         	| [$d8b9: ld   (hl),a]
 	move.w	(sp)+,d6                        	| [$d8ba: pop  hl]
 	                     	| [$d8bb: ld   de,$FFE0]
-	sub.w	#0x20,a0                            	| [$d8be: add  hl,de]
+	* next X
+	sub.w	#0x20,d6                            	| [$d8be: add  hl,de]
  	rts                                    	| [$d8bf: ret]
-l_d8c0:
-
+	
+play_type_sample_d8c0:
 	move.l	a0,-(sp)                        	| [$d8c0: push hl]
 	movem.w	d1/d2,-(sp)                    	| [$d8c1: push bc]
 	movem.w	d3/d4,-(sp)                    	| [$d8c2: push de]
@@ -8097,8 +8106,8 @@ l_d8c0:
 	movem.w	(sp)+,d1/d2                    	| [$d8ca: pop  bc]
 	move.l	(sp)+,a0                        	| [$d8cb: pop  hl]
 	rts                                    	| [$d8cc: ret]
-l_d8cd:
-
+	
+small_wait_d8cd:
 	move.l	a0,-(sp)                        	| [$d8cd: push hl]
 	move.w	d0,-(sp)                        	| [$d8ce: push af]
 						| [$d8cf: ld   hl,number_of_credits_6000]
@@ -8108,12 +8117,12 @@ l_d8cd:
 	move.l	(sp)+,a0   	
 	rts
 		
-l_d8d4:
+wait_for_type_effect_d8d4:
 
 	move.l	a0,-(sp)                        	| [$d8d4: push hl]
 	move.w	d0,-(sp)                        	| [$d8d5: push af]
-	move.w	#0x0F0,0xDFF180
-	move.w	#20,d0                      	| [$d8d6: ld   hl,$3000]
+	
+	move.w	#10,d0                      	| [$d8d6: ld   hl,$3000]
 	jbsr	osd_wait				                           	| [$d8d9: dec  hl]
  	                           	| [$d8da: ld   a,h]
 	                       	| [$d8db: cp   $00]

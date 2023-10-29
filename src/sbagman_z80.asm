@@ -2638,6 +2638,11 @@ read_player_controls_1689:
 168C: 32 50 60    ld   (player_previous_input_6050),a
 168F: AF          xor  a
 1690: 32 07 A0    ld   ($A007),a
+* bug-avoiding code (hardware related?)
+* not present in Bagman read_player_controls_xxxx
+* seems that the program reads inputs twice, and compares if 
+* they're different, loops until they're the same...
+
 1693: CD D9 16    call $16D9
 1696: 47          ld   b,a
 1697: CD D9 16    call $16D9
@@ -2645,6 +2650,7 @@ read_player_controls_1689:
 169B: 28 05       jr   z,$16A2
 169D: 32 60 63    ld   (unknown_6360),a
 16A0: 18 F1       jr   $1693
+* ok, inputs were read identically twice: valid!
 16A2: 2F          cpl
 16A3: CD F0 16    call $16F0
 16A6: CD 05 17    call $1705
