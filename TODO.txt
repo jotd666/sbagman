@@ -1,6 +1,6 @@
+- pick pickaxe problem!
 - text story freezes (doesn't scroll)
-- missing tiles for big bagman animations
-  (enter them in script)
+- missing tiles for big bagman animations: wiking eye
 - write a script to detect move.w to/from ram
 
 - reduce memory footprint (> 1MB!)
@@ -9,8 +9,6 @@
 - new code unknown_609F D1AE
 - debug: l_f4f2
 - check TODO (sfx...)
-
-- sync fe54 with bagman (is_background_tile_for_object_drop_CFF3)
 
 z80 conv: review move.w into address register inc hl/dec hl => subq.w
 

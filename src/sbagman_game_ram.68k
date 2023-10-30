@@ -996,7 +996,7 @@ unknown_screen_pointer_631B:
 	ds.w	1
 unknown_screen_pointer_631E:
 	ds.w	1
-unknown_62AD:
+mechanical_stair_frame_62AD:
 	ds.w	1
 
 
