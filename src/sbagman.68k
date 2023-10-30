@@ -4370,8 +4370,8 @@ l_c047:
 	jbsr	l_c073                            	| [$c059: call $C073]
 	move.b	#0x01,d0                        	| [$c05c: ld   a,$01]
 	move.b	d0,unknown_626E                 	| [$c05e: ld   (unknown_626E),a]
-l_c061:
-	move.w	(sp)+,d0                        	| [$c061: pop  af]
+l_c061:	                        	| [$c061: pop  af]
+	addq.w	#4,sp		| 32-bit stack pop
 	rts                                    	| [$c062: ret]
 l_c063:
 	lea	game_mem+0x5763,a1                      	| [$c063: ld   de,$5763]
@@ -4393,6 +4393,7 @@ l_c07c:
 	clr.b	d0                               	| [$c085: xor  a]
 	move.b	d0,unknown_626E                 	| [$c086: ld   (unknown_626E),a]
 	move.w	(sp)+,d0                        	| [$c089: pop  af]
+	addq	#2,sp
 	rts                                    	| [$c08a: ret]
 l_c08b:
 	move.b	current_player_617C,d0          	| [$c08b: ld   a,(current_player_617C)]
