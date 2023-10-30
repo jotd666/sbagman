@@ -4610,7 +4610,7 @@ l_c16d:
 	roxl.b	#1,d1                           	| [$c186: rl   b]
 	rts                                    	| [$c188: ret]
 	
-display_screen_x_c189:
+display_screen_5_c189:
 	jbsr	clear_screen_c3cd                            	| [$c189: call $C3CD]
 	move.b	#0x3F,d0                        	| [$c18c: ld   a,$3F]
 	jbsr	change_attribute_everywhere_C3A3  	| [$c18e: call change_attribute_everywhere_C3A3]
@@ -4652,7 +4652,7 @@ display_screen_4_c1c1:
 							
 
 	move.w	#0x9302,d6                      	| [$c1d7: ld   hl,$9302]
-	jbsr	l_c338                            	| [$c1da: call $C338]
+	jbsr	draw_cactus_c338                            	| [$c1da: call $C338]
 	move.w	#0x9862,d6                      	| [$c1dd: ld   hl,$9862]
 	move.b	#0x0E,d1                        	| [$c1e0: ld   b,$0E]
 	jbsr	l_c361                            	| [$c1e2: call $C361]
@@ -4693,7 +4693,7 @@ display_screen_3_c20e:
 	addq.w	#1,d6
 	dbf		d1,0b
 	move.w	#0x9362,d6                      	| [$c224: ld   hl,$9362]
-	jbsr	l_c338                            	| [$c227: call $C338]
+	jbsr	draw_cactus_c338                            	| [$c227: call $C338]
 	move.w	#0x9842,d6                      	| [$c22a: ld   hl,$9842]
 	move.b	#0x0F,d1                        	| [$c22d: ld   b,$0F]
 	jbsr	l_c361                            	| [$c22f: call $C361]
@@ -4746,7 +4746,7 @@ display_screen_2_c272:
          	| [$c283: ld   bc,$0400] 1024
 	                              	| [$c286: ldir]
 	move.w	#0x9182,d6                      	| [$c288: ld   hl,$9182]
-	jbsr	l_c338                            	| [$c28b: call $C338]
+	jbsr	draw_cactus_c338                            	| [$c28b: call $C338]
 	move.w	#0x9882,d6                      	| [$c28e: ld   hl,$9882]
 	move.b	#0x07,d1                        	| [$c291: ld   b,$07]
 	jbsr	l_c361                            	| [$c293: call $C361]
@@ -4795,7 +4795,7 @@ display_maze_C2C9:
 	                        	| [$c2da: ld   bc,$0400] 1024
 	                              	| [$c2dd: ldir]
  	move.w	#0x9182,d6                      	| [$c2df: ld   hl,$9182]
-	jbsr	l_c338                            	| [$c2e2: call $C338]
+	jbsr	draw_cactus_c338                            	| [$c2e2: call $C338]
 	move.w	#0x9842,d6                      	| [$c2e5: ld   hl,$9842]
 	move.b	#0x07,d1                        	| [$c2e8: ld   b,$07]
 	jbsr	l_c361                            	| [$c2ea: call $C361]
@@ -4835,7 +4835,8 @@ init_guard_directions_and_wagons_C314:
 	jbsr	ldir                              	| [$c332: ldir]
 	jbsr	l_f9a3                            	| [$c334: call $F9A3]
 	rts                                    	| [$c337: ret]
-l_c338:
+	
+draw_cactus_c338:
 	move.b	#0x55,d0                        	| [$c338: ld   a,$55]
 	jbsr	osd_w_videoram                         	| [$c33a: ld   (hl),a]
 	addq.w	#1,d6                           	| [$c33b: inc  hl]
@@ -4861,7 +4862,7 @@ l_c338:
  
 	jbsr	osd_w_colorram                         	| [$c356: ld   (hl),a]
 	                      	| [$c357: ld   de,$FFE1]
-	sub.w	#0x1F,a0                            	| [$c35a: add  hl,de]
+	sub.w	#0x1F,d6                            	| [$c35a: add  hl,de]
 
 	jbsr	osd_w_colorram                         	| [$c35b: ld   (hl),a]
 	subq.w	#1,d6                           	| [$c35c: dec  hl]
@@ -5703,7 +5704,7 @@ l_c849:
 	move.b	#0x10,d1                        	| [$c849: ld   b,$10]
 	jbsr	write_current_highscore_name_letter_c878                            	| [$c84b: call $C878]
 	                     	| [$c84e: ld   de,$0020] 32
-	add.w	#0x0020,a0                            	| [$c851: add  hl,de]
+	add.w	#0x0020,d6                            	| [$c851: add  hl,de]
 	subq.w	#1,a2                           	| [$c852: dec  ix]
  	jbsr	osd_r_videoram                         	| [$c854: ld   b,(hl)]
 	move.b	d0,d1
@@ -6274,12 +6275,12 @@ l_cbeb:
 	clr.b	unknown_6285                 	| [$cbf2: ld   (unknown_6285),a]
 	cmp.b	#0xE8,d0                         	| [$cbee: cp   $E8]
 	bcs.b	0f                               	| [...]
-	jbsr	l_cc15                            	| [$cbf5: call nc,$CC15]
+	jbsr	goto_next_right_screen_cc15                            	| [$cbf5: call nc,$CC15]
 0:
 	move.b	player_x_6582,d0                	| [$cbf8: ld   a,(player_x_6582)]
 	cmp.b	#0x10,d0                         	| [$cbfb: cp   $10]
 	bcc.b	0f                               	| [...]
-	jbsr	l_cc8d                            	| [$cbfd: call c,$CC8D]
+	jbsr	goto_next_left_screen_cc8d                            	| [$cbfd: call c,$CC8D]
 0:
 	clr.b	d0                               	| [$cc00: ld   a,$00]
 	move.b	d0,unknown_626F                 	| [$cc02: ld   (unknown_626F),a]
@@ -6292,7 +6293,7 @@ l_cbeb:
      	| [$cc10: ld   (interrupt_control_A000),a]
 	                                    	| [$cc13: nop]
 	rts                                    	| [$cc14: ret]
-l_cc15:
+goto_next_right_screen_cc15:
 	jbsr	l_cdcc                            	| [$cc15: call $CDCC]
 	move.b	player_screen_600D,d0           	| [$cc18: ld   a,(player_screen_600D)]
 	cmp.b	#0x01,d0                         	| [$cc1b: cp   $01]
@@ -6334,7 +6335,7 @@ l_cc6f:
 	move.b	player_screen_600D,d0           	| [$cc6f: ld   a,(player_screen_600D)]
 	cmp.b	#0x04,d0                         	| [$cc72: cp   $04]
 	jne	l_cc8c                             	| [$cc74: jr   nz,$CC8C]
-	jbsr	display_screen_x_c189                            	| [$cc76: call $C189]
+	jbsr	display_screen_5_c189                            	| [$cc76: call $C189]
 	move.b	#0x05,d0                        	| [$cc79: ld   a,$05]
 	move.b	d0,player_screen_600D           	| [$cc7b: ld   (player_screen_600D),a]
 	jbsr	draw_object_tiles_FD72            	| [$cc7e: call draw_object_tiles_FD72]
@@ -6344,7 +6345,7 @@ l_cc6f:
 	jra	l_cd1a                             	| [$cc89: jp   $CD1A]
 l_cc8c:
 	rts                                    	| [$cc8c: ret]
-l_cc8d:
+goto_next_left_screen_cc8d:
 	move.b	#0x01,d0                        	| [$cc8d: ld   a,$01]
 	move.b	d0,unknown_6285                 	| [$cc8f: ld   (unknown_6285),a]
 	jbsr	l_cdcc                            	| [$cc92: call $CDCC]
@@ -6355,6 +6356,7 @@ l_cc8d:
 0:
 	cmp.b	#0x02,d0                         	| [$cc9b: cp   $02]
 	jne	l_ccb5                             	| [$cc9d: jr   nz,$CCB5]
+	* screen 1
 	jbsr	display_maze_C2C9                 	| [$cc9f: call display_maze_C2C9]
 	move.b	#0x01,d0                        	| [$cca2: ld   a,$01]
 	move.b	d0,player_screen_600D           	| [$cca4: ld   (player_screen_600D),a]
@@ -7629,7 +7631,7 @@ l_d565:
 	lea	unknown_65A3,a0                	| [$d56d: ld   hl,unknown_65A3]
 l_d570:
 	move.b	(a0),d0                         	| [$d570: ld   a,(hl)]
-	cmp.b	#0x00,d0                         	| [$d571: cp   $00]
+	                         	| [$d571: cp   $00]
 	jeq	l_d577                             	| [$d573: jr   z,$D577]
 	add.b	d2,d0                            	| [$d575: add  a,c]
 	move.b	d0,(a0)                         	| [$d576: ld   (hl),a]

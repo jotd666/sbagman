@@ -1,4 +1,5 @@
 - pick pickaxe/barrow/bag problem!
+- bomb tiles not displayed
 - 5th screen elevator shifted by 2 X tiles, doesn't move
 - 5th screen: blitz, locks up when returning to screen 4
 - dies: too long wait

@@ -96,6 +96,9 @@ used_cluts.update({k:[0xC] for k in range(0x2A6,0x2BC)})
 # mechanical stair tiles
 used_cluts.update({k:[0xF] for k in range(0x3C8,0x3DA)})
 used_cluts.update({k:[0xF] for k in range(0x35F,0x367)})
+# bomb
+used_cluts.update({k:[0x4] for k in range(0x1D4,0x1D8)})
+
 
 dump_tiles = True
 dump_sprites = True
