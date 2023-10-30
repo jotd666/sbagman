@@ -262,6 +262,10 @@ sbagman_reset:
 	* we need to set this variable to 2 once out of 5 calls
 	move.b	#1,vb_ticks_count
 
+	* initialize A4 properly, to be able to detect
+	* when A4 is bogus (which originally happens too)
+	sub.l	a4,a4
+
 	jra	l_eca8                             	| [$0000: jp   $1200]
 
 sbagman_irq:
@@ -4497,6 +4501,12 @@ l_c103:
 
 	movem.w	(sp)+,d1/d2                    	| [$c10c: pop  bc]
 l_c10d:
+	* protection as at startup the game gets here
+	* while BC isn't initialized properly at first
+	cmp.l	#0,a4
+	bne.b	0f
+	rts
+0:
 	                           	| [$c10d: inc  bc]
 	                         	| [$c10e: ld   a,(bc)]
 	addq.b	#1,(1,a4)                           	| [$c10f: inc  a]
@@ -12569,7 +12579,7 @@ l_f96d:
 	move.b	d0,unknown_6166                 	| [$f9a0: ld   (unknown_6166),a]
 l_f9a3:
 	lea	holds_barrow_61C7,a1           	| [$f9a3: ld   de,holds_barrow_61C7]
-	lea	game_mem+0x1BFB,a0                      	| [$f9a6: ld   hl,$1BFB]
+	lea	table_1BFB,a0                      	| [$f9a6: ld   hl,$1BFB]
 	move.w	#0x18,d1                        	| [$f9a9: ld   bc,$0018] 24
 	jbsr	ldir                              	| [$f9ac: ldir]
  	move.b	#0x40,d0                        	| [$f9ae: ld   a,$40]
@@ -13203,7 +13213,6 @@ l_fdef:
 	movem.w	d1/d2,-(sp)                    	| [$fdef: push bc]
 
 	move.l	a3,-(sp)                        	| [$fdf0: push iy]
-	                    	| [$fdf2: push de]
 	move.l	a1,-(sp)                        	| [$fdf2: push de]
 	jbsr	swap_3_bytes_DBC2                 	| [$fdf3: call swap_3_bytes_DBC2]
 	* decode screen address (now big endian, we changed the ROM source)
@@ -13215,10 +13224,10 @@ l_fdef:
                            	| [$fdfa: ld   h,a]
                            	| [$fdfb: dec  de]
 	move.b	player_screen_600D,d0           	| [$fdfc: ld   a,(player_screen_600D)]
-	move.l	(sp),a3                        	| [$fdff: pop  iy]
+	move.l	(sp)+,a3                        	| [$fdff: pop  iy]
 	cmp.b	(0x02,a3),d0                     	| [$fe01: cp   (iy+$02)]
 
-	                        	| [$fe04: push iy]
+	move.l	a3,-(sp)                        	| [$fe04: push iy]
 	jne	l_fe24                             	| [$fe06: jr   nz,$FE24]
 * read screen tile, with test against 00 on D6 to avoid issues
 * (original game reads in 0 at some point)
@@ -13293,7 +13302,7 @@ l_fe6c:
 	movem.w	d1/d2,-(sp)                    	| [$fe6c: push bc]
 
 	move.l	a3,-(sp)                        	| [$fe6d: push iy]
-	movem.w	d3/d4,-(sp)                    	| [$fe6f: push de]
+	move.l	a1,-(sp)                    	| [$fe6f: push de]
 	jbsr	l_dbb5                            	| [$fe70: call $DBB5]
 	LOAD_AX_BE_WORD_DY	a1,d6
 		| [$fe73: ld   a,(de)]
@@ -13304,10 +13313,10 @@ l_fe6c:
 		| [$fe77: ld   h,a]
 		| [$fe78: dec  de]
 	move.b	player_screen_600D,d0           	| [$fe79: ld   a,(player_screen_600D)]
-	move.l	(sp),a3                        	| [$fe7c: pop  iy]
+	move.l	(sp)+,a3                        	| [$fe7c: pop  iy]
 	cmp.b	(0x02,a3),d0                     	| [$fe7e: cp   (iy+$02)]
 
-	                        	| [$fe81: push iy]
+	move.l	a3,-(sp)                        	| [$fe81: push iy]
 	jne	l_fea1                             	| [$fe83: jr   nz,$FEA1]
 	jbsr		read_rom                         	| [$fe85: ld   a,(hl)]
 	jbsr	is_background_tile_for_object_drop_CFF3	| [$fe86: call is_background_tile_for_object_drop_CFF3]
@@ -13411,4 +13420,14 @@ l_ff2f:
 	jra	guard_move_if_fast_enough_06EE     	| [$ff34: jp   guard_move_if_fast_enough_06EE]
 
 direction_table_5970:
-	dc.b	0x80,0x40,0x20,0x10
+	.byte	0x80,0x40,0x20,0x10
+
+* same as in the game but as big endian
+table_1BFB:
+	.byte 	0x00,0x00,0x00,0x00,0x00,0x92,0x2e,0x04
+	.byte	0x00,0x00,0x00,0x00,0x92,0x1b,0x01,0x92
+	.byte	0x0a,0x03,0x93,0x07,0x05,0x91,0xa3,0x02
+* original table contains little endian screen addresses	
+*	.byte 	0x00,0x00,0x00,0x00,0x00,0x2e,0x92,0x4
+*	.byte	0x00,0x00,0x00,0x00,0x1b,0x92,0x1,0xa
+*	.byte	0x92,0x3,0x7,0x93,0x5,0xa3,0x91,0x2

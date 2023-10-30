@@ -1,4 +1,3 @@
-- access fault A4 not initialized l_c10d: probably same in original game
 - text story freezes (doesn't scroll)
 - missing tiles for big bagman animations
   (enter them in script)
