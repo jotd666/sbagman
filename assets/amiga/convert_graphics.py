@@ -204,11 +204,11 @@ with open(os.path.join(src_dir,"palette.68k"),"w") as f:
 # to display sprites with wrong clut (briefly but would still be logged)
 
 add_sprites(0x21,0x31,0xC,"guard")
+add_sprite(0x3F,0xC,"guard",True)  #guard sliding
 # player frames symmetric but sometimes not useful
 # (saves memory!)
-add_sprite(0x12,0x8,"player",True)
-add_sprites(0x14,0x1c,0x8,"player",False)
-add_sprites(0x1d,0x20,0x8,"player",True)
+add_sprites(0x11,0x20,0x8,"player",True)
+
 # pick frames
 add_sprites(0x77,0x78,0x9,"pickaxe")
 #add_sprite(0x79,0x9,"pickaxe",False)  # no mirror
@@ -218,19 +218,18 @@ add_sprites(0x7A,0x7B,0x8,"barrow",False)
 # wagon
 add_sprite(0x35,4,"wagon",False)
 # elevators!!
+add_sprite(0x10,0xC,"shot",False)
 add_sprite(0x33,4,"elevator",False)
 add_sprite(0x33,8,"elevator",False)
 #add_sprites(0x10,xx,"elevator",False)  # from Super Bagman ?
 # bag
 add_sprite(0x7F,0x9,"bag",True)  # yellow
 add_sprite(0x7F,0x4,"bag",True)  # blue
+# key
+add_sprite(0x71,0xC,"key",False)
+add_sprites(0x74,0x75,0xC,"bomb",False)
 
-# some sprite frames aren't used until super bagman. They're already in the sprite sheet, interesting!!!
 
-# guard jumping/sliding
-del used_sprites[0x2f]
-del used_sprites[0x28]
-del used_sprites[0x29]
 # we also dropped player sliding (jump is used when exiting the wagon)
 
 

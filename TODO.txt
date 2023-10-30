@@ -1,4 +1,7 @@
-- pick pickaxe problem!
+- pick pickaxe/barrow/bag problem!
+- 5th screen elevator shifted by 2 X tiles, doesn't move
+- 5th screen: blitz, locks up when returning to screen 4
+- dies: too long wait
 - text story freezes (doesn't scroll)
 - missing tiles for big bagman animations: wiking eye
 - write a script to detect move.w to/from ram
@@ -9,6 +12,8 @@
 - new code unknown_609F D1AE
 - debug: l_f4f2
 - check TODO (sfx...)
+
+unknown_6334: has key?
 
 z80 conv: review move.w into address register inc hl/dec hl => subq.w
 

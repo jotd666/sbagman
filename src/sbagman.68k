@@ -159,8 +159,11 @@ read_rom:
 	clr.w	d6
 	swap	d6
 	.ifndef		RELEASE
+	cmp.w	#0xC000,d6
+	bcc.b	0f
 	cmp.w	#0x6000,d6
 	bcc.b	rr_error
+0:
 	.endif
 	
 	lea		game_mem,a0
@@ -3441,9 +3444,17 @@ write_credits_and_lives_162e:
 	and.b	#0x0F,d0                         	| [$1641: and  $0F]
 	move.w	#0x90BF,d6                       	| [$1643: ld   ($90BF),a]
 	jbsr	osd_w_videoram
+	* first erase the space where lives are drawn
+	* we're going to be smarter than the original to avoid flickering
 	move.b	#0xE0,d0                        	| [$1646: ld   a,$E0]
 	move.b	#0x06,d1                        	| [$1648: ld   b,$06]
+	moveq	#0,d2
+	move.b	lives_6056,d2
+	* only erase the end
+	sub.b	d2,d1
 	move.w	#0x93BF,d6                      	| [$164a: ld   hl,$93BF]
+	lsl.w	#5,d2		| times 0x20 to advance cursor
+	sub.w	d2,d6
 	jbsr	draw_repeated_char_c373                            	| [$164d: call $C373]
 	move.b	lives_6056,d0                   	| [$1650: ld   a,(lives_6056)]
 	                         	| [$1653: cp   $00]
@@ -4600,7 +4611,7 @@ l_c16d:
 	rts                                    	| [$c188: ret]
 	
 display_screen_x_c189:
-	jbsr	l_c3cd                            	| [$c189: call $C3CD]
+	jbsr	clear_screen_c3cd                            	| [$c189: call $C3CD]
 	move.b	#0x3F,d0                        	| [$c18c: ld   a,$3F]
 	jbsr	change_attribute_everywhere_C3A3  	| [$c18e: call change_attribute_everywhere_C3A3]
 	            	| [$c191: ld   a,(io_read_shit_B800)]
@@ -4626,7 +4637,7 @@ display_screen_x_c189:
 **out  ($58),a
 	rts                                    	| [$c1c0: ret]
 display_screen_4_c1c1:
-	jbsr	l_c3cd                            	| [$c1c1: call $C3CD]
+	jbsr	clear_screen_c3cd                            	| [$c1c1: call $C3CD]
 	move.b	#0x3F,d0                        	| [$c1c4: ld   a,$3F]
 	jbsr	change_attribute_everywhere_C3A3  	| [$c1c6: call change_attribute_everywhere_C3A3]
 	            	| [$c1c9: ld   a,(io_read_shit_B800)]
@@ -4668,7 +4679,7 @@ display_screen_4_c1c1:
 	jbsr	display_player_1_and_2_text_ca7e                            	| [$c20a: call $CA7E]
 	rts                                    	| [$c20d: ret]
 display_screen_3_c20e:
-	jbsr	l_c3cd                            	| [$c20e: call $C3CD]
+	jbsr	clear_screen_c3cd                            	| [$c20e: call $C3CD]
 	move.b	#0x3F,d0                        	| [$c211: ld   a,$3F]
 	jbsr	change_attribute_everywhere_C3A3  	| [$c213: call change_attribute_everywhere_C3A3]
 	            	| [$c216: ld   a,(io_read_shit_B800)]
@@ -4694,7 +4705,7 @@ display_screen_3_c20e:
 	jbsr	l_c36e                            	| [$c23f: call $C36E]
 	move.b	#0x3F,d0                        	| [$c242: ld   a,$3F]
 	move.w	#0x9A77,d6                       	| [$c244: ld   ($9A77),a]
-	jbsr	osd_w_videoram
+	jbsr	osd_w_colorram
  	jbsr	l_d0dd                            	| [$c247: call $D0DD]
 	            	| [$c24a: ld   a,(io_read_shit_B800)]
 	jbsr	osd_read_dipswitches                       	| [$c24d: ld   a,($B000)]
@@ -4719,13 +4730,13 @@ l_c265:
 	jbsr	l_d0f3                            	| [$c26e: call $D0F3]
 	rts                                    	| [$c271: ret]
 display_screen_2_c272:
-	jbsr	l_c3cd                            	| [$c272: call $C3CD]
+	jbsr	clear_screen_c3cd                            	| [$c272: call $C3CD]
 	move.b	#0x3F,d0                        	| [$c275: ld   a,$3F]
 	jbsr	change_attribute_everywhere_C3A3  	| [$c277: call change_attribute_everywhere_C3A3]
 	            	| [$c27a: ld   a,(io_read_shit_B800)]
 	lea	game_mem+0x4400,a0                      	| [$c27d: ld   hl,$4400]
 	move.w	#0x9000,d6                      	| [$c280: ld   de,$9000]
-	                        	| [$c283: ld   bc,$0400] 1024
+	move.w	#0x0400-1,d1                        	| [$c283: ld   bc,$0400] 1024
 0:
 	move.b	(a0)+,d0
 	jbsr	osd_w_videoram
@@ -4769,7 +4780,7 @@ l_c2b1:
 	rts                                    	| [$c2c8: ret]
 
 display_maze_C2C9:
-	jbsr	l_c3cd                            	| [$c2c9: call $C3CD]
+	jbsr	clear_screen_c3cd                            	| [$c2c9: call $C3CD]
 	move.b	#0x3F,d0                        	| [$c2cc: ld   a,$3F]
 	jbsr	change_attribute_everywhere_C3A3  	| [$c2ce: call change_attribute_everywhere_C3A3]
 	            	| [$c2d1: ld   a,(io_read_shit_B800)]
@@ -4965,7 +4976,7 @@ l_c3c0:
 	subq.b	#1,d1                           	| [...]
 	jne	l_c3be                             	| [$c3ca: djnz $C3BE]
 	rts                                    	| [$c3cc: ret]
-l_c3cd:
+clear_screen_c3cd:
 	move.b	#0xE0,d0                        	| [$c3cd: ld   a,$E0]
 	                        	| [$c3cf: ld   a,$E0]
 	move.w	#0x93E4,d6                      	| [$c3d1: ld   hl,$93E4]
@@ -6412,14 +6423,16 @@ l_cd22:
 	move.b	(0x03,a3),d0                    	| [$cd37: ld   a,(iy+$03)]
 	cmp.b	(0x03,a2),d0                     	| [$cd3a: cp   (ix+$03)]
 	jne	l_cd54                             	| [$cd3d: jp   nz,$CD54]
+	* guard 1 same Y as player
 	move.b	(0x02,a2),d0                    	| [$cd40: ld   a,(ix+$02)]
-	cmp.b	d3,d0                            	| [$cd43: cp   d]
+	jbsr	osd_break
+	cmp.b	d3,d0    | value of D3/D4???                     	| [$cd43: cp   d]
 	jcs	l_cd4b                             	| [$cd44: jr   c,$CD4B]
 	jbsr	move_guard_1_96_times_d0c5                            	| [$cd46: call $D0C5]
 	jra	l_cd54                             	| [$cd49: jr   $CD54]
 l_cd4b:
 	move.b	(0x02,a2),d0                    	| [$cd4b: ld   a,(ix+$02)]
-	cmp.b	d4,d0                            	| [$cd4e: cp   e]
+	cmp.b	d4,d0                        	| [$cd4e: cp   e]
 	jcc	l_cd54                             	| [$cd4f: jr   nc,$CD54]
 	jbsr	move_guard_1_96_times_d0c5                            	| [$cd51: call $D0C5]
 l_cd54:
@@ -6566,9 +6579,10 @@ l_ce3b:
 	rts                                    	| [$ce4c: ret]
 
 switch_to_screen_5_CE4D:
+	jbsr	osd_break
 	move.b	unknown_627D,d0                 	| [$ce4d: ld   a,(unknown_627D)]
 	move.w	#0x91F3,d6                       	| [$ce50: ld   ($91F3),a]
-        jbsr	osd_w_videoram
+    jbsr	osd_w_videoram
 	cmp.b	#0xE0,d0                         	| [$ce53: cp   $E0]
 	jeq	l_ce58                             	| [$ce55: jr   z,$CE58]
 	subq.b	#1,d0                           	| [$ce57: dec  a]
@@ -8834,7 +8848,7 @@ l_def7:
 	bsr		read_rom                         	| [$df23: ld   a,(hl)]
 l_df24:
 	move.w	#0x938E,d6
-	jbsr	osd_w_colorram                       	| [$df24: ld   ($938E),a]
+	jbsr	osd_w_videoram                       	| [$df24: ld   ($938E),a]
 	move.b	#0x08,d0                        	| [$df27: ld   a,$08]
 	move.w	#0x9B8E,d6                       	| [$df29: ld   ($9B8E),a]
     jbsr	osd_w_colorram
@@ -9569,30 +9583,32 @@ l_e463:
 	rts                                    	| [$e469: ret  nz] [...]
 0:
 	move.b	(A3),d0                    	| [$e46a: ld   a,(iy+$00)]
-	cmp.b	#0x00,d0                         	| [$e46d: cp   $00]
+	                         	| [$e46d: cp   $00]
 	beq.b	0f                               	| [...]
 	rts                                    	| [$e46f: ret  nz] [...]
 0:
+	* fire pressed but player not holding any object: handle jump
 	move.b	#0x01,d0                        	| [$e470: ld   a,$01]
-	move.b	d0,(A3)                    	| [$e472: ld   (iy+$00),a]
-	lea	game_mem+0xE4A4,a0                      	| [$e475: ld   hl,$E4A4]
-	move.b	d5,(0x01,a3)                    	| [$e478: ld   (iy+$01),h]
-	move.b	d6,(0x02,a3)                    	| [$e47b: ld   (iy+$02),l]
+	move.b	d0,(A3)+                    	| [$e472: ld   (iy+$00),a]
+	move.w	#0xE4A4,d6                      	| [$e475: ld   hl,$E4A4]
+	STORE_DX_BE_WORD_AY	d6,a3
+	subq.w	#1,a3                    	| [$e478: ld   (iy+$01),h]
+	                    	| [$e47b: ld   (iy+$02),l]
 	move.b	(A2),d0                    	| [$e47e: ld   a,(ix+$00)]
 	and.b	#0x80,d0                         	| [$e481: and  $80]
 	move.b	d0,(0x03,a3)                    	| [$e483: ld   (iy+$03),a]
 	rts                                    	| [$e486: ret]
 l_e487:
 	move.b	(A3),d0                    	| [$e487: ld   a,(iy+$00)]
-	cmp.b	#0x00,d0                         	| [$e48a: cp   $00]
+	                         	| [$e48a: cp   $00]
 	beq.b	0f                               	| [...]
 	rts                                    	| [$e48c: ret  nz] [...]
 0:
 	move.b	#0x01,d0                        	| [$e48d: ld   a,$01]
-	move.b	d0,(A3)                    	| [$e48f: ld   (iy+$00),a]
-	lea	game_mem+0xE501,a0                      	| [$e492: ld   hl,$E501]
-	move.b	d5,(0x01,a3)                    	| [$e495: ld   (iy+$01),h]
-	move.b	d6,(0x02,a3)                    	| [$e498: ld   (iy+$02),l]
+	move.b	d0,(A3)+                    	| [$e48f: ld   (iy+$00),a]
+	move.w	#0xE501,d6                      	| [$e492: ld   hl,$E501]
+	STORE_DX_BE_WORD_AY	d6,a3                    	| [$e495: ld   (iy+$01),h]
+	subq.w	#1,a3                    	| [$e498: ld   (iy+$02),l]
 	move.b	(A2),d0                    	| [$e49b: ld   a,(ix+$00)]
 	and.b	#0x80,d0                         	| [$e49e: and  $80]
 	move.b	d0,(0x03,a3)                    	| [$e4a0: ld   (iy+$03),a]
@@ -10331,8 +10347,8 @@ l_e9d3:
 	                      	| [$ea34: ld   de,$0000] 0
 	clr.w	mechanical_stair_frame_62AD                 	| [$ea37: ld   (mechanical_stair_frame_62AD),de]
 	rts                                    	| [$ea3b: ret]
+
 draw_mechanical_stair_ea3c:
-	WPSET	0x200
 	move.b	(A2),d0                    	| [$ea3c: ld   a,(ix+$00)]
 	jbsr	osd_w_videoram                         	| [$ea3f: ld   (hl),a]
 	subq.w	#1,d6                           	| [$ea40: dec  hl]
@@ -12868,6 +12884,9 @@ check_object_pickup_FBCC:
 	bne.b	0f                               	| [...]
 	rts                                    	| [$fbd7: ret  z] [...]
 0:
+	* also can't pick if already has object in hand
+	* rather release it
+
 	move.b	(a4),d0                         	| [$fbd8: ld   a,(bc)]
 	jbsr	exx                               	| [$fbd9: exx]
  
