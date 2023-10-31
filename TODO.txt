@@ -1,9 +1,12 @@
+- guard monitoring doesn't work?? when waiting for elevator 5, guard
+  disappears
+- invincibility doesn't work with guards & guns & elevators
 - gun tile: wrong color: same cyan as V/A title should be replaced
   by bomb blue
+- test elevator level 4 picks up player or not?
 - armurerie in english at screen 3: doesn't work despite tiles defined!
 - pick pickaxe/barrow/bag/bomb problem!
 - cd43: check d3/D4 values (twice) when going from screen 3 to 4
-- 5th screen elevator doesn't move
 - wagons wrong X start/stop
 - dies: too long wait
 - text story freezes (doesn't scroll)

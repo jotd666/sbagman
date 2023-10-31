@@ -260,12 +260,12 @@
 	.global	unknown_62DA
 	.global	elevator_5_direction_62df
 	.global	unknown_62E0
-	.global	unknown_62E1
-	.global	unknown_62E3
-	.global	unknown_62E5
-	.global	unknown_62E9
+	.global	elevator_5_stop_timer_62E1
+	.global	elevator_5_y_62E3
+	.global	player_in_elevator_5_62E5
+	.global	guard_1_in_elevator_5_62E9
 	.global	unknown_62EA
-	.global	unknown_62ED
+	.global	guard_2_in_elevator_5_62ED
 	.global	unknown_62EE
 	.global	jail_buddy_aniimation_counter_62F0
 	.global	unknown_62F5
@@ -790,23 +790,23 @@ unknown_62DA:
 unknown_pointer_62DB:
 	ds.l	1
 elevator_5_screen_address_62DD:
-	ds.l	1
+	ds.w	1
 
 elevator_5_direction_62df:
 	ds.b	1
 unknown_62E0:
 	ds.b	1
-unknown_62E1:
+elevator_5_stop_timer_62E1:
 	ds.b	2
-unknown_62E3:
+elevator_5_y_62E3:
 	ds.b	2
-unknown_62E5:
+player_in_elevator_5_62E5:
 	ds.b	4
-unknown_62E9:
+guard_1_in_elevator_5_62E9:
 	ds.b	1
 unknown_62EA:
 	ds.b	3
-unknown_62ED:
+guard_2_in_elevator_5_62ED:
 	ds.b	1
 unknown_62EE:
 	ds.b	2
