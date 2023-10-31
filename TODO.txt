@@ -1,18 +1,22 @@
-- gun tile: wrong color
-- pick pickaxe/barrow/bag problem!
+- gun tile: wrong color: same cyan as V/A title should be replaced
+  by bomb blue
+- armurerie in english at screen 3: doesn't work despite tiles defined!
+- pick pickaxe/barrow/bag/bomb problem!
 - cd43: check d3/D4 values (twice) when going from screen 3 to 4
-- 5th screen elevator shifted by 2 X tiles, doesn't move
-- 5th screen: blitz, locks up when returning to screen 4
+- 5th screen elevator doesn't move
+- wagons wrong X start/stop
 - dies: too long wait
 - text story freezes (doesn't scroll)
-- missing tiles for big bagman animations: wiking eye
+- missing tiles for big bagman animations: winking eye, fingers
+- jail buddy animation is too fast
 - write a script to detect move.w to/from ram
+- highscore!!! (inc. showing even if score not reached)
 
 - reduce memory footprint (> 1MB!)
 - suspicious : @246e
 - new code unknown_609F D1AE
 - debug: l_f4f2
-- check TODO (sfx...)
+- check TODO (almost no sfx are active...)
 
 unknown_6334: has key?
 

@@ -1,8 +1,8 @@
 	.global	current_player_617C
-	.global	elevator_dir_current_screen_6010
-	.global	elevator_not_moving_6012
-	.global	elevator_timer_current_screen_6011
-	.global	elevator_y_current_screen_6587
+	.global	elevator_dir_screen_4_6010
+	.global	elevator_not_moving_screen_4_6012
+	.global	elevator_timer_screen_4_6011
+	.global	elevator_y_screen_4_6587
 	.global	gameplay_allowed_6054
 	.global	guard_2_direction_6067
 	.global	guard_1_in_elevator_603B
@@ -194,7 +194,7 @@
 	.global	unknown_628C
 	.global	unknown_6290
 	.global	unknown_pointer_62DB
-	.global	unknown_screen_pointer_62DD
+	.global	elevator_5_screen_address_62DD
 	.global	elevator_struct_6584
 	.global	wagon_1_struct_6588
 	.global	unknown_658B
@@ -258,7 +258,7 @@
 	.global	unknown_62D3
 	.global	unknown_62D6
 	.global	unknown_62DA
-	.global	unknown_62DF
+	.global	elevator_5_direction_62df
 	.global	unknown_62E0
 	.global	unknown_62E1
 	.global	unknown_62E3
@@ -267,7 +267,7 @@
 	.global	unknown_62EA
 	.global	unknown_62ED
 	.global	unknown_62EE
-	.global	unknown_62F0
+	.global	jail_buddy_aniimation_counter_62F0
 	.global	unknown_62F5
 	.global	unknown_62F7
 	.global	unknown_62F9
@@ -298,7 +298,7 @@
 	.global	unknown_6340
 	.global	is_key_hunt_phase_6341
 	.global	unknown_6342
-	.global	unknown_6343
+	.global	jail_buddy_free_6343
 	.global	unknown_6345
 	.global	unknown_6346
 	.global	unknown_6348
@@ -345,11 +345,11 @@ unknown_600C:
 	ds.b	1
 player_screen_600D:
 	ds.b	3
-elevator_dir_current_screen_6010:
+elevator_dir_screen_4_6010:
 	ds.b	1
-elevator_timer_current_screen_6011:
+elevator_timer_screen_4_6011:
 	ds.b	1
-elevator_not_moving_6012:
+elevator_not_moving_screen_4_6012:
 	ds.b	1
 unknown_6013:
 	ds.b	1
@@ -789,10 +789,10 @@ unknown_62DA:
 	.align	2
 unknown_pointer_62DB:
 	ds.l	1
-unknown_screen_pointer_62DD:
+elevator_5_screen_address_62DD:
 	ds.l	1
 
-unknown_62DF:
+elevator_5_direction_62df:
 	ds.b	1
 unknown_62E0:
 	ds.b	1
@@ -810,7 +810,7 @@ unknown_62ED:
 	ds.b	1
 unknown_62EE:
 	ds.b	2
-unknown_62F0:
+jail_buddy_aniimation_counter_62F0:
 	ds.b	1
 jail_buddy_aniimation_rom_address_62F1:
 	ds.b	4
@@ -895,7 +895,7 @@ is_key_hunt_phase_6341:
 	ds.b	1
 unknown_6342:
 	ds.b	1
-unknown_6343:
+jail_buddy_free_6343:
 	ds.b	2
 unknown_6345:
 	ds.b	1
@@ -936,7 +936,7 @@ elevator_struct_6584:
 unknown_6586:
 	ds.b	1
 	
-elevator_y_current_screen_6587:
+elevator_y_screen_4_6587:
 	ds.b	1
 wagon_1_struct_6588:
 	ds.b	2

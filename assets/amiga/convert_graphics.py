@@ -71,19 +71,26 @@ for sf in glob.glob(os.path.join(screens_dir,"*.bin")):
 # force some tiles
 used_cluts.update({k:range(0,16) for k in range(0,64)})
 
-# elevator wire 1F4 -> 1FB clut F
-
-used_cluts.update({k:[0] for k in range(0x1F4,0x1FC)})
+# elevator wire 1F4 -> 1FB clut F: not used in Super Bagman
+#used_cluts.update({k:[0] for k in range(0x1F4,0x1FC)})
 
 # breakable wall
 
 used_cluts.update({k:[0xF] for k in range(0x301,0x30B)})
+
+# level 5 elevator
+used_cluts.update({k:[0xF] for k in range(0x390,0x3BD)})
 
 # highscore instructions
 
 used_cluts.update({k:[0x8] for k in range(0x25D,0x28A)})
 used_cluts[0x254] = [0x8]
 
+# gunsmith's text
+used_cluts.update({k:[0xF] for k in range(0x334,0x33A)})
+
+# gun
+used_cluts[0x3BD] = [0x6]
 # highscore arrows
 
 used_cluts.update({k:[0x4] for k in range(0x255,0x25D)})
@@ -318,11 +325,16 @@ for k,data in used_sprites.items():
                 data["right"] = bitplanelib.palette_image2sprite(ImageOps.mirror(img),None,spritepal)
             data["left"] = left
 
+        if (k,clut_index) == (0x33,4):
+            left_2 = bytearray(left)
+            left_2[0x3C:0x44] = bytearray([0,0,255,255,0,0,255,255])
 
+            red_elevator = {"left":bytes(left_2),"name":"red_elevator","mirror":False}
         if dump_sprites:
             scaled = ImageOps.scale(img,5,0)
             scaled.save(os.path.join(sprites_dump_dir,outname))
 
+used_sprites[10] = red_elevator
 
 with open(os.path.join(src_dir,"graphics.68k"),"w") as f:
     f.write("\t.global\tcharacter_table\n")

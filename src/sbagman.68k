@@ -564,7 +564,7 @@ l_0282:
 	move.b	unknown_6014,d0                 	| [$0282: ld   a,(unknown_6014)]
 	cmp.b	#0x01,d0                         	| [$0285: cp   $01]
 	jne	l_0290                             	| [$0287: jr   nz,$0290]
-	move.b	elevator_not_moving_6012,d0     	| [$0289: ld   a,(elevator_not_moving_6012)]
+	move.b	elevator_not_moving_screen_4_6012,d0     	| [$0289: ld   a,(elevator_not_moving_screen_4_6012)]
 	cmp.b	#0x01,d0                         	| [$028c: cp   $01]
 	jne	l_029e                             	| [$028e: jr   nz,$029E]
 l_0290:
@@ -670,7 +670,7 @@ l_0376:
 	move.b	guard_1_in_elevator_603B,d0     	| [$0376: ld   a,(guard_1_in_elevator_603B)]
 	cmp.b	#0x01,d0                         	| [$0379: cp   $01]
 	jne	l_0384                             	| [$037b: jr   nz,$0384]
-	move.b	elevator_not_moving_6012,d0     	| [$037d: ld   a,(elevator_not_moving_6012)]
+	move.b	elevator_not_moving_screen_4_6012,d0     	| [$037d: ld   a,(elevator_not_moving_screen_4_6012)]
 	cmp.b	#0x01,d0                         	| [$0380: cp   $01]
 	jne	l_0387                             	| [$0382: jr   nz,$0387]
  * routine actually moving the guards
@@ -722,7 +722,7 @@ l_03e0:
 	move.b	guard_2_in_elevator_607B,d0     	| [$03e0: ld   a,(guard_2_in_elevator_607B)]
 	cmp.b	#0x01,d0                         	| [$03e3: cp   $01]
 	jne	l_03ee                             	| [$03e5: jr   nz,$03EE]
-	move.b	elevator_not_moving_6012,d0     	| [$03e7: ld   a,(elevator_not_moving_6012)]
+	move.b	elevator_not_moving_screen_4_6012,d0     	| [$03e7: ld   a,(elevator_not_moving_screen_4_6012)]
 	cmp.b	#0x01,d0                         	| [$03ea: cp   $01]
 	jne	l_03f1                             	| [$03ec: jr   nz,$03F1]
 l_03ee:
@@ -1745,22 +1745,22 @@ l_0a34:
 	rts                                    	| [$0a3b: ret]
 
 handle_elevator_stops_0A40:
-	tst.b	elevator_not_moving_6012     	| [$0a40: ld   a,(elevator_not_moving_6012)]
+	tst.b	elevator_not_moving_screen_4_6012     	| [$0a40: ld   a,(elevator_not_moving_screen_4_6012)]
 	                         	| [$0a43: cp   $00]
 	bne.b	0f                               	| [...]
 	rts                                    	| [$0a45: ret  z] [...]
 0:
-	move.b	elevator_timer_current_screen_6011,d0	| [$0a46: ld   a,(elevator_timer_current_screen_6011)]
+	move.b	elevator_timer_screen_4_6011,d0	| [$0a46: ld   a,(elevator_timer_screen_4_6011)]
 	addq.b	#1,d0                           	| [$0a49: inc  a]
-	move.b	d0,elevator_timer_current_screen_6011	| [$0a4a: ld   (elevator_timer_current_screen_6011),a]
+	move.b	d0,elevator_timer_screen_4_6011	| [$0a4a: ld   (elevator_timer_screen_4_6011),a]
 	cmp.b	#0x5F,d0                         	| [$0a4d: cp   $5F]  < $5F:	 don't move the elevator
 	beq.b	0f                               	| [...]
 	rts                                    	| [$0a4f: ret  nz] [...]
 0:
  * move the elevator
 	clr.b	d0                               	| [$0a50: xor  a]
-	move.b	d0,elevator_timer_current_screen_6011	| [$0a51: ld   (elevator_timer_current_screen_6011),a]
-	move.b	d0,elevator_not_moving_6012     	| [$0a54: ld   (elevator_not_moving_6012),a]
+	move.b	d0,elevator_timer_screen_4_6011	| [$0a51: ld   (elevator_timer_screen_4_6011),a]
+	move.b	d0,elevator_not_moving_screen_4_6012     	| [$0a54: ld   (elevator_not_moving_screen_4_6012),a]
 	addq.b	#1,d0                           	| [$0a57: inc  a]
 	move.b	d0,unknown_6015                 	| [$0a58: ld   (unknown_6015),a]
 	lea	game_mem+0x0A72,a3                      	| [$0a5b: ld   iy,$0A72]
@@ -1785,7 +1785,7 @@ l_0a6d:
  * player entering in the elevator
 
 l_0a7b:
-	move.b	elevator_y_current_screen_6587,d0	| [$0a7b: ld   a,(elevator_y_current_screen_6587)]
+	move.b	elevator_y_screen_4_6587,d0	| [$0a7b: ld   a,(elevator_y_screen_4_6587)]
 	* no effect : removed								| [$09f4: sub  $00]
 	cmp.b	(0x03,a2),d0                     	| [$0a80: cp   (ix+$03)]
 	jeq	l_0a93                             	| [$0a83: jr   z,$0A93]
@@ -1840,13 +1840,13 @@ l_0ac6:
 * < ix: player struct (6580)
 * < iy: unknown_6014
 handle_elevators_0ADB:
-	move.b	elevator_not_moving_6012,d0     	| [$0adb: ld   a,(elevator_not_moving_6012)]
-	cmp.b	#0x00,d0                         	| [$0ade: cp   $00]
+	tst.b	elevator_not_moving_screen_4_6012     	| [$0adb: ld   a,(elevator_not_moving_screen_4_6012)]
+	                         	| [$0ade: cp   $00]
 	beq.b	0f                               	| [...]
 	rts                                    	| [$0ae0: ret  nz] [...]
 0:
-	lea	elevator_y_current_screen_6587,a0	| [$0ae1: ld   hl,elevator_y_current_screen_6587]
-	move.b	elevator_dir_current_screen_6010,d0	| [$0ae4: ld   a,(elevator_dir_current_screen_6010)]
+	lea	elevator_y_screen_4_6587,a0	| [$0ae1: ld   hl,elevator_y_screen_4_6587]
+	move.b	elevator_dir_screen_4_6010,d0	| [$0ae4: ld   a,(elevator_dir_screen_4_6010)]
 	cmp.b	#0x01,d0                         	| [$0ae7: cp   $01]
 	jne	l_0b44                             	| [$0ae9: jr   nz,$0B44]
 	move.b	(a0),d0                         	| [$0aeb: ld   a,(hl)]
@@ -1899,9 +1899,9 @@ l_0b2c:
 	rts                                    	| [$0b39: ret]
 l_0b3a:
 	                              	| [$0b3a: ld   a,$00]
-	clr.b	elevator_dir_current_screen_6010	| [$0b3c: ld   (elevator_dir_current_screen_6010),a]
+	clr.b	elevator_dir_screen_4_6010	| [$0b3c: ld   (elevator_dir_screen_4_6010),a]
 	                           	| [$0b3f: inc  a]
-	move.b	#1,elevator_not_moving_6012     	| [$0b40: ld   (elevator_not_moving_6012),a]
+	move.b	#1,elevator_not_moving_screen_4_6012     	| [$0b40: ld   (elevator_not_moving_screen_4_6012),a]
 	rts                                    	| [$0b43: ret]
 l_0b44:
 	move.b	(a0),d0                         	| [$0b44: ld   a,(hl)]
@@ -1934,10 +1934,10 @@ l_0b69:
 	rts                                    	| [$0b76: ret]
 l_0b77:
 	move.b	#0x01,d0                        	| [$0b77: ld   a,$01]
-	move.b	d0,elevator_dir_current_screen_6010	| [$0b79: ld   (elevator_dir_current_screen_6010),a]
+	move.b	d0,elevator_dir_screen_4_6010	| [$0b79: ld   (elevator_dir_screen_4_6010),a]
 l_0b7c:
 	move.b	#0x01,d0                        	| [$0b7c: ld   a,$01]
-	move.b	d0,elevator_not_moving_6012     	| [$0b7e: ld   (elevator_not_moving_6012),a]
+	move.b	d0,elevator_not_moving_screen_4_6012     	| [$0b7e: ld   (elevator_not_moving_screen_4_6012),a]
 	rts                                    	| [$0b81: ret]
 l_0b82:
 	cmp.b	#0x01,d0                         	| [$0b82: cp   $01]
@@ -2845,7 +2845,7 @@ play_intro_1218:
 	clr.b	guard_1_in_elevator_6037     	| [$123e: ld   (guard_1_in_elevator_6037),a]
 	clr.b	fatal_fall_height_reached_604E	| [$1241: ld   (fatal_fall_height_reached_604E),a]
 	clr.b	guard_2_in_elevator_6077     	| [$1244: ld   (guard_2_in_elevator_6077),a]
-	clr.b	elevator_y_current_screen_6587	| [$1247: ld   (elevator_y_current_screen_6587),a]
+	clr.b	elevator_y_screen_4_6587	| [$1247: ld   (elevator_y_screen_4_6587),a]
 	clr.b	guard_2_x_659A               	| [$124a: ld   (guard_2_x_659A),a]
 	clr.b	guard_2_y_659B               	| [$124d: ld   (guard_2_y_659B),a]
 	clr.b	bag_falling_6159             	| [$1250: ld   (bag_falling_6159),a]
@@ -3690,7 +3690,7 @@ l_17c9:
 	move.b	d0,guard_1_x_6596               	| [$17d3: ld   (guard_1_x_6596),a]
 	move.b	#0xE0,d0                        	| [$17d6: ld   a,$E0]
 	move.b	d0,guard_2_x_659A               	| [$17d8: ld   (guard_2_x_659A),a]
-	move.b	elevator_y_current_screen_6587,d0	| [$17db: ld   a,(elevator_y_current_screen_6587)]
+	move.b	elevator_y_screen_4_6587,d0	| [$17db: ld   a,(elevator_y_screen_4_6587)]
 	cmp.b	#0x11,d0                         	| [$17de: cp   $11]
 	beq.b	0f                               	| [...]
 	rts                                    	| [$17e0: ret  nz] [...]
@@ -4283,7 +4283,7 @@ l_5d02:
 	move.b	#0xE0,d0                        	| [$5d0f: ld   a,$E0]
 	jra	l_5e38                             	| [$5d11: jp   $5E38]
 l_5d14:
-	move.b	elevator_y_current_screen_6587,d0	| [$5d14: ld   a,(elevator_y_current_screen_6587)]
+	move.b	elevator_y_screen_4_6587,d0	| [$5d14: ld   a,(elevator_y_screen_4_6587)]
 	cmp.b	#0x11,d0                         	| [$5d17: cp   $11]  max height for elevator
 	beq.b	0f                               	| [$5d19: ret  nz] [...]
 	rts                                    	| [$5d19: ret  nz]
@@ -4717,12 +4717,12 @@ display_screen_3_c20e:
 	and.b	#0x20,d0                         	| [$c250: and  $20]
 	cmp.b	#0x20,d0                         	| [$c252: cp   $20]
 	jne	l_c265                             	| [$c254: jr   nz,$C265]
+	* english: change default text to "gunsmith's"
 	move.w	#0x9232,d6                      	| [$c256: ld   hl,$9232]
 	move.b	#0x34,d0                        	| [$c259: ld   a,$34]
 	move.b	#0x06,d1                        	| [$c25b: ld   b,$06]
-l_c25d:
-	jbsr	osd_w_videoram                         	| [$c25d: ld   (hl),a]
 	move.w	#0x0020,d3                      	| [$c25e: ld   de,$0020] 32
+l_c25d:
 	add.w	d3,d6                            	| [$c261: add  hl,de]
 	addq.b	#1,d0                           	| [$c262: inc  a]
 	subq.b	#1,d1                           	| [...]
@@ -7045,6 +7045,8 @@ l_d114:
 	clr.b	d0                               	| [$d117: xor  a]
 	move.b	d0,ay_sound_start_6142          	| [$d118: ld   (ay_sound_start_6142),a]
 	rts                                    	| [$d11b: ret]
+
+* super-useless code that tests stuff and does ... nothing
 l_d11c:
 	move.b	player_screen_600D,d0           	| [$d11c: ld   a,(player_screen_600D)]
 	cmp.b	#0x05,d0                         	| [$d11f: cp   $05]
@@ -7142,8 +7144,8 @@ l_d1d0:
 	cmp.b	#0x01,d0                         	| [$d1d3: cp   $01]
 	jeq	l_d1f3                             	| [$d1d5: jr   z,$D1F3]
 	                       	| [$d1d7: xor  a]
-	clr.b	d0,unknown_6288                 	| [$d1d8: ld   (unknown_6288),a]
-	clr.b	d0,gameplay_allowed_6054        	| [$d1db: ld   (gameplay_allowed_6054),a]
+	clr.b	unknown_6288                 	| [$d1d8: ld   (unknown_6288),a]
+	clr.b	gameplay_allowed_6054        	| [$d1db: ld   (gameplay_allowed_6054),a]
 	move.b	#0xE0,d0                        	| [$d1de: ld   a,$E0]
 	move.w	#0x930E,d6                       	| [$d1e0: ld   ($930E),a]
 	jbsr	osd_w_videoram
@@ -7254,117 +7256,7 @@ l_d27e:
 	move.w	#TIME_WARN_SND,d0									| [$3bb8: ld   (ay_sound_start_6142),a]
 	jbsr	start_a_sound
 	rts                                    	| [$3bbb: ret]
-
-* seems not used
-draw_elevator_cable_d29a:
-	move.b	player_screen_600D,d0           	| [$d29a: ld   a,(player_screen_600D)]
-	move.b	d0,current_guard_screen_index_6098	| [$d29d: ld   (current_guard_screen_index_6098),a]
-	lea	unknown_6161,a3                	| [$d2a0: ld   iy,unknown_6161]
-	lea	elevator_struct_6584,a2        	| [$d2a4: ld   ix,elevator_struct_6584]
-	jbsr	compute_logical_address_from_xy_EAEF	| [$d2a8: call compute_logical_address_from_xy_EAEF]
-	move.b	player_screen_600D,d0           	| [$d2ab: ld   a,(player_screen_600D)]
-	cmp.b	#0x04,d0                         	| [$d2ae: cp   $04]
-	jeq	l_d2b6                             	| [$d2b0: jr   z,$D2B6]
-	rts                                    	| [$d2b2: ret]
-	cmp.b	#0x05,d0                         	| [$d2b3: cp   $05]
-	beq.b	0f                               	| [...]
-	rts                                    	| [$d2b5: ret  nz] [...]
-0:
-l_d2b6:
-	move.b	(0x03,a2),d0                    	| [$d2b6: ld   a,(ix+$03)]
-	cmp.b	#0x11,d0                         	| [$d2b9: cp   $11]
-	bcc.b	0f                               	| [...]
-	* elevator at the top: no need to draw cable
-	rts                                    	| [$d2bb: ret  c] [...]
-0:
-	move.b	player_screen_600D,d0           	| [$d2bc: ld   a,(player_screen_600D)]
-	cmp.b	#0x04,d0                         	| [$d2bf: cp   $04]
-	jne	l_d2d4                             	| [$d2c1: jr   nz,$D2D4]
-	                     	| [$d2c3: ld   de,$30DE]
-	                              	| [$d2c6: xor  a]
-	add.w	#0x30DE,d6		| adc  hl,de
-	                          	| [$d2c9: ld   a,h]
-	add.w	#0x2F00,d6                         	| [$d2ca: add  a,$2F]
-	                         	| [$d2cc: ld   h,a]
-	move.w	#0x90C3,d3                      	| [$d2cd: ld   de,$90C3]
-	move.b	#0x1A,d1                        	| [$d2d0: ld   b,$1A]
-	jra	l_d2df                             	| [$d2d2: jr   $D2DF]
-l_d2d4:
-	                      	| [$d2d4: ld   de,$34FE]
-	                              	| [$d2d7: xor  a]
-	add.w	#0x34FE,d6	| adc  hl,de
-	move.w	#0x90E4,d3                      	| [$d2da: ld   de,$90E4]
-	move.b	#0x1A,d1                        	| [$d2dd: ld   b,$1A]
-l_d2df:
-	move.b	#0xFB,d0                        	| [$d2df: ld   a,$FB]
-
-	                     	| [$d2e1: push hl]
-	                              	| [$d2e2: xor  a]
-	cmp.w	d3,d6                            	| [$d2e3: sbc  hl,de]
-                       	| [$d2e5: pop  hl]
-	jeq	l_d2f1                             	| [$d2e6: jr   z,$D2F1]
- 	move.b	#0xFB,d0                        	| [$d2e8: ld   a,$FB]
-	jbsr	draw_elevator_wire_tile_d313                            	| [$d2ea: call $D313]
-	addq.w	#1,d3                           	| [$d2ed: inc  de]
-	subq.b	#1,d1                           	| [...]
-	jne	l_d2df                             	| [$d2ee: djnz $D2DF]
-	rts                                    	| [$d2f0: ret]
-l_d2f1:
-	* tile "holding" elevator: 
-	* get elevator Y to compute which partial cable segment char to write
-	* (full cable not included)
-	move.b	(0x03,a2),d0                    	| [$d2f1: ld   a,(ix+$03)]
-	and.b	#0x07,d0                         	| [$d2f4: and  $07]
-	move.b	d0,d1                           	| [$d2f6: ld   b,a]
-	move.b	#0xF3,d0                        	| [$d2f7: ld   a,$F3]
-	add.b	d1,d0                            	| [$d2f9: add  a,b]
-	jbsr	draw_elevator_wire_tile_d313                            	| [$d2fa: call $D313]
-	move.b	#0x03,d1                        	| [$d2fd: ld   b,$03]
-	* then clear other tiles below elevator roof
-l_d2ff:
-	addq.w	#1,d3                           	| [$d2ff: inc  de]
- 	movem.w	d1/d2,-(sp)                    	| [$d300: push bc]
-	move.w	d3,d6
-	jbsr	osd_r_videoram                        	| [$d301: ld   a,(de)]
-	move.w	#0x08,d1                        	| [$d302: ld   bc,$0008] 8
-	                       	| [$d302: ld   bc,$0008] 8
-	lea	game_mem+0xD326,a0                      	| [$d305: ld   hl,$D326]
-	jbsr	cpir                              	| [$d308: cpir]
-	bne.b	0f                               	| [...]
-	* found elevator cable: write blank
-	move.b	#0xF3,d0                        	| [$d30a: ld   a,$F3]
-	jbsr	draw_elevator_wire_tile_d313                            	| [$d30c: call z,$D313]
-0:
-
-	movem.w	(sp)+,d1/d2                    	| [$d30f: pop  bc]
-	subq.b	#1,d1                           	| [...]
-	jne	l_d2ff                             	| [$d310: djnz $D2FF]
-	rts                                    	| [$d312: ret]
-	
-draw_elevator_wire_tile_d313:
-	move.w	d6,-(sp)
-	move.w	d3,d6
-	jbsr	osd_w_videoram                         	| [$3c2c: ld   (de),a]
-	* skipped part where it writes until it's correct
-	* (hardware bug?)
-	                    	| [$d314: push bc]
-	                          	| [$d315: ld   b,a]
-	                        	| [$d316: ld   a,(de)]
-	                           	| [$d317: cp   b]
-	                       	| [$d318: ld   a,b]
-
-	                  	| [$d319: pop  bc]
-	                           	| [$d31a: jr   nz,$D313]
-	                        	| [$d31c: push de]
-	                           	| [$d31d: ld   a,d]
-	                         	| [$d31e: add  a,$08]
-	                          	| [$d320: ld   d,a]
-	move.b	#0x20,d0                        	| [$d321: ld   a,$20]
-	add.w	#0x800,d6
-	jbsr	osd_w_colorram                         	| [$d323: ld   (de),a]
-	move.w	(sp)+,d6                        	| [$d324: pop  de]
-	                  	| [$d324: pop  de]
-	rts                                    	| [$d325: ret]
+                              	| [$d325: ret]
 * probably to swap memory
 l_d32e:
 	move.w	guard_logical_address_6091,unknown_61FF
@@ -8905,13 +8797,13 @@ l_df88:
 	rts                                    	| [$df8c: ret]
 l_df8d:
 	move.w	#0x90C7,d6                      	| [$df8d: ld   hl,$90C7]
-	move.w	d6,unknown_screen_pointer_62DD                 	| [$df90: ld   (unknown_screen_pointer_62DD),hl]
+	move.w	d6,elevator_5_screen_address_62DD                 	| [$df90: ld   (elevator_5_screen_address_62DD),hl]
 	lea	game_mem+0xE004,a0                      	| [$df93: ld   hl,$E004]
 	move.l	a0,unknown_pointer_62DB                 	| [$df96: ld   (unknown_pointer_62DB),hl]
 	move.b	#0xBB,d0                        	| [$df99: ld   a,$BB]
 	move.b	d0,unknown_62E0                 	| [$df9b: ld   (unknown_62E0),a]
 	st.b	d0                                	| [$df9e: ld   a,$FF]
-	move.b	d0,unknown_62DF                 	| [$dfa0: ld   (unknown_62DF),a]
+	move.b	d0,elevator_5_direction_62df                 	| [$dfa0: ld   (elevator_5_direction_62df),a]
 	move.b	#0x28,d0                        	| [$dfa3: ld   a,$28]
 	move.b	d0,unknown_62E3                 	| [$dfa5: ld   (unknown_62E3),a]
 	move.b	player_screen_600D,d0           	| [$dfa8: ld   a,(player_screen_600D)]
@@ -8961,7 +8853,7 @@ init_bombs_locations_and_other_stuff_dfbf:
 l_e039:
 	jbsr	l_df8d                            	| [$e039: call $DF8D]
 l_e03c:
-	move.w	unknown_screen_pointer_62DD,d6             	| [$e03c: ld   hl,(unknown_screen_pointer_62DD)]
+	move.w	elevator_5_screen_address_62DD,d6             	| [$e03c: ld   hl,(elevator_5_screen_address_62DD)]
 	move.b	d6,d0                           	| [$e03f: ld   a,l]
 	cmp.b	#0xC7,d0                         	| [$e040: cp   $C7]
 	jcs	l_e039                             	| [$e042: jr   c,$E039]
@@ -8974,7 +8866,7 @@ l_e03c:
 	move.b	d0,unknown_62E1                 	| [$e050: ld   (unknown_62E1),a]
 	rts                                    	| [$e053: ret]
 l_e054:
-	move.b	unknown_62DF,d0                 	| [$e054: ld   a,(unknown_62DF)]
+	move.b	elevator_5_direction_62df,d0                 	| [$e054: ld   a,(elevator_5_direction_62df)]
 	                         	| [$e057: cp   $00]
 	bne.b	0f                               	| [...]
 	rts                                    	| [$e059: ret  z] [...]
@@ -9002,12 +8894,12 @@ l_e079:
 	move.b	d1,d0                           	| [$e080: ld   a,b]
 	move.b	d0,guard_2_y_659B               	| [$e081: ld   (guard_2_y_659B),a]
 l_e084:
-	move.b	unknown_62DF,d0                 	| [$e084: ld   a,(unknown_62DF)]
+	move.b	elevator_5_direction_62df,d0                 	| [$e084: ld   a,(elevator_5_direction_62df)]
 	move.b	d0,d1                           	| [$e087: ld   b,a]
-	move.w	unknown_screen_pointer_62DD,d6             	| [$e088: ld   hl,(unknown_screen_pointer_62DD)]
-	jbsr	l_e188                            	| [$e08b: call $E188]
+	move.w	elevator_5_screen_address_62DD,d6             	| [$e088: ld   hl,(elevator_5_screen_address_62DD)]
+	jbsr	write_elevator_5_bg_tiles_e188                            	| [$e08b: call $E188]
 	move.l	unknown_pointer_62DB,a2             	| [$e08e: ld   ix,(unknown_pointer_62DB)]
-	move.b	unknown_62DF,d0                 	| [$e092: ld   a,(unknown_62DF)]
+	move.b	elevator_5_direction_62df,d0                 	| [$e092: ld   a,(elevator_5_direction_62df)]
 	cmp.b	#0xFF,d0                         	| [$e095: cp   $FF]
 	jeq	l_e09f                             	| [$e09a: jr   z,$E09F]
 	move.b	(0x24,a2),d0                    	| [$e09c: ld   a,(ix+$24)]
@@ -9020,14 +8912,14 @@ l_e09f:
 	jbsr	l_e0c7                            	| [$e0a1: call z,$E0C7]
 0:
 	move.l	unknown_pointer_62DB,a2             	| [$e0a4: ld   ix,(unknown_pointer_62DB)]
-	move.l	unknown_screen_pointer_62DD,a0             	| [$e0a8: ld   hl,(unknown_screen_pointer_62DD)]
+	move.w	elevator_5_screen_address_62DD,d6             	| [$e0a8: ld   hl,(elevator_5_screen_address_62DD)]
 	move.b	(A2),d0                    	| [$e0ab: ld   a,(ix+$00)]
 	jbsr	l_e0f7                            	| [$e0ae: call $E0F7]
-	jbsr	l_e172                            	| [$e0b1: call $E172]
+	jbsr	write_elevator_tiles_e172                            	| [$e0b1: call $E172]
 	move.l	unknown_pointer_62DB,a0             	| [$e0b4: ld   hl,(unknown_pointer_62DB)]
- 	jbsr	l_e0ec                            	| [$e0b7: call $E0EC]
+ 	jbsr	move_elevator_5_e0ec                            	| [$e0b7: call $E0EC]
 	move.l	a0,unknown_pointer_62DB                 	| [$e0ba: ld   (unknown_pointer_62DB),hl]
-	move.l	unknown_screen_pointer_62DD,a0             	| [$e0bd: ld   hl,(unknown_screen_pointer_62DD)]
+	move.w	elevator_5_screen_address_62DD,d6             	| [$e0bd: ld   hl,(elevator_5_screen_address_62DD)]
 	jbsr	l_e137                            	| [$e0c0: call $E137]
 	jbsr	l_e151                            	| [$e0c3: call $E151]
 	rts                                    	| [$e0c6: ret]
@@ -9041,27 +8933,26 @@ l_e0c7:
 	bne.b	0f                               	| [...]
 	jbsr	l_e0e5                            	| [$e0d1: call z,$E0E5]
 0:
-	move.l	unknown_screen_pointer_62DD,a0             	| [$e0d4: ld   hl,(unknown_screen_pointer_62DD)]
-	jbsr	l_e0ec                            	| [$e0d7: call $E0EC]
-	move.l	a0,unknown_screen_pointer_62DD                 	| [$e0da: ld   (unknown_screen_pointer_62DD),hl]
+	move.w	elevator_5_screen_address_62DD,d6             	| [$e0d4: ld   hl,(elevator_5_screen_address_62DD)]
+	jbsr	move_elevator_5_e0ec                            	| [$e0d7: call $E0EC]
+	move.w	d6,elevator_5_screen_address_62DD                 	| [$e0da: ld   (elevator_5_screen_address_62DD),hl]
 	rts                                    	| [$e0dd: ret]
 l_e0de:
 	lea	game_mem+0xE004,a0                      	| [$e0de: ld   hl,$E004]
-l_e0e1:
 	move.l	a0,unknown_pointer_62DB                 	| [$e0e1: ld   (unknown_pointer_62DB),hl]
 	rts                                    	| [$e0e4: ret]
 l_e0e5:
 	lea	game_mem+0xE013,a0                      	| [$e0e5: ld   hl,$E013]
 	move.l	a0,unknown_pointer_62DB                 	| [$e0e8: ld   (unknown_pointer_62DB),hl]
 	rts                                    	| [$e0eb: ret]
-l_e0ec:
-	move.b	unknown_62DF,d0                 	| [$e0ec: ld   a,(unknown_62DF)]
+move_elevator_5_e0ec:
+	move.b	elevator_5_direction_62df,d0                 	| [$e0ec: ld   a,(elevator_5_direction_62df)]
 	cmp.b	#0xFF,d0                         	| [$e0ef: cp   $FF]
 	jeq	l_e0f5                             	| [$e0f1: jr   z,$E0F5]
-	subq.w	#1,a0                           	| [$e0f3: dec  hl]
+	subq.w	#1,d6                           	| [$e0f3: dec  hl]
 	rts                                    	| [$e0f4: ret]
 l_e0f5:
-	addq.w	#1,a0                           	| [$e0f5: inc  hl]
+	addq.w	#1,d6                           	| [$e0f5: inc  hl]
 	rts                                    	| [$e0f6: ret]
 l_e0f7:
 	move.w	d0,-(sp)                        	| [$e0f7: push af]
@@ -9106,7 +8997,7 @@ l_e135:
 	move.w	(sp)+,d0                        	| [$e135: pop  af]
 	rts                                    	| [$e136: ret]
 l_e137:
-	move.b	unknown_62DF,d0                 	| [$e137: ld   a,(unknown_62DF)]
+	move.b	elevator_5_direction_62df,d0                 	| [$e137: ld   a,(elevator_5_direction_62df)]
 	cmp.b	#0x01,d0                         	| [$e13a: cp   $01]
 	beq.b	0f                               	| [...]
 	rts                                    	| [$e13c: ret  nz] [...]
@@ -9126,7 +9017,7 @@ l_e137:
 	move.l	a0,unknown_pointer_62DB                 	| [$e14c: ld   (unknown_pointer_62DB),hl]
 	jra	l_e169                             	| [$e14f: jr   $E169]
 l_e151:
-	move.b	unknown_62DF,d0                 	| [$e151: ld   a,(unknown_62DF)]
+	move.b	elevator_5_direction_62df,d0                 	| [$e151: ld   a,(elevator_5_direction_62df)]
 	cmp.b	#0xFF,d0                         	| [$e154: cp   $FF]
 	beq.b	0f                               	| [...]
 	rts                                    	| [$e156: ret  nz] [...]
@@ -9136,6 +9027,7 @@ l_e151:
 	beq.b	0f                               	| [...]
 	rts                                    	| [$e15a: ret  nz] [...]
 0:
+	* elevator level 5 almost at the bottom
 	move.b	(A2),d0                    	| [$e15b: ld   a,(ix+$00)]
 	cmp.b	#0x90,d0                         	| [$e15e: cp   $90]
 	beq.b	0f                               	| [...]
@@ -9145,13 +9037,13 @@ l_e151:
 	subq.w	#2,a0                           	| [$e164: dec  hl] * 2
 	move.l	a0,unknown_pointer_62DB                 	| [$e166: ld   (unknown_pointer_62DB),hl]
 l_e169:
-	move.b	unknown_62DF,d0                 	| [$e169: ld   a,(unknown_62DF)]
+	move.b	elevator_5_direction_62df,d0                 	| [$e169: ld   a,(elevator_5_direction_62df)]
 	not.b	d0                               	| [$e16c: cpl]
 	addq.b	#1,d0                           	| [$e16d: inc  a]
-	move.b	d0,unknown_62DF                 	| [$e16e: ld   (unknown_62DF),a]
+	move.b	d0,elevator_5_direction_62df                 	| [$e16e: ld   (elevator_5_direction_62df),a]
 	rts                                    	| [$e171: ret]
 
-l_e172:
+write_elevator_tiles_e172:
 	
 	exg	d0,d7                              	| [$e172: ex   af,af']
 
@@ -9177,25 +9069,26 @@ l_e172:
 	addq.b	#1,d0                           	| [$e185: inc  a]
 	jbsr	osd_w_videoram                         	| [$e186: ld   (hl),a]
 	rts                                    	| [$e187: ret]
-l_e188:
+
+write_elevator_5_bg_tiles_e188:
 	move.b	player_screen_600D,d0           	| [$e188: ld   a,(player_screen_600D)]
 	cmp.b	#0x05,d0                         	| [$e18b: cp   $05]
 	beq.b	0f                               	| [...]
 	rts                                    	| [$e18d: ret  nz] [...]
 0:
-	jbsr	l_e1a1                            	| [$e18e: call $E1A1]
+	jbsr	write_elevator_5_bg_tile_e1a1                            	| [$e18e: call $E1A1]
 	move.w	#0x0020,d3                      	| [$e191: ld   de,$0020] 32
 	add.w	d3,d6                            	| [$e194: add  hl,de]
 
-	jbsr	l_e1a1                            	| [$e195: call $E1A1]
+	jbsr	write_elevator_5_bg_tile_e1a1                            	| [$e195: call $E1A1]
 	add.w	d3,d6                            	| [$e198: add  hl,de]
 
-	jbsr	l_e1a1                            	| [$e199: call $E1A1]
+	jbsr	write_elevator_5_bg_tile_e1a1                            	| [$e199: call $E1A1]
 	add.w	d3,d6                            	| [$e19c: add  hl,de]
 
-	jbsr	l_e1a1                            	| [$e19d: call $E1A1]
+	jbsr	write_elevator_5_bg_tile_e1a1                            	| [$e19d: call $E1A1]
 	rts                                    	| [$e1a0: ret]
-l_e1a1:
+write_elevator_5_bg_tile_e1a1:
 	move.w	d6,-(sp)                        	| [$e1a1: push hl]
 
 	sub.w	#0x5C00,d6						| [$e1a2: pop  bc]
@@ -9206,7 +9099,8 @@ l_e1a1:
 	move.w	(sp)+,d6
 	jbsr	osd_w_videoram                         	| [$e1a8: ld   (hl),a]
 	rts                                    	| [$e1a9: ret]
-	
+
+* < D4	
 l_e1aa:
 	move.b	#0x50,d0                        	| [$e1aa: ld   a,$50]
 	move.b	d0,unknown_62E1                 	| [$e1ac: ld   (unknown_62E1),a]
@@ -9702,7 +9596,7 @@ l_e593:
 	jbsr	reset_barrow_position_f9cc                            	| [$e5ce: call $F9CC]
 	rts                                    	| [$e5d1: ret]
 
-l_e5d2:
+test_gun_button_e5d2:
 	clr.b	d1                               	| [$e5d2: ld   b,$00]
 	move.b	gameplay_allowed_6054,d0        	| [$e5d4: ld   a,(gameplay_allowed_6054)]
 	                         	| [$e5d7: cp   $00]
@@ -9784,6 +9678,7 @@ l_e630:
 	move.b	d0,player_gun_nb_shots_6294                 	| [$e653: ld   (player_gun_nb_shots_6294),a]
 	move.b	d0,guard_1_gun_nb_shots_629C                 	| [$e656: ld   (guard_1_gun_nb_shots_629C),a]
 	move.b	d0,guard_2_gun_nb_shots_62A4                 	| [$e659: ld   (guard_2_gun_nb_shots_62A4),a]
+	* remove gun from armoury
 	move.b	#0xE0,d0                        	| [$e65c: ld   a,$E0]
 	move.w	#0x9295,d6                       	| [$e65e: ld   ($9295),a]
     jbsr	osd_w_videoram
@@ -9797,6 +9692,7 @@ l_e667:
 	beq.b	0f                               	| [...]
 	rts                                    	| [$e66c: ret  nz] [...]
 0:
+	* player doesn't have any bullets: draw gun tile
 	move.b	#0xBD,d0                        	| [$e66d: ld   a,$BD]
 	move.w	#0x9295,d6                       	| [$e66f: ld   ($9295),a]
     jbsr	osd_w_videoram
@@ -9992,12 +9888,12 @@ l_e78b:
 	move.w	#0x921F,d6                       	| [$e799: ld   ($921F),a]
     jbsr	osd_w_videoram
 l_e79c:
-	move.b	is_player_bullet_in_air_6297,d0                 	| [$e79c: ld   a,(is_player_bullet_in_air_6297)]
+	tst.b	is_player_bullet_in_air_6297                 	| [$e79c: ld   a,(is_player_bullet_in_air_6297)]
 	                         	| [$e79f: cp   $00]
 	beq.b	0f                               	| [...]
 	rts                                    	| [$e7a1: ret  nz] [...]
 0:
-	jbsr	l_e5d2                            	| [$e7a2: call $E5D2]
+	jbsr	test_gun_button_e5d2                            	| [$e7a2: call $E5D2]
 	move.b	d1,d0                           	| [$e7a5: ld   a,b]
 	                         	| [$e7a6: cp   $00]
 	bne.b	0f                               	| [...]
@@ -12213,8 +12109,7 @@ handle_guard_1_views_player_F6F2:
 0:
 	lea	guard_1_sees_player_left_603D,a2	| [$f6fb: ld   ix,guard_1_sees_player_left_603D]
 	move.w	guard_1_logical_address_6038,d6	| [$f6ff: ld   hl,(guard_1_logical_address_6038)]
- 	move.b	#0xff,d1                        	| [$f702: ld   bc,$FFE0] 65504
-	move.b	#0xe0,d2                        	| [$f702: ld   bc,$FFE0] 65504
+ 	move.w	#-0x20,d1                        	| [$f702: ld   bc,$FFE0] 65504
 	move.b	#0x40,d0                        	| [$f70a: ld   a,$40]
 	tst.b	has_pick_61CF                	| [$f705: ld   a,(has_pick_61CF)]
 	                         	| [$f708: cp   $00]
@@ -12227,8 +12122,7 @@ l_f714:
 	jbsr	is_way_clear_to_player_F7F5       	| [$f715: call is_way_clear_to_player_F7F5]
 	move.w	guard_1_logical_address_6038,d6	| [$f718: ld   hl,(guard_1_logical_address_6038)]
 	lea	guard_1_sees_player_right_603C,a2	| [$f71b: ld   ix,guard_1_sees_player_right_603C]
-	move.b	#0x00,d1                        	| [$f71f: ld   bc,$0020] 32
-	move.b	#0x20,d2                        	| [$f71f: ld   bc,$0020] 32
+	move.w	#0x0020,d1                        	| [$f71f: ld   bc,$0020] 32
 	move.b	#0x80,d0                        	| [$f727: ld   a,$80]
 	tst.b	has_pick_61CF                	| [$f722: ld   a,(has_pick_61CF)]
 	jne	l_f731                             	| [$f729: jr   nz,$F731]
@@ -12239,8 +12133,7 @@ l_f731:
 
 	jbsr	is_way_clear_to_player_F7F5       	| [$f732: call is_way_clear_to_player_F7F5]
 	move.w	guard_1_logical_address_6038,d6	| [$f735: ld   hl,(guard_1_logical_address_6038)]
-	move.b	#0xff,d1                        	| [$f738: ld   bc,$FFFF] 65535
-	move.b	#0xff,d2                        	| [$f738: ld   bc,$FFFF] 65535
+	move.w	#0xffff,d1                        	| [$f738: ld   bc,$FFFF] 65535
 	move.b	#0x10,d0                        	| [$f73b: ld   a,$10]
 	exg	d0,d7                              	| [$f73d: ex   af,af']
 
@@ -12248,8 +12141,7 @@ l_f731:
 	jbsr	is_way_clear_to_player_F7F5       	| [$f742: call is_way_clear_to_player_F7F5]
 	move.w	guard_1_logical_address_6038,d6	| [$f745: ld   hl,(guard_1_logical_address_6038)]
  	lea	guard_1_sees_player_down_603F,a2	| [$f748: ld   ix,guard_1_sees_player_down_603F]
-	move.b	#0x00,d1                        	| [$f74c: ld   bc,$0001] 1
-	move.b	#0x01,d2                        	| [$f74c: ld   bc,$0001] 1
+	move.w	#0x0001,d1                        	| [$f74c: ld   bc,$0001] 1
 	move.b	#0x20,d0                        	| [$f74f: ld   a,$20]
 	exg	d0,d7                              	| [$f751: ex   af,af']
 
