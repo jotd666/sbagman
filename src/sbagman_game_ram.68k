@@ -224,21 +224,21 @@
 	.global	screen_base_logical_address_6326
 	.global	unknown_609F
 	.global	unknown_60A1
-	.global	unknown_60D3
+	.global	act_number_60D3
 	.global	unknown_61B6
 	.global	unknown_61F7
-	.global	unknown_6293
-	.global	unknown_6294
+	.global	player_has_gun_6293
+	.global	player_gun_nb_shots_6294
 	.global	unknown_6295
-	.global	unknown_6297
-	.global	unknown_6298
-	.global	unknown_6299
-	.global	unknown_629B
-	.global	unknown_629C
+	.global	is_player_bullet_in_air_6297
+	.global	bullet_direction_6298
+	.global	guards_shoot_on_sight_6299
+	.global	guard_1_has_gun_629B
+	.global	guard_1_gun_nb_shots_629C
 	.global	unknown_629D
 	.global	unknown_629F
-	.global	unknown_62A3
-	.global	unknown_62A4
+	.global	guard_2_has_gun_62A3
+	.global	guard_2_gun_nb_shots_62A4
 	.global	unknown_62A5
 	.global	unknown_62A7
 	.global	unknown_62AC
@@ -320,7 +320,7 @@
 	.global	unknown_6595
 	.global	unknown_pointer_62F6
 	.global	unknown_pointer_633D
-	.global	unknown_rom_address_62F1
+	.global	jail_buddy_aniimation_rom_address_62F1
 	.global	unknown_screen_address_62F8
 	.global	unknown_699A
 	
@@ -498,7 +498,7 @@ unknown_609F:
 	ds.b	2
 unknown_60A1:
 	ds.b	50
-unknown_60D3:
+act_number_60D3:
 	ds.b	200
 
 	.align	2
@@ -720,29 +720,33 @@ unknown_628C:
 	ds.b	4
 unknown_6290:
 	ds.b	3
-unknown_6293:
+player_has_gun_6293:
 	ds.b	1
-unknown_6294:
+player_gun_nb_shots_6294:
 	ds.b	1
 unknown_6295:
 	ds.b	2
-unknown_6297:
+is_player_bullet_in_air_6297:
 	ds.b	1
-unknown_6298:
+* 0: no bullet, 1: going right, -1: going left
+* note: only one bullet can move, if the guards fire
+* bagman can't fire (which is probably a limit for the number
+* of simultaneous sprites as well!)
+bullet_direction_6298:
 	ds.b	1
-unknown_6299:
+guards_shoot_on_sight_6299:
 	ds.b	2
-unknown_629B:
+guard_1_has_gun_629B:
 	ds.b	1
-unknown_629C:
+guard_1_gun_nb_shots_629C:
 	ds.b	1
 unknown_629D:
 	ds.b	2
 unknown_629F:
 	ds.b	4
-unknown_62A3:
+guard_2_has_gun_62A3:
 	ds.b	1
-unknown_62A4:
+guard_2_gun_nb_shots_62A4:
 	ds.b	1
 unknown_62A5:
 	ds.b	2
@@ -808,7 +812,7 @@ unknown_62EE:
 	ds.b	2
 unknown_62F0:
 	ds.b	1
-unknown_rom_address_62F1:
+jail_buddy_aniimation_rom_address_62F1:
 	ds.b	4
 unknown_62F5:
 	ds.b	1

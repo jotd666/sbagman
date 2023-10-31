@@ -6253,11 +6253,11 @@ D7A9: 3A D3 60    ld   a,(unknown_60D3)
 D7AC: FE 02       cp   $02
 D7AE: D8          ret  c
 D7AF: 3E 06       ld   a,$06
-D7B1: 32 94 62    ld   (unknown_6294),a
+D7B1: 32 94 62    ld   (gun_nb_shots_6294),a
 D7B4: 32 9C 62    ld   (unknown_629C),a
 D7B7: 32 A4 62    ld   (unknown_62A4),a
 D7BA: 3E 01       ld   a,$01
-D7BC: 32 93 62    ld   (unknown_6293),a
+D7BC: 32 93 62    ld   (has_gun_6293),a
 D7BF: 32 9B 62    ld   (unknown_629B),a
 D7C2: 32 A3 62    ld   (unknown_62A3),a
 D7C5: 32 99 62    ld   (unknown_6299),a
@@ -7067,23 +7067,23 @@ DFC5: 22 F1 62    ld   (unknown_rom_address_62F1),hl
 DFC8: 21 63 92    ld   hl,$9263
 DFCB: 22 0E 63    ld   (unknown_630E),hl
 DFCE: 3E 01       ld   a,$01
-DFD0: 32 10 63    ld   (unknown_6310),a
+DFD0: 32 10 63    ld   (bomb_1_screen_6310),a
 DFD3: 21 3C 91    ld   hl,$913C
 DFD6: 22 15 63    ld   (unknown_6315),hl
 DFD9: 3E 02       ld   a,$02
-DFDB: 32 17 63    ld   (unknown_6317),a
+DFDB: 32 17 63    ld   (bomb_2_screen_6317),a
 DFDE: 21 54 92    ld   hl,$9254
 DFE1: 22 18 63    ld   (unknown_6318),hl
 DFE4: 3E 03       ld   a,$03
-DFE6: 32 1A 63    ld   (unknown_631A),a
+DFE6: 32 1A 63    ld   (bomb_3_screen_631A),a
 DFE9: 21 2E 91    ld   hl,$912E
 DFEC: 22 1B 63    ld   (unknown_631B),hl
 DFEF: 3E 04       ld   a,$04
-DFF1: 32 1D 63    ld   (unknown_631D),a
+DFF1: 32 1D 63    ld   (bomb_4_screen_631D),a
 DFF4: 21 7C 92    ld   hl,$927C
 DFF7: 22 1E 63    ld   (unknown_631E),hl
 DFFA: 3E 05       ld   a,$05
-DFFC: 32 20 63    ld   (unknown_6320),a
+DFFC: 32 20 63    ld   (bomb_5_screen_6320),a
 DFFF: CD 8C E5    call $E58C
 E002: C9          ret
 
@@ -7617,7 +7617,7 @@ E585: DD 77 00    ld   (ix+$00),a
 E588: DD 23       inc  ix
 E58A: 10 F9       djnz memset_E585
 E58C: AF          xor  a
-E58D: DD 21 93 62 ld   ix,unknown_6293
+E58D: DD 21 93 62 ld   ix,has_gun_6293
 E591: 06 24       ld   b,$24
 E593: DD 77 00    ld   (ix+$00),a
 E596: DD 23       inc  ix
@@ -7703,9 +7703,9 @@ E646: 38 1F       jr   c,$E667
 E648: FE 60       cp   $60
 E64A: 30 1B       jr   nc,$E667
 E64C: 3E 01       ld   a,$01
-E64E: 32 93 62    ld   (unknown_6293),a
+E64E: 32 93 62    ld   (has_gun_6293),a
 E651: 3E 06       ld   a,$06
-E653: 32 94 62    ld   (unknown_6294),a
+E653: 32 94 62    ld   (gun_nb_shots_6294),a
 E656: 32 9C 62    ld   (unknown_629C),a
 E659: 32 A4 62    ld   (unknown_62A4),a
 E65C: 3E E0       ld   a,$E0
@@ -7713,7 +7713,7 @@ E65E: 32 95 92    ld   ($9295),a
 E661: 3E 3F       ld   a,$3F
 E663: 32 95 9A    ld   ($9A95),a
 E666: C9          ret
-E667: 3A 94 62    ld   a,(unknown_6294)
+E667: 3A 94 62    ld   a,(gun_nb_shots_6294)
 E66A: FE 00       cp   $00
 E66C: C0          ret  nz
 E66D: 3E BD       ld   a,$BD
@@ -7839,14 +7839,14 @@ E767: 32 45 63    ld   (unknown_6345),a
 E76A: 3E 28       ld   a,$28
 E76C: 4F          ld   c,a
 E76D: 18 45       jr   $E7B4
-E76F: 3A 93 62    ld   a,(unknown_6293)
+E76F: 3A 93 62    ld   a,(has_gun_6293)
 E772: FE 01       cp   $01
 E774: C0          ret  nz
 E775: 3E BD       ld   a,$BD
 E777: 32 1F 92    ld   ($921F),a
 E77A: 3E 35       ld   a,$35
 E77C: 32 1F 9A    ld   ($9A1F),a
-E77F: 3A 94 62    ld   a,(unknown_6294)
+E77F: 3A 94 62    ld   a,(gun_nb_shots_6294)
 E782: FE 00       cp   $00
 E784: 20 05       jr   nz,$E78B
 E786: 3E E0       ld   a,$E0
@@ -7868,7 +7868,7 @@ E7A8: C8          ret  z
 E7A9: 3E 11       ld   a,$11
 E7AB: 4F          ld   c,a
 E7AC: DD 21 80 65 ld   ix,player_struct_6580
-E7B0: FD 21 93 62 ld   iy,unknown_6293
+E7B0: FD 21 93 62 ld   iy,has_gun_6293
 E7B4: FD 7E 01    ld   a,(iy+$01)
 E7B7: FE 00       cp   $00
 E7B9: C8          ret  z
