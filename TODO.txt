@@ -1,5 +1,5 @@
 - pick pickaxe/barrow/bag problem!
-- bomb tiles not displayed
+- cd43: check d3/D4 values (twice) when going from screen 3 to 4
 - 5th screen elevator shifted by 2 X tiles, doesn't move
 - 5th screen: blitz, locks up when returning to screen 4
 - dies: too long wait
@@ -8,7 +8,6 @@
 - write a script to detect move.w to/from ram
 
 - reduce memory footprint (> 1MB!)
-- cd43: check d3/D4 values (twice)
 - suspicious : @246e
 - new code unknown_609F D1AE
 - debug: l_f4f2

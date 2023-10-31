@@ -4625,14 +4625,14 @@ display_screen_5_c189:
 	dbf		d1,0b   | [$2673: ldir]
 	move.w	#0x9882,d6                      	| [$c19f: ld   hl,$9882]
 	move.b	#0x06,d1                        	| [$c1a2: ld   b,$06]
-	jbsr	l_c361                            	| [$c1a4: call $C361]
+	jbsr	set_attribute_row_c361                            	| [$c1a4: call $C361]
 	jbsr	switch_to_screen_5_CE4D           	| [$c1a7: call switch_to_screen_5_CE4D]
-	jbsr	l_d0dd                            	| [$c1aa: call $D0DD]
+	jbsr	draw_credit_and_bonus_d0dd                            	| [$c1aa: call $D0DD]
 	jbsr	l_c30e                            	| [$c1ad: call $C30E]
 	            	| [$c1b0: ld   a,(io_read_shit_B800)]
-	jbsr	l_f8de                            	| [$c1b3: call $F8DE]
+	jbsr	put_score_lives_attributes_f8de                            	| [$c1b3: call $F8DE]
 	jbsr	display_player_1_and_2_text_ca7e                            	| [$c1b6: call $CA7E]
-	jbsr	l_d0f3                            	| [$c1b9: call $D0F3]
+	jbsr	start_level_music_d0f3                            	| [$c1b9: call $D0F3]
 	move.b	#0x63,d0                        	| [$c1bc: ld   a,$63]
 **out  ($58),a
 	rts                                    	| [$c1c0: ret]
@@ -4655,7 +4655,7 @@ display_screen_4_c1c1:
 	jbsr	draw_cactus_c338                            	| [$c1da: call $C338]
 	move.w	#0x9862,d6                      	| [$c1dd: ld   hl,$9862]
 	move.b	#0x0E,d1                        	| [$c1e0: ld   b,$0E]
-	jbsr	l_c361                            	| [$c1e2: call $C361]
+	jbsr	set_attribute_row_c361                            	| [$c1e2: call $C361]
 	move.w	#0x991A,d6                      	| [$c1e5: ld   hl,$991A]
 	move.b	#0x16,d1                        	| [$c1e8: ld   b,$16]
 	jbsr	l_c36e                            	| [$c1ea: call $C36E]
@@ -4663,7 +4663,7 @@ display_screen_4_c1c1:
 	move.w	#0x9B57,d6                       	| [$c1ef: ld   ($9B57),a]
 	jbsr	osd_w_colorram
 
-	jbsr	l_d0dd                            	| [$c1f2: call $D0DD]
+	jbsr	draw_credit_and_bonus_d0dd                            	| [$c1f2: call $D0DD]
 	lea	elevator_struct_6584,a0        	| [$c1f5: ld   hl,elevator_struct_6584]
 	move.b	#0x33,d0                        	| [$c1f8: ld   a,$33]
 	move.b	d0,(a0)+                         	| [$c1fa: ld   (hl),a]
@@ -4675,7 +4675,7 @@ display_screen_4_c1c1:
 	move.b	d0,(a0)+                         	| [$c202: ld   (hl),a]
 	                           	| [$c203: inc  hl]
 	            	| [$c204: ld   a,(io_read_shit_B800)]
-	jbsr	l_f8de                            	| [$c207: call $F8DE]
+	jbsr	put_score_lives_attributes_f8de                            	| [$c207: call $F8DE]
 	jbsr	display_player_1_and_2_text_ca7e                            	| [$c20a: call $CA7E]
 	rts                                    	| [$c20d: ret]
 display_screen_3_c20e:
@@ -4696,7 +4696,7 @@ display_screen_3_c20e:
 	jbsr	draw_cactus_c338                            	| [$c227: call $C338]
 	move.w	#0x9842,d6                      	| [$c22a: ld   hl,$9842]
 	move.b	#0x0F,d1                        	| [$c22d: ld   b,$0F]
-	jbsr	l_c361                            	| [$c22f: call $C361]
+	jbsr	set_attribute_row_c361                            	| [$c22f: call $C361]
 	move.w	#0x98FA,d6                      	| [$c232: ld   hl,$98FA]
 	move.b	#0x16,d1                        	| [$c235: ld   b,$16]
 	jbsr	l_c36e                            	| [$c237: call $C36E]
@@ -4706,7 +4706,7 @@ display_screen_3_c20e:
 	move.b	#0x3F,d0                        	| [$c242: ld   a,$3F]
 	move.w	#0x9A77,d6                       	| [$c244: ld   ($9A77),a]
 	jbsr	osd_w_colorram
- 	jbsr	l_d0dd                            	| [$c247: call $D0DD]
+ 	jbsr	draw_credit_and_bonus_d0dd                            	| [$c247: call $D0DD]
 	            	| [$c24a: ld   a,(io_read_shit_B800)]
 	jbsr	osd_read_dipswitches                       	| [$c24d: ld   a,($B000)]
 
@@ -4725,9 +4725,9 @@ l_c25d:
 	jne	l_c25d                             	| [$c263: djnz $C25D]
 l_c265:
 	jbsr	l_c30e                            	| [$c265: call $C30E]
-	jbsr	l_f8de                            	| [$c268: call $F8DE]
+	jbsr	put_score_lives_attributes_f8de                            	| [$c268: call $F8DE]
 	jbsr	display_player_1_and_2_text_ca7e                            	| [$c26b: call $CA7E]
-	jbsr	l_d0f3                            	| [$c26e: call $D0F3]
+	jbsr	start_level_music_d0f3                            	| [$c26e: call $D0F3]
 	rts                                    	| [$c271: ret]
 display_screen_2_c272:
 	jbsr	clear_screen_c3cd                            	| [$c272: call $C3CD]
@@ -4749,10 +4749,10 @@ display_screen_2_c272:
 	jbsr	draw_cactus_c338                            	| [$c28b: call $C338]
 	move.w	#0x9882,d6                      	| [$c28e: ld   hl,$9882]
 	move.b	#0x07,d1                        	| [$c291: ld   b,$07]
-	jbsr	l_c361                            	| [$c293: call $C361]
+	jbsr	set_attribute_row_c361                            	| [$c293: call $C361]
 	move.w	#0x9AA2,d6                      	| [$c296: ld   hl,$9AA2]
 	move.b	#0x09,d1                        	| [$c299: ld   b,$09]
-	jbsr	l_c361                            	| [$c29b: call $C361]
+	jbsr	set_attribute_row_c361                            	| [$c29b: call $C361]
 	move.b	#0xBE,d0                        	| [$c29e: ld   a,$BE]
 	move.w	#0x930E,d6                       	| [$c2a0: ld   ($930E),a]
 	jbsr	osd_w_videoram
@@ -4772,14 +4772,14 @@ l_c2b1:
 	add.w	d3,d6                            	| [$c2b6: add  hl,de]
 	subq.b	#1,d1                           	| [...]
 	jne	l_c2b1                             	| [$c2b7: djnz $C2B1]
-	jbsr	l_d0dd                            	| [$c2b9: call $D0DD]
+	jbsr	draw_credit_and_bonus_d0dd                            	| [$c2b9: call $D0DD]
 	            	| [$c2bc: ld   a,(io_read_shit_B800)]
 	jbsr	l_c30e                            	| [$c2bf: call $C30E]
-	jbsr	l_f8de                            	| [$c2c2: call $F8DE]
+	jbsr	put_score_lives_attributes_f8de                            	| [$c2c2: call $F8DE]
 	jbsr	display_player_1_and_2_text_ca7e                            	| [$c2c5: call $CA7E]
 	rts                                    	| [$c2c8: ret]
 
-display_maze_C2C9:
+display_screen_1_C2C9:
 	jbsr	clear_screen_c3cd                            	| [$c2c9: call $C3CD]
 	move.b	#0x3F,d0                        	| [$c2cc: ld   a,$3F]
 	jbsr	change_attribute_everywhere_C3A3  	| [$c2ce: call change_attribute_everywhere_C3A3]
@@ -4798,21 +4798,21 @@ display_maze_C2C9:
 	jbsr	draw_cactus_c338                            	| [$c2e2: call $C338]
 	move.w	#0x9842,d6                      	| [$c2e5: ld   hl,$9842]
 	move.b	#0x07,d1                        	| [$c2e8: ld   b,$07]
-	jbsr	l_c361                            	| [$c2ea: call $C361]
+	jbsr	set_attribute_row_c361                            	| [$c2ea: call $C361]
 	move.w	#0x9AC2,d6                      	| [$c2ed: ld   hl,$9AC2]
 	move.b	#0x07,d1                        	| [$c2f0: ld   b,$07]
-	jbsr	l_c361                            	| [$c2f2: call $C361]
-	jbsr	l_d0dd                            	| [$c2f5: call $D0DD]
+	jbsr	set_attribute_row_c361                            	| [$c2f2: call $C361]
+	jbsr	draw_credit_and_bonus_d0dd                            	| [$c2f5: call $D0DD]
 	            	| [$c2f8: ld   a,(io_read_shit_B800)]
 	jbsr	l_c30e                            	| [$c2fb: call $C30E]
-	jbsr	l_f8de                            	| [$c2fe: call $F8DE]
+	jbsr	put_score_lives_attributes_f8de                            	| [$c2fe: call $F8DE]
 	jbsr	display_player_1_and_2_text_ca7e                            	| [$c301: call $CA7E]
-	move.b	must_play_music_6210,d0         	| [$c304: ld   a,(must_play_music_6210)]
+	tst.b	must_play_music_6210         	| [$c304: ld   a,(must_play_music_6210)]
 	                         	| [$c307: cp   $00]
 	bne.b	0f                               	| [...]
 	rts                                    	| [$c309: ret  z] [...]
 0:
-	jbsr	l_d0f3                            	| [$c30a: call $D0F3]
+	jbsr	start_level_music_d0f3                            	| [$c30a: call $D0F3]
 	rts                                    	| [$c30d: ret]
 l_c30e:
 	lea	unknown_6586,a0                	| [$c30e: ld   hl,unknown_6586]
@@ -4870,10 +4870,10 @@ draw_cactus_c338:
 	subq.w	#1,d6                           	| [$c35e: dec  hl]
  	jbsr	osd_w_colorram                         	| [$c35f: ld   (hl),a]
 	rts                                    	| [$c360: ret]
-l_c361:
+set_attribute_row_c361:
 	move.b	#0x38,d0                        	| [$c361: ld   a,$38]
-	jra	l_c366                             	| [$c363: jr   $C366]
-	rts                                    	| [$c365: ret]
+											| [$c363: jr   $C366]
+											| [$c365: ret]
 l_c366:
 	move.w	#0x0020,d3                      	| [$c366: ld   de,$0020] 32
 l_c369:
@@ -6357,7 +6357,7 @@ goto_next_left_screen_cc8d:
 	cmp.b	#0x02,d0                         	| [$cc9b: cp   $02]
 	jne	l_ccb5                             	| [$cc9d: jr   nz,$CCB5]
 	* screen 1
-	jbsr	display_maze_C2C9                 	| [$cc9f: call display_maze_C2C9]
+	jbsr	display_screen_1_C2C9                 	| [$cc9f: call display_screen_1_C2C9]
 	move.b	#0x01,d0                        	| [$cca2: ld   a,$01]
 	move.b	d0,player_screen_600D           	| [$cca4: ld   (player_screen_600D),a]
 	jbsr	draw_object_tiles_FD72            	| [$cca7: call draw_object_tiles_FD72]
@@ -6416,7 +6416,7 @@ l_cd22:
 	move.b	unknown_6358,d0                 	| [$cd22: ld   a,(unknown_6358)]
 	                        	| [$cd25: cp   $00]
 	beq.b	0f                               	| [...]
-	jbsr	display_maze_C2C9                 	| [$cd27: call nz,display_maze_C2C9]
+	jbsr	display_screen_1_C2C9                 	| [$cd27: call nz,display_screen_1_C2C9]
 0:
 	jbsr	osd_enable_display                        	| [$cd2a: ld   a,$01]
                    	| [$cd2c: ld   ($A003),a]
@@ -7003,7 +7003,7 @@ l_d0d4:
 	jne	l_d0d4                             	| [$d0d9: djnz $D0D4]
 	rts                                    	| [$d0dc: ret]
 	
-l_d0dd:
+draw_credit_and_bonus_d0dd:
 	lea	game_mem+0x5689,a1                      	| [$d0dd: ld   de,$5689]
 	move.w	#0x919F,d6                      	| [$d0e0: ld   hl,$919F]
 	jbsr	display_localized_text_CA67       	| [$d0e3: call display_localized_text_CA67]
@@ -7012,7 +7012,8 @@ l_d0dd:
 	move.w	#0x9240,d6                      	| [$d0ec: ld   hl,$9240]
 	jbsr	display_localized_text_CA67       	| [$d0ef: call display_localized_text_CA67]
 	rts                                    	| [$d0f2: ret]
-l_d0f3:
+
+start_level_music_d0f3:
 	jbsr	is_ay_sound_playing_D4D9                 	| [$d0f3: call is_ay_sound_playing_D4D9]
 	beq.b	0f                               	| [...]
 	rts                                    	| [$d0f6: ret  nz] [...]
@@ -7097,7 +7098,7 @@ l_d164:
 	move.b	d0,is_key_hunt_phase_6341                 	| [$d171: ld   (is_key_hunt_phase_6341),a]
 	jbsr	init_new_game_F951                	| [$d174: call init_new_game_F951]
 	jbsr	init_guard_directions_and_wagons_C314	| [$d177: call init_guard_directions_and_wagons_C314]
-	jbsr	l_dfbf                            	| [$d17a: call $DFBF]
+	jbsr	init_bombs_locations_and_other_stuff_dfbf                            	| [$d17a: call $DFBF]
 	move.w	barrow_screen_params_61C4,d6	| [$d17d: ld   hl,(barrow_screen_params_61C4)]
  
 	                        	| [$d180: push hl]
@@ -8440,7 +8441,7 @@ l_db6b:
 
 	move.l	a3,-(sp)                        	| [$db6c: push iy]
 	lea		has_bomb_6311,a4            	| [$db6e: ld   bc,has_bomb_6311] None
-	lea	unknown_630E,a3                	| [$db71: ld   iy,unknown_630E]
+	lea	bomb_1_screen_pointer_630E,a3                	| [$db71: ld   iy,bomb_1_screen_pointer_630E]
 	move.b	#0x35,d0                        	| [$db75: ld   a,$35]
 	move.b	d0,(0x04,a3)                    	| [$db77: ld   (iy+$04),a]
 	move.b	#0x24,d0                        	| [$db7a: ld   a,$24]
@@ -8457,7 +8458,7 @@ l_db6b:
 	subq.b	#1,d1                           	| [...]
 	jne	l_db6b                             	| [$db96: djnz $DB6B]
 	lea		has_bomb_6311,a4            	| [$db98: ld   bc,has_bomb_6311] None
-	lea	unknown_630E,a3                	| [$db9b: ld   iy,unknown_630E]
+	lea	bomb_1_screen_pointer_630E,a3                	| [$db9b: ld   iy,bomb_1_screen_pointer_630E]
 	move.b	#0x32,d0                        	| [$db9f: ld   a,$32]
 	move.b	d0,(0x04,a3)                    	| [$dba1: ld   (iy+$04),a]
 	move.b	#0x24,d0                        	| [$dba4: ld   a,$24]
@@ -8475,7 +8476,7 @@ l_dbb5:
 
 	move.l	a2,-(sp)                        	| [$dbb8: push ix]
 	move.b	#0x03,d1                        	| [$dbba: ld   b,$03]
-	lea	unknown_630E,a2                	| [$dbbc: ld   ix,unknown_630E]
+	lea	bomb_1_screen_pointer_630E,a2                	| [$dbbc: ld   ix,bomb_1_screen_pointer_630E]
 	jra	l_dbcd                             	| [$dbc0: jr   $DBCD]
 
 swap_3_bytes_DBC2:
@@ -8915,30 +8916,31 @@ l_df8d:
 	move.w	#0x9126,d6                       	| [$dfbb: ld   ($9126),a]
 	jbsr	osd_w_videoram
 	rts                                    	| [$dfbe: ret]
-l_dfbf:
+	
+init_bombs_locations_and_other_stuff_dfbf:
 	jbsr	l_df8d                            	| [$dfbf: call $DF8D]
 	lea	game_mem+0xDF2D,a0                      	| [$dfc2: ld   hl,$DF2D]
 	move.l	a0,unknown_rom_address_62F1                 	| [$dfc5: ld   (unknown_rom_address_62F1),hl]
 	move.w	#0x9263,d6                      	| [$dfc8: ld   hl,$9263]
-	move.w	d6,unknown_screen_pointer_630E                 	| [$dfcb: ld   (unknown_630E),hl]
+	move.w	d6,bomb_1_screen_pointer_630E                 	| [$dfcb: ld   (bomb_1_screen_pointer_630E),hl]
 	move.b	#0x01,d0                        	| [$dfce: ld   a,$01]
-	move.b	d0,unknown_6310                 	| [$dfd0: ld   (unknown_6310),a]
+	move.b	d0,bomb_1_screen_6310                 	| [$dfd0: ld   (bomb_1_screen_6310),a]
 	move.w	#0x913C,d6                      	| [$dfd3: ld   hl,$913C]
-	move.w	d6,unknown_screen_pointer_6315                 	| [$dfd6: ld   (unknown_6315),hl]
+	move.w	d6,bomb_2_screen_pointer_6315                 	| [$dfd6: ld   (bomb_2_screen_pointer_6315),hl]
 	move.b	#0x02,d0                        	| [$dfd9: ld   a,$02]
-	move.b	d0,unknown_6317                 	| [$dfdb: ld   (unknown_6317),a]
+	move.b	d0,bomb_2_screen_6317                 	| [$dfdb: ld   (bomb_2_screen_6317),a]
 	move.w	#0x9254,d6                      	| [$dfde: ld   hl,$9254]
-	move.w	d6,unknown_screen_pointer_6318                 	| [$dfe1: ld   (unknown_6318),hl]
+	move.w	d6,bomb_3_screen_pointer_6318                 	| [$dfe1: ld   (unknown_6318),hl]
 	move.b	#0x03,d0                        	| [$dfe4: ld   a,$03]
-	move.b	d0,unknown_631A                 	| [$dfe6: ld   (unknown_631A),a]
+	move.b	d0,bomb_3_screen_631A                 	| [$dfe6: ld   (bomb_3_screen_631A),a]
 	move.w	#0x912E,d6                      	| [$dfe9: ld   hl,$912E]
-	move.w	d6,unknown_screen_pointer_631B                 	| [$dfec: ld   (unknown_631B),hl]
+	move.w	d6,bomb_4_screen_pointer_631B                 	| [$dfec: ld   (unknown_631B),hl]
 	move.b	#0x04,d0                        	| [$dfef: ld   a,$04]
-	move.b	d0,unknown_631D                 	| [$dff1: ld   (unknown_631D),a]
+	move.b	d0,bomb_4_screen_631D                 	| [$dff1: ld   (bomb_4_screen_631D),a]
 	move.w	#0x927C,d6                      	| [$dff4: ld   hl,$927C]
-	move.w	d6,unknown_screen_pointer_631E                 	| [$dff7: ld   (unknown_631E),hl]
+	move.w	d6,bomb_5_screen_pointer_631E                 	| [$dff7: ld   (unknown_631E),hl]
 	move.b	#0x05,d0                        	| [$dffa: ld   a,$05]
-	move.b	d0,unknown_6320                 	| [$dffc: ld   (unknown_6320),a]
+	move.b	d0,bomb_5_screen_6320                 	| [$dffc: ld   (bomb_5_screen_6320),a]
 	jbsr	l_e58c                            	| [$dfff: call $E58C]
 	rts                                    	| [$e002: ret]
 
@@ -10828,7 +10830,7 @@ l_ecdc:
 	move.b	d0,guard_2_screen_609A          	| [$eceb: ld   (guard_2_screen_609A),a]
 	move.b	#0x03,d0                        	| [$ecee: ld   a,$03]
 	move.b	d0,guard_1_screen_6099          	| [$ecf0: ld   (guard_1_screen_6099),a]
-	jbsr	l_dfbf                            	| [$ecf3: call $DFBF]
+	jbsr	init_bombs_locations_and_other_stuff_dfbf                            	| [$ecf3: call $DFBF]
 	jbsr	l_d7a9                            	| [$ecf6: call $D7A9]
 l_ecf9:
 	move.b	#0x01,d0                        	| [$ecf9: ld   a,$01]
@@ -12490,7 +12492,7 @@ display_player_ids_and_credit_F8A4:
 
 						| [$1e22: call $1E26] converted to fallthrough
 						| [$1e25: ret]
-l_f8de:
+put_score_lives_attributes_f8de:
 	move.b	#0x02,d0                        	| [$f8de: ld   a,$02]
 	move.w	#0x9840,d6                      	| [$f8e0: ld   hl,$9840]
 	jbsr	write_attribute_on_line_5605      	| [$f8e3: call write_attribute_on_line_5605]
@@ -12572,7 +12574,7 @@ init_new_game_F951:
 l_f96d:
 	jbsr	osd_disable_display                               	| [$f96d: xor  a]
 	                       	| [$f96e: ld   ($A003),a]
-	jbsr	display_maze_C2C9                 	| [$f971: call display_maze_C2C9]
+	jbsr	display_screen_1_C2C9                 	| [$f971: call display_screen_1_C2C9]
 	move.b	#0x01,d0                        	| [$f974: ld   a,$01]
 	move.b	d0,wagon_direction_array_6016   	| [$f976: ld   (wagon_direction_array_6016),a]
 	jbsr	display_player_ids_and_credit_F8A4	| [$f979: call display_player_ids_and_credit_F8A4]
@@ -12610,7 +12612,7 @@ l_f9a3:
 	move.b	d0,unknown_6019                 	| [$f9b8: ld   (unknown_6019),a]
 	move.b	#0xB0,d0                        	| [$f9bb: ld   a,$B0]
 	move.b	d0,guard_2_x_659A               	| [$f9bd: ld   (guard_2_x_659A),a]
-	jbsr	l_dfbf                            	| [$f9c0: call $DFBF]
+	jbsr	init_bombs_locations_and_other_stuff_dfbf                            	| [$f9c0: call $DFBF]
 	move.b	#0x38,d0                        	| [$f9c3: ld   a,$38]
 	move.b	d0,unknown_634D                 	| [$f9c5: ld   (unknown_634D),a]
 	jbsr	l_d756                            	| [$f9c8: call $D756]
@@ -12708,7 +12710,7 @@ l_fa68:
 	move.b	d0,has_bag_6158                 	| [$fa7e: ld   (has_bag_6158),a]
 	move.b	d0,holds_barrow_61C7            	| [$fa81: ld   (holds_barrow_61C7),a]
 	move.b	d0,has_bomb_6311                 	| [$fa84: ld   (has_bomb_6311),a]
-	jbsr	l_dfbf                            	| [$fa87: call $DFBF]
+	jbsr	init_bombs_locations_and_other_stuff_dfbf                            	| [$fa87: call $DFBF]
 	move.b	number_of_players_617D,d0       	| [$fa8a: ld   a,(number_of_players_617D)]
 	cmp.b	#0x01,d0                         	| [$fa8d: cp   $01]
 	jeq	l_faa5                             	| [$fa8f: jr   z,$FAA5]
@@ -13290,16 +13292,18 @@ l_fe24:
 	jne	l_fdef                             	| [$fe2e: djnz $FDEF]
 	                       	| [$fe30: ld   a,($FFFF)]
 
+	* draw bombs
 	move.b	player_screen_600D,d0           	| [$fe33: ld   a,(player_screen_600D)]
 	move.b	d0,d1                           	| [$fe36: ld   b,a]
-	lea	unknown_630E,a3                	| [$fe37: ld   iy,unknown_630E]
+	lea	bomb_1_screen_pointer_630E,a3                	| [$fe37: ld   iy,bomb_1_screen_pointer_630E]
 	move.b	(0x02,a3),d0                    	| [$fe3b: ld   a,(iy+$02)]
 	cmp.b	d1,d0                            	| [$fe3e: cp   b]
 	jne	l_fe63                             	| [$fe3f: jr   nz,$FE63]
 	LOAD_AX_BE_WORD_DY	a3,d6
 	              	| [$fe41: ld   l,(iy+$00)]
 	                   	| [$fe44: ld   h,(iy+$01)]
-	jbsr		read_rom                         	| [$fe47: ld   a,(hl)]
+	* get bomb background
+	jbsr	osd_r_videoram                         	| [$fe47: ld   a,(hl)]
 	jbsr	is_background_tile_for_object_drop_CFF3	| [$fe48: call is_background_tile_for_object_drop_CFF3]
 	jne	l_fe63                             	| [$fe4b: jr   nz,$FE63]
 
@@ -13308,7 +13312,7 @@ l_fe24:
 	                      	| [$fe4f: ld   de,$0020] 32
 	add.w	#0x20,d6                            	| [$fe52: add  hl,de]
 	
-	jbsr		read_rom                         	| [$fe53: ld   a,(hl)]
+	jbsr	osd_r_videoram                         	| [$fe53: ld   a,(hl)]
 	jbsr	is_background_tile_for_object_drop_CFF3	| [$fe54: call is_background_tile_for_object_drop_CFF3]
 	movem.w	(sp)+,d3/d4                    	| [$fe57: pop  de]
 	movem.w	(sp)+,d6                        	| [$fe58: pop  hl]
@@ -13320,8 +13324,8 @@ l_fe24:
 	jbsr	draw_object_tiles_CE7C            	| [$fe60: call draw_object_tiles_CE7C]
 l_fe63:
 	move.b	#0x04,d1                        	| [$fe63: ld   b,$04]
-	lea	unknown_6315,a3                	| [$fe65: ld   iy,unknown_6315]
-	lea	unknown_630E,a1                	| [$fe69: ld   de,unknown_630E]
+	lea	bomb_2_screen_pointer_6315,a3                	| [$fe65: ld   iy,bomb_2_screen_pointer_6315]
+	lea	bomb_1_screen_pointer_630E,a1                	| [$fe69: ld   de,bomb_1_screen_pointer_630E]
 l_fe6c:
 	movem.w	d1/d2,-(sp)                    	| [$fe6c: push bc]
 
@@ -13447,6 +13451,8 @@ direction_table_5970:
 	.byte	0x80,0x40,0x20,0x10
 
 * same as in the game but as big endian
+* maps on holds_barrow_61C7
+* screen address + screen index for ???
 table_1BFB:
 	.byte 	0x00,0x00,0x00,0x00,0x00,0x92,0x2e,0x04
 	.byte	0x00,0x00,0x00,0x00,0x92,0x1b,0x01,0x92
