@@ -2206,7 +2206,7 @@ play_intro_1218:
 127B: 10 F1       djnz $126E
 127D: 21 00 00    ld   hl,$0000
 1280: 22 F6 61    ld   (picked_up_object_screen_address_61F6),hl
-1283: CD 42 15    call $1542
+1283: CD 42 15    call credit_inserted_loop_1542
 1286: 3E 01       ld   a,$01
 1288: 32 54 60    ld   (gameplay_allowed_6054),a
 128B: 11 80 65    ld   de,player_struct_6580
@@ -2256,7 +2256,7 @@ play_intro_1218:
 12F5: FF          rst  $38
 12F6: 06 02       ld   b,$02
 12F8: 11 00 40    ld   de,$4000
-12FB: CD 42 15    call $1542
+12FB: CD 42 15    call credit_inserted_loop_1542
 12FE: 1B          dec  de
 12FF: 7A          ld   a,d
 1300: FE 00       cp   $00
@@ -2283,7 +2283,7 @@ play_intro_1218:
 1336: DD 36 40 1A ld   (ix+$40),$1A
 133A: DD 36 41 15 ld   (ix+$41),$15
 133E: 11 00 06    ld   de,$0600
-1341: CD 42 15    call $1542
+1341: CD 42 15    call credit_inserted_loop_1542
 1344: 1B          dec  de
 1345: 7A          ld   a,d
 1346: FE 00       cp   $00
@@ -2295,14 +2295,14 @@ play_intro_1218:
 135A: DD 36 40 B2 ld   (ix+$40),$B2
 135E: DD 36 41 B5 ld   (ix+$41),$B5
 1362: 11 00 06    ld   de,$0600
-1365: CD 42 15    call $1542
+1365: CD 42 15    call credit_inserted_loop_1542
 1368: 1B          dec  de
 1369: 7A          ld   a,d
 136A: FE 00       cp   $00
 136C: 20 F7       jr   nz,$1365
 136E: 10 B2       djnz $1322
 1370: 11 00 40    ld   de,$4000
-1373: CD 42 15    call $1542
+1373: CD 42 15    call credit_inserted_loop_1542
 1376: 1B          dec  de
 1377: 7A          ld   a,d
 1378: FE 00       cp   $00
@@ -2317,7 +2317,7 @@ play_intro_1218:
 1398: DD 36 41 1F ld   (ix+$41),$1F
 139C: DD 36 61 1E ld   (ix+$61),$1E
 13A0: 11 00 14    ld   de,$1400
-13A3: CD 42 15    call $1542
+13A3: CD 42 15    call credit_inserted_loop_1542
 13A6: 1B          dec  de
 13A7: 7A          ld   a,d
 13A8: FE 00       cp   $00
@@ -2332,7 +2332,7 @@ play_intro_1218:
 13C8: DD 36 41 9B ld   (ix+$41),$9B
 13CC: DD 36 61 72 ld   (ix+$61),$72
 13D0: 11 00 40    ld   de,$4000
-13D3: CD 42 15    call $1542
+13D3: CD 42 15    call credit_inserted_loop_1542
 13D6: 1B          dec  de
 13D7: 7A          ld   a,d
 13D8: FE 00       cp   $00
@@ -2352,7 +2352,7 @@ play_intro_1218:
 140A: DD 21 91 91 ld   ix,$9191
 140E: DD 36 40 B8 ld   (ix+$40),$B8
 1412: 11 00 07    ld   de,$0700
-1415: CD 42 15    call $1542
+1415: CD 42 15    call credit_inserted_loop_1542
 1418: 1B          dec  de
 1419: 7A          ld   a,d
 141A: FE 00       cp   $00
@@ -2360,14 +2360,14 @@ play_intro_1218:
 141E: DD 36 00 BD ld   (ix+$00),$BD
 1422: DD 36 20 BA ld   (ix+$20),$BA
 1426: 11 00 07    ld   de,$0700
-1429: CD 42 15    call $1542
+1429: CD 42 15    call credit_inserted_loop_1542
 142C: 1B          dec  de
 142D: 7A          ld   a,d
 142E: FE 00       cp   $00
 1430: 20 F7       jr   nz,$1429
 1432: DD 36 40 43 ld   (ix+$40),$43
 1436: 11 00 07    ld   de,$0700
-1439: CD 42 15    call $1542
+1439: CD 42 15    call credit_inserted_loop_1542
 143C: 1B          dec  de
 143D: 7A          ld   a,d
 143E: FE 00       cp   $00
@@ -2376,14 +2376,14 @@ play_intro_1218:
 1446: DD 36 20 44 ld   (ix+$20),$44
 144A: DD 36 40 43 ld   (ix+$40),$43
 144E: 11 00 07    ld   de,$0700
-1451: CD 42 15    call $1542
+1451: CD 42 15    call credit_inserted_loop_1542
 1454: 1B          dec  de
 1455: 7A          ld   a,d
 1456: FE 00       cp   $00
 1458: 20 F7       jr   nz,$1451
 145A: 10 B2       djnz $140E
 145C: 11 00 20    ld   de,$2000
-145F: CD 42 15    call $1542
+145F: CD 42 15    call credit_inserted_loop_1542
 1462: 1B          dec  de
 1463: 7A          ld   a,d
 1464: FE 00       cp   $00
@@ -2413,7 +2413,7 @@ play_intro_1218:
 14B0: 3E 80       ld   a,$80
 14B2: 32 27 60    ld   (guard_1_direction_6027),a
 14B5: 11 00 20    ld   de,$2000
-14B8: CD 42 15    call $1542
+14B8: CD 42 15    call credit_inserted_loop_1542
 14BB: 1B          dec  de
 14BC: 7A          ld   a,d
 14BD: FE 00       cp   $00
@@ -2430,7 +2430,7 @@ play_intro_1218:
 14CF: ED 56       im   1
 14D1: FF          rst  $38
 14D2: 11 00 08    ld   de,$0800
-14D5: CD 42 15    call $1542
+14D5: CD 42 15    call credit_inserted_loop_1542
 14D8: 1B          dec  de
 14D9: 7A          ld   a,d
 14DA: FE 00       cp   $00
@@ -2446,7 +2446,7 @@ play_intro_1218:
 14EC: 3E 2C       ld   a,$2C
 14EE: 32 94 65    ld   (guard_1_struct_6594),a
 14F1: 11 00 40    ld   de,$4000
-14F4: CD 42 15    call $1542
+14F4: CD 42 15    call credit_inserted_loop_1542
 14F7: 1B          dec  de
 14F8: 7A          ld   a,d
 14F9: FE 00       cp   $00
@@ -2479,6 +2479,7 @@ play_intro_1218:
 153D: AF          xor  a
 153E: 32 32 63    ld   (unknown_6332),a
 1541: C9          ret
+credit_inserted_loop_1542:
 1542: 3A 00 60    ld   a,(number_of_credits_6000)
 1545: FE 00       cp   $00
 1547: C8          ret  z
@@ -6319,7 +6320,7 @@ D837: 3E 01       ld   a,$01
 D839: 32 03 A0    ld   ($A003),a
 D83C: CD E2 D8    call $D8E2
 D83F: 21 B0 93    ld   hl,$93B0
-D842: 22 2F 63    ld   (unknown_632F),hl
+D842: 22 2F 63    ld   (unknown_screen_address_632F),hl
 D845: ED 56       im   1
 D847: FB          ei
 D848: 3E 01       ld   a,$01
@@ -6347,7 +6348,7 @@ D87C: CD D4 D8    call $D8D4
 D87F: CD D4 D8    call $D8D4
 D882: CD D4 D8    call $D8D4
 D885: C9          ret
-D886: 2A 2F 63    ld   hl,(unknown_632F)
+D886: 2A 2F 63    ld   hl,(unknown_screen_address_632F)
 D889: F5          push af
 D88A: 7D          ld   a,l
 D88B: FE BF       cp   $BF
@@ -6355,7 +6356,7 @@ D88D: 20 05       jr   nz,$D894
 D88F: CD E8 D7    call $D7E8
 D892: 18 01       jr   $D895
 D894: 23          inc  hl
-D895: 22 2F 63    ld   (unknown_632F),hl
+D895: 22 2F 63    ld   (unknown_screen_address_632F),hl
 D898: F1          pop  af
 D899: DD 23       inc  ix
 D89B: CD E8 D7    call $D7E8

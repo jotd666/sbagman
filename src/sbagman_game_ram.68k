@@ -288,7 +288,7 @@
 	.global	unknown_6324
 	.global	unknown_6327
 	.global	unknown_632A
-	.global	unknown_632F
+	.global	unknown_screen_address_632F
 	.global	unknown_6332
 	.global	unknown_6334
 	.global	unknown_6336
@@ -297,7 +297,7 @@
 	.global	unknown_633A
 	.global	unknown_6340
 	.global	is_key_hunt_phase_6341
-	.global	unknown_6342
+	.global	ignore_if_has_credits_6342
 	.global	jail_buddy_free_6343
 	.global	unknown_6345
 	.global	unknown_6346
@@ -872,7 +872,7 @@ unknown_6327:
 	ds.b	3
 unknown_632A:
 	ds.b	5
-unknown_632F:
+unknown_screen_address_632F:
 	ds.b	3
 unknown_6332:
 	ds.b	2
@@ -893,7 +893,7 @@ unknown_6340:
 	ds.b	1
 is_key_hunt_phase_6341:
 	ds.b	1
-unknown_6342:
+ignore_if_has_credits_6342:
 	ds.b	1
 jail_buddy_free_6343:
 	ds.b	2

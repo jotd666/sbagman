@@ -95,11 +95,13 @@ used_cluts[0x3BD] = [0x6]
 
 used_cluts.update({k:[0x4] for k in range(0x255,0x25D)})
 
-# bagman title/character tile anums
+# bagman title/character tile anims
+
+
 used_cluts.update({k:[0xC] for k in range(0x100,0x146)})
 used_cluts.update({k:[0xC] for k in range(0x200,0x231)})
 used_cluts.update({k:[0xC] for k in range(0x2A6,0x2BC)})
-
+used_cluts.update({k:[0xC] for k in  [0x162,0x19B,0x1AD,0X1B2,0x1BD]})
 # mechanical stair tiles
 used_cluts.update({k:[0xF] for k in range(0x3C8,0x3DA)})
 used_cluts.update({k:[0xF] for k in range(0x35F,0x367)})
