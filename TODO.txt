@@ -1,16 +1,17 @@
 - guard monitoring doesn't work?? when waiting for elevator 5, guard
   disappears (unknown_6156??)
-- gun tile: wrong color: same cyan as V/A title should be replaced
-  by bomb blue
-- test elevator level 4 picks up player or not?
-- armurerie in english at screen 3: doesn't work despite tiles defined!
+- unknown_pointer_62DB MSB gets corrupted
+- test elevator level 4 doesn't carry player at ground level! lifts player
+  then drops him!!!!
 - pick pickaxe/barrow/bag/bomb problem!
-- wagons wrong X start/stop
 - dies: too long wait
+- gun status not flashing in the bottom
+
+- armurerie in english at screen 3: doesn't work despite tiles defined!
 - write a script to detect move.w to/from ram
 - highscore when not reached a highscore: check time
-- invincibility doesn't work with guards & guns & elevators
-
+- gun tile: wrong color: same cyan as V/A title should be replaced
+  by bomb blue
 - big bagman fingers animation is wrong
 - reduce memory footprint (> 1MB!)
 - suspicious : @246e

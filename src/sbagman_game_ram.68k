@@ -61,8 +61,8 @@
 	.global	unknown_6008
 	.global	way_clear_flag_600B
 	.global	unknown_600C
-	.global	unknown_6013
-	.global	unknown_6014
+	.global	player_in_elevator_4_6013
+	.global	player_in_elevator_4_6014
 	.global	unknown_6015
 	.global	wagon_direction_array_6016
 	.global	unknown_6019
@@ -221,7 +221,7 @@
 	.global	bomb_4_screen_pointer_631B
 	.global	bomb_5_screen_pointer_631E
 
-	.global	screen_base_logical_address_6326
+	.global	screen_base_screen_address_6326
 	.global	unknown_609F
 	.global	unknown_60A1
 	.global	act_number_60D3
@@ -351,9 +351,9 @@ elevator_timer_screen_4_6011:
 	ds.b	1
 elevator_not_moving_screen_4_6012:
 	ds.b	1
-unknown_6013:
+player_in_elevator_4_6013:
 	ds.b	1
-unknown_6014:
+player_in_elevator_4_6014:
 	ds.b	1
 unknown_6015:
 	ds.b	1
@@ -866,7 +866,7 @@ unknown_6323:
 	ds.b	1
 unknown_6324:
 	ds.b	2
-screen_base_logical_address_6326:
+screen_base_screen_address_6326:
 	ds.b	1
 unknown_6327:
 	ds.b	3
