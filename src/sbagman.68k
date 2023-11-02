@@ -345,7 +345,7 @@ l_007f:
 	cmp.b	#0x01,d0                         	| [$008d: cp   $01]
 	jne	l_00b3                             	| [$008f: jr   nz,$00B3]
 	move.b	gameplay_allowed_6054,d0        	| [$0091: ld   a,(gameplay_allowed_6054)]
-	cmp.b	#0x00,d0                         	| [$0094: cp   $00]
+	                         	| [$0094: cp   $00]
 	jeq	l_00b3                             	| [$0096: jr   z,$00B3]
 	move.b	player_controls_blocked_61F2,d0 	| [$0098: ld   a,(player_controls_blocked_61F2)]
 	cmp.b	#0x01,d0                         	| [$009b: cp   $01]
@@ -652,13 +652,13 @@ l_0323:
 	cmp.b	#0x01,d0                         	| [$0348: cp   $01]
 	jeq	l_0387                             	| [$034a: jr   z,$0387]
 	move.b	unknown_6211,d0                 	| [$034c: ld   a,(unknown_6211)]
-	cmp.b	#0x00,d0                         	| [$034f: cp   $00]
+	                         	| [$034f: cp   $00]
 	jne	l_0387                             	| [$0351: jr   nz,$0387]
 	move.b	unknown_62C4,d0                 	| [$0353: ld   a,(unknown_62C4)]
-	cmp.b	#0x00,d0                         	| [$0356: cp   $00]
+	                         	| [$0356: cp   $00]
 	jne	l_0387                             	| [$0358: jr   nz,$0387]
 	move.b	unknown_629D,d0                 	| [$035a: ld   a,(unknown_629D)]
-	cmp.b	#0x00,d0                         	| [$035d: cp   $00]
+	                         	| [$035d: cp   $00]
 	jne	l_0387                             	| [$035f: jr   nz,$0387]
 	move.b	unknown_62B6,d0                 	| [$0361: ld   a,(unknown_62B6)]
 	cmp.b	#0x01,d0                         	| [$0364: cp   $01]
@@ -768,7 +768,7 @@ l_0418:
 	cmp.b	#0x01,d0                         	| [$0447: cp   $01]
 	jeq	l_046b                             	| [$0449: jr   z,$046B]
 	move.b	unknown_62CB,d0                 	| [$044b: ld   a,(unknown_62CB)]
-	cmp.b	#0x00,d0                         	| [$044e: cp   $00]
+	                         	| [$044e: cp   $00]
 	jne	l_046b                             	| [$0450: jr   nz,$046B]
 	move.b	guard_2_in_elevator_5_62ED,d0                 	| [$0452: ld   a,(guard_2_in_elevator_5_62ED)]
 	cmp.b	#0x01,d0                         	| [$0455: cp   $01]
@@ -799,7 +799,7 @@ l_046b:
 	cmp.b	#0x01,d0                         	| [$0497: cp   $01]
 	jeq	l_04bb                             	| [$0499: jr   z,$04BB]
 	move.b	unknown_62C4,d0                 	| [$049b: ld   a,(unknown_62C4)]
-	cmp.b	#0x00,d0                         	| [$049e: cp   $00]
+	                         	| [$049e: cp   $00]
 	jne	l_04bb                             	| [$04a0: jr   nz,$04BB]
 	move.b	guard_1_in_elevator_5_62E9,d0                 	| [$04a2: ld   a,(guard_1_in_elevator_5_62E9)]
 	cmp.b	#0x01,d0                         	| [$04a5: cp   $01]
@@ -2080,7 +2080,7 @@ animate_player_1_frame_0C47:
 	                         	| [$0c4c: cp   $00]
 	jeq	l_0c57                             	| [$0c4e: jr   z,$0C57]
 	jbsr	l_0d50                            	| [$0c50: call $0D50]
-	cmp.b	#0x00,d0                         	| [$0c53: cp   $00]
+	tst.b	d0                         	| [$0c53: cp   $00]
 	jeq	l_0c90                             	| [$0c55: jr   z,$0C90] skip animation because player has bag
 l_0c57:
 	move.w	(sp)+,d0                        	| [$0c57: pop  af]
@@ -2186,7 +2186,7 @@ l_0ce9:
 	rts                                    	| [$0cf2: ret]
 l_0cf3:
 	move.b	has_pick_61CF,d0                	| [$0cf3: ld   a,(has_pick_61CF)]
-	cmp.b	#0x00,d0                         	| [$0cf6: cp   $00]
+	                         	| [$0cf6: cp   $00]
 	bne.b	0f                               	| [...]
 	rts                                    	| [$0cf8: ret  z] [...]
 0:
@@ -3642,13 +3642,13 @@ l_174e:
 	lea	player_struct_6580,a3          	| [$174e: ld   iy,player_struct_6580]
 	move.w	#0x0004,d3                      	| [$1752: ld   de,$0004] 4
 	move.b	unknown_6288,d0                 	| [$1755: ld   a,(unknown_6288)]
-	cmp.b	#0x00,d0                         	| [$1758: cp   $00]
+	                         	| [$1758: cp   $00]
 	bne.b	0f                               	| [...]
 	jbsr	l_17f1                            	| [$175a: call z,$17F1]
 0:
 	move.b	unknown_6288,d0                 	| [$175d: ld   a,(unknown_6288)]
 l_1760:
-	cmp.b	#0x00,d0                         	| [$1760: cp   $00]
+	                         	| [$1760: cp   $00]
 	jeq	l_1769                             	| [$1762: jr   z,$1769]
 	add.w	d3,a2                            	| [$1764: add  ix,de]
 	subq.b	#1,d0                           	| [$1766: dec  a]
@@ -5067,7 +5067,7 @@ l_c427:
 	* cocktail mode
 *	move.b	flipped_dip_switches_copy_6163,d0	| [$c427: ld   a,(flipped_dip_switches_copy_6163)]
 *	and.b	#0x80,d0                         	| [$c42a: and  $80]
-*	cmp.b	#0x00,d0                         	| [$c42c: cp   $00]
+*	                         	| [$c42c: cp   $00]
 *	jeq	l_c439                             	| [$c42e: jr   z,$C439]
 *	move.b	current_player_617C,d0          	| [$c430: ld   a,(current_player_617C)]
 *	not.b	d0                               	| [$c433: cpl]
@@ -6134,7 +6134,7 @@ l_caf3:
 	rts                                    	| [$cb13: ret]
 set_bag_color_attribute_cb14:
 *	move.b	d5,d0                           	| [$cb14: ld   a,h]
-*	cmp.b	#0x00,d0                         	| [$cb15: cp   $00]
+*	                         	| [$cb15: cp   $00]
 *	bne.b	0f                               	| [...]
 *	rts                                    	| [$cb17: ret  z] [...]
 *0:
@@ -6186,7 +6186,7 @@ l_cb32:
 	rts                                    	| [$cb4c: ret]
 l_cb4d:
 *	move.b	d5,d0                           	| [$cb4d: ld   a,h]
-*	cmp.b	#0x00,d0                         	| [$cb4e: cp   $00]
+*	                         	| [$cb4e: cp   $00]
 *	bne.b	0f                               	| [...]
 *	rts                                    	| [$cb50: ret  z] [...]
 *0:
@@ -8926,7 +8926,7 @@ l_e03c:
 	cmp.b	#0xDE,d0                         	| [$e044: cp   $DE]
 	jcc	l_e039                             	| [$e046: jr   nc,$E039]
 	move.b	elevator_5_stop_timer_62E1,d0                 	| [$e048: ld   a,(elevator_5_stop_timer_62E1)]
-	cmp.b	#0x00,d0                         	| [$e04b: cp   $00]
+	                         	| [$e04b: cp   $00]
 	jeq	l_e054                             	| [$e04d: jr   z,$E054]
 	subq.b	#1,d0                           	| [$e04f: dec  a]
 	move.b	d0,elevator_5_stop_timer_62E1                 	| [$e050: ld   (elevator_5_stop_timer_62E1),a]
@@ -9430,7 +9430,7 @@ l_e399:
 	lea	player_struct_6580,a2          	| [$e399: ld   ix,player_struct_6580]
 	lea	unknown_62BD,a3                	| [$e39d: ld   iy,unknown_62BD]
 	move.b	unknown_6008,d0                 	| [$e3a1: ld   a,(unknown_6008)]
-	cmp.b	#0x00,d0                         	| [$e3a4: cp   $00]
+	                         	| [$e3a4: cp   $00]
 	beq.b	0f                               	| [...]
 	rts                                    	| [$e3a6: ret  nz] [...]
 0:
@@ -9529,7 +9529,7 @@ l_e416:
 	bsr		read_rom                         	| [$e42c: ld   a,(hl)]
 	move.b	d0,d1                           	| [$e42d: ld   b,a]
 	move.b	(0x04,a3),d0                    	| [$e42e: ld   a,(iy+$04)]
-	cmp.b	#0x00,d0                         	| [$e431: cp   $00]
+	                         	| [$e431: cp   $00]
 	jeq	l_e43a                             	| [$e433: jr   z,$E43A]
 	subq.b	#1,d0                           	| [$e435: dec  a]
 	move.b	d0,(0x04,a3)                    	| [$e436: ld   (iy+$04),a]
@@ -9830,7 +9830,7 @@ l_e6b7:
 	rts                                    	| [$e6bf: ret  nz] [...]
 0:
 	move.b	unknown_6157,d0                 	| [$e6c0: ld   a,(unknown_6157)]
-	cmp.b	#0x00,d0                         	| [$e6c3: cp   $00]
+	                         	| [$e6c3: cp   $00]
 	jne	l_e678                             	| [$e6c5: jr   nz,$E678]
 	move.b	unknown_6346,d0                 	| [$e6c7: ld   a,(unknown_6346)]
 	cmp.b	#0x0F,d0                         	| [$e6ca: cp   $0F]
@@ -9910,7 +9910,7 @@ l_e733:
 	rts                                    	| [$e73b: ret  nz] [...]
 0:
 	move.b	unknown_6156,d0                 	| [$e73c: ld   a,(unknown_6156)]
-	cmp.b	#0x00,d0                         	| [$e73f: cp   $00]
+	                         	| [$e73f: cp   $00]
 	jne	l_e6f4                             	| [$e741: jr   nz,$E6F4]
 	move.b	unknown_6345,d0                 	| [$e743: ld   a,(unknown_6345)]
 	cmp.b	#0x0F,d0                         	| [$e746: cp   $0F]
@@ -10674,7 +10674,7 @@ l_ec05:
 	cmp.b	#0x01,d0                         	| [$ec08: cp   $01]
 	jeq	l_ec20                             	| [$ec0a: jr   z,$EC20]
 	addq.w	#1,d6                           	| [$ec0c: inc  hl]
-	bsr		read_rom	                         	| [$ec0d: ld   a,(hl)]
+	bsr		osd_r_videoram	                         	| [$ec0d: ld   a,(hl)]
 	cmp.b	#0xED,d0                         	| [$ec0e: cp   $ED]
 	bne.b	0f                               	| [...]
 	rts                                    	| [$ec10: ret  z] [...]
@@ -10689,12 +10689,12 @@ l_ec05:
 									| [$ec18: ld   a,h]
 			
 									| [$ec1b: ld   h,a]
-	bsr		read_rom                         	| [$ec1c: ld   a,(hl)]
+	bsr		osd_r_videoram                         	| [$ec1c: ld   a,(hl)]
 	cmp.b	#0xED,d0                         	| [$ec1d: cp   $ED]
 	rts                                    	| [$ec1f: ret]
 l_ec20:
 	addq.w	#1,d6                           	| [$ec20: inc  hl]
-	bsr		read_rom                         	| [$ec21: ld   a,(hl)]
+	bsr		osd_r_videoram                         	| [$ec21: ld   a,(hl)]
 	cmp.b	#0xBF,d0                         	| [$ec22: cp   $BF]
 	bne.b	0f                               	| [...]
 	rts                                    	| [$ec24: ret  z] [...]
@@ -10703,11 +10703,11 @@ l_ec20:
 	move.l	a1,-(sp)                        	| [$ec25: push de]
 	move.w	#0x0020,d3                      	| [$ec26: ld   de,$0020] 32
 	add.w	d3,d6                            	| [$ec29: add  hl,de]
-	bsr		read_rom                         	| [$ec2a: ld   a,(hl)]
+	bsr		osd_r_videoram                         	| [$ec2a: ld   a,(hl)]
 	cmp.b	#0xBF,d0                         	| [$ec2b: cp   $BF]
 	jeq	l_ec35                             	| [$ec2d: jr   z,$EC35]
 	add.w	d3,d6                            	| [$ec2f: add  hl,de]
-	bsr		read_rom                         	| [$ec30: ld   a,(hl)]
+	bsr		osd_r_videoram                         	| [$ec30: ld   a,(hl)]
 	cmp.b	#0xBF,d0                         	| [$ec31: cp   $BF]
 	jeq	l_ec35                             	| [$ec33: jr   z,$EC35]
 l_ec35:
@@ -10832,7 +10832,7 @@ mainloop_ecf9:
 	cmp.b	d1,d0                            	| [$ed1c: cp   b]
 	jne	l_ed32                             	| [$ed1d: jr   nz,$ED32]
 	jbsr	guard_collision_5537                            	| [$ed1f: call $5537]
-	cmp.b	#0x00,d0                         	| [$ed22: cp   $00]
+	tst.b	d0                         	| [$ed22: cp   $00]
 	jeq	l_ed32                             	| [$ed24: jr   z,$ED32]
 	move.b	unknown_6156,d0                 	| [$ed26: ld   a,(unknown_6156)]
 	                         	| [$ed29: cp   $00]
@@ -10911,7 +10911,7 @@ l_edc5:
 	cmp.b	#0x01,d0                         	| [$edc8: cp   $01]
 	jeq	l_ecdc                             	| [$edca: jp   z,$ECDC]
 	move.b	time_61E8,d0                    	| [$edcd: ld   a,(time_61E8)]
-	cmp.b	#0x00,d0                         	| [$edd0: cp   $00]
+	                         	| [$edd0: cp   $00]
 	jne	l_eddc                             	| [$edd2: jr   nz,$EDDC]
 	jbsr	l_f92d                            	| [$edd4: call $F92D]
 	cmp.b	#0x01,d0                         	| [$edd7: cp   $01]
@@ -11235,7 +11235,7 @@ l_f0d9:
 	jbsr	compute_guard_speed_from_dipsw_C5EE	| [$f0da: call compute_guard_speed_from_dipsw_C5EE]
 	jbsr	l_d27e                            	| [$f0dd: call $D27E]
 	move.b	check_scenery_disabled_61ED,d0  	| [$f0e0: ld   a,(check_scenery_disabled_61ED)]
-	cmp.b	#0x00,d0                         	| [$f0e3: cp   $00]
+	                         	| [$f0e3: cp   $00]
 	bne.b	0f                               	| [...]
 	jbsr	draw_object_tiles_FD72            	| [$f0e5: call z,draw_object_tiles_FD72]
 0:
@@ -11243,7 +11243,7 @@ l_f0d9:
 	move.b	d0,d1                           	| [$f0eb: ld   b,a]
 	move.b	guard_2_sees_player_left_607D,d0	| [$f0ec: ld   a,(guard_2_sees_player_left_607D)]
 	or.b	d1,d0                             	| [$f0ef: or   b]
-	cmp.b	#0x00,d0                         	| [$f0f0: cp   $00]
+	                         	| [$f0f0: cp   $00]
 	beq.b	0f                               	| [...]
 	jbsr	l_e67d                            	| [$f0f2: call nz,$E67D]
 0:
@@ -11513,7 +11513,7 @@ l_f2cb:
 	rts                                    	| [$f2d6: ret  z] [...]
 0:
 	move.b	has_bag_6158,d0                 	| [$f2d7: ld   a,(has_bag_6158)]
-	cmp.b	#0x00,d0                         	| [$f2da: cp   $00]
+	                         	| [$f2da: cp   $00]
 	jne	l_f4a7                             	| [$f2dc: jp   nz,$F4A7]
 	move.b	has_pick_61CF,d0                	| [$f2df: ld   a,(has_pick_61CF)]
 	cmp.b	#0x01,d0                         	| [$f2e2: cp   $01]
@@ -11545,6 +11545,9 @@ l_f2cb:
 	bne.b	0f                               	| [...]
 	rts                                    	| [$f302: ret  z] [...]
 0:
+	* for bags, it's different from other items
+	* scan if player is at the same position as a bag
+	* do it permanently
 	lea	bags_coordinates_609C,a3       	| [$f303: ld   iy,bags_coordinates_609C]
 	move.b	#0x12,d1                        	| [$f307: ld   b,$12]
 	move.w	player_logical_address_6009,d6	| [$f309: ld   hl,(player_logical_address_6009)]
@@ -11562,7 +11565,7 @@ l_f311:
 	LOAD_AX_BE_WORD_DY	a3,d3
 										| [$f31e: ld   d,(iy+$01)]
 									| [$f321: ld   e,(iy+$00)]
-	addq.w	#2,a1                           	| [$f324: inc  de] * 2
+	addq.w	#2,d3                           	| [$f324: inc  de] * 2
 	jbsr	compute_backbuffer_tile_address_F47B	| [$f326: call compute_backbuffer_tile_address_F47B]
 	clr.b	d0                               	| [$f329: xor  a]
 
@@ -11581,14 +11584,16 @@ l_f335:
 	jne	l_f311                             	| [$f340: djnz $F311]
 	rts                                    	| [$f342: ret]
 l_f343:
+	* player is at the same X/Y as a bag (in a position
+	* that is compatible with picking it up)
 	jbsr	test_pickup_flag_F4E3             	| [$f343: call test_pickup_flag_F4E3]
 	move.b	d1,d0                           	| [$f346: ld   a,b]
 	                         	| [$f347: cp   $00]
 	bne.b	0f                               	| [...]
 	rts                                    	| [$f349: ret  z] [...]
 0:
-	move.b	has_pick_61CF,d0                	| [$f34a: ld   a,(has_pick_61CF)]
-	cmp.b	#0x00,d0                         	| [$f34d: cp   $00]
+	tst.b	has_pick_61CF                	| [$f34a: ld   a,(has_pick_61CF)]
+	                         	| [$f34d: cp   $00]
 	jeq	l_f370                             	| [$f34f: jr   z,$F370]
 
 	move.l	a3,-(sp)                        	| [$f351: push iy]
@@ -11631,13 +11636,15 @@ l_f395:
 	sub.b	#0x08,d0                         	| [$f3a9: sub  $08]
 	move.b	d0,(0x1e,a2)                    	| [$f3ab: ld   (ix+$1e),a]
 l_f3ae:
-	jbsr	is_ay_sound_playing_D4D9                 	| [$f3ae: call is_ay_sound_playing_D4D9]
-	* TODO sound
-	*jne	l_f3bd                             	| [$f3b1: jr   nz,$F3BD]
-	*lea	game_mem+0x5BA8,a0                      	| [$f3b3: ld   hl,$5BA8]
-	*move.b	a0,ay_sound_pointer_6140        	| [$f3b6: ld   (ay_sound_pointer_6140),hl]
-	*clr.b	d0                               	| [$f3b9: xor  a]
-	*move.b	d0,ay_sound_start_6142          	| [$f3ba: ld   (ay_sound_start_6142),a]
+	move.w	#TAKE_BAG_SND,d0      	
+	jbsr	start_a_sound         	
+										| [$f3ae: call is_ay_sound_playing_D4D9]
+							
+								| [$f3b1: jr   nz,$F3BD]
+										| [$f3b3: ld   hl,$5BA8]
+								| [$f3b6: ld   (ay_sound_pointer_6140),hl]
+								| [$f3b9: xor  a]
+								| [$f3ba: ld   (ay_sound_start_6142),a]
 l_f3bd:
 	move.b	#0x01,d0                        	| [$f3bd: ld   a,$01]
 	move.b	d0,has_bag_6158                 	| [$f3bf: ld   (has_bag_6158),a]
@@ -11948,7 +11955,7 @@ l_f551:
 	clr.b	d0                               	| [$f55f: xor  a]
 	move.b	d0,(0x15,a2)                    	| [$f560: ld   (ix+$15),a]
 	move.b	player_just_moved_flag_6047,d0  	| [$f563: ld   a,(player_just_moved_flag_6047)]
-	cmp.b	#0x00,d0                         	| [$f566: cp   $00]
+	                         	| [$f566: cp   $00]
 	jeq	l_f595                             	| [$f568: jp   z,$F595]
 	move.b	player_x_6582,d0                	| [$f56b: ld   a,(player_x_6582)]
 	move.b	d0,d1                           	| [$f56e: ld   b,a]
@@ -12878,6 +12885,8 @@ choose_guard_random_direction_FBB8:
 	move.l	guard_direction_pointer_6095,a0	| [$fbc7: ld   hl,(guard_direction_pointer_6095)]
 	move.b	d0,(a0)                         	| [$fbca: ld   (hl),a]
 	rts                                    	| [$fbcb: ret]
+
+* check if we can pick objects up (not for bags!)
 check_object_pickup_FBCC:
 	* can't pickup an object when bag is falling or sliding
 	move.b	bag_falling_6159,d0             	| [$fbcc: ld   a,(bag_falling_6159)]
