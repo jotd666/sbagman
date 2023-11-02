@@ -47,8 +47,8 @@
 	.global	player_struct_6580
 	.global	player_x_6582
 	.global	player_y_6583
-	.global	previous_guard_1_struct_65B8
-	.global	previous_guard_2_struct_65BC
+	.global	guard_1_shadow_sprite_65B8
+	.global	guard_2_shadow_sprite_65BC
 	.global	score_ten_thousands_player_1_6178
 	.global	current_guard_screen_index_6098
 	.global	time_61E8
@@ -201,7 +201,6 @@
 	.global	wagon_2_shadow_sprite_658C
 	.global	wagon_3_shadow_sprite_6590
 	.global	object_held_struct_659C
-	.global	unknown_659D
 	.global	sprite_object_x_659E
 	.global	sprite_object_y_659F
 	.global	barrow_sprite_shadow_ram_65A0
@@ -210,7 +209,6 @@
 	.global	unknown_65A6
 	.global	player_shadow_sprite_65A8
 	.global	wagon_1_shadow_sprite_65AC
-	.global	unknown_65AF
 	.global	unknown_65B0
 	.global	unknown_65B4
 	.global	stack_top_67F0
@@ -268,9 +266,8 @@
 	.global	guard_2_in_elevator_5_62ED
 	.global	unknown_62EE
 	.global	jail_buddy_aniimation_counter_62F0
-	.global	unknown_62F5
-	.global	unknown_62F7
-	.global	unknown_62F9
+	.global	bomb_must_detonate_62F5
+
 	.global	unknown_62FA
 	.global	unknown_62FB
 	.global	unknown_62FC
@@ -284,8 +281,8 @@
 	.global	bomb_3_screen_631A
 	.global	bomb_4_screen_631D
 	.global	bomb_5_screen_6320
-	.global	unknown_6323
-	.global	unknown_6324
+	.global	bomb_picked_up_6323
+	.global	bomb_timer_6324
 	.global	unknown_6327
 	.global	unknown_632A
 	.global	unknown_screen_address_632F
@@ -313,7 +310,7 @@
 	.global	unknown_635B
 	.global	unknown_635D
 	.global	unknown_6360
-	.global	unknown_6586
+	.global	elevator_x_screen_4_6586
 	.global	unknown_658D
 	.global	unknown_658E
 	.global	unknown_658F
@@ -814,16 +811,15 @@ jail_buddy_aniimation_counter_62F0:
 	ds.b	1
 jail_buddy_aniimation_rom_address_62F1:
 	ds.b	4
-unknown_62F5:
+bomb_must_detonate_62F5:
 	ds.b	1
+	.align	2
 unknown_pointer_62F6:
-	ds.b	1
-unknown_62F7:
-	ds.b	1
+	ds.l	1
+
 unknown_screen_address_62F8:
-	ds.b	1
-unknown_62F9:
-	ds.b	1
+	ds.w	2
+
 unknown_62FA:
 	ds.b	1
 unknown_62FB:
@@ -862,9 +858,12 @@ bomb_5_screen_pointer_631E:
 	ds.w	1
 bomb_5_screen_6320:
 	ds.b	3
-unknown_6323:
+* different from has_bomb_6311: when bomb is dropped
+* by played, this flag stays at 1 until it explodes,
+* (to avoid another bomb to be picked probably)
+bomb_picked_up_6323:
 	ds.b	1
-unknown_6324:
+bomb_timer_6324:
 	ds.b	2
 screen_base_screen_address_6326:
 	ds.b	1
@@ -925,6 +924,8 @@ unknown_635D:
 	ds.b	3
 unknown_6360:
 	ds.b	0x220	
+	
+* start of sprite shadow ram, 8 sprites max at once
 player_struct_6580:
 	ds.b	2
 player_x_6582:
@@ -933,9 +934,8 @@ player_y_6583:
 	ds.b	1
 elevator_struct_6584:
 	ds.b	2
-unknown_6586:
+elevator_x_screen_4_6586:
 	ds.b	1
-	
 elevator_y_screen_4_6587:
 	ds.b	1
 wagon_1_struct_6588:
@@ -969,14 +969,17 @@ guard_2_x_659A:
 	ds.b	1
 guard_2_y_659B:
 	ds.b	1
-object_held_struct_659C:
+	
+
+object_held_struct_659C:   | also sprite code
 	ds.b	1
-unknown_659D:
+object_held_color_attrs_659D:
 	ds.b	1
 sprite_object_x_659E:
 	ds.b	1
 sprite_object_y_659F:
 	ds.b	1
+	
 barrow_sprite_shadow_ram_65A0:
 	ds.b	3
 unknown_65A3:
@@ -985,20 +988,21 @@ elevator_shadow_sprite_65A4:
 	ds.b	2
 unknown_65A6:
 	ds.b	2
+	
+* the real shadow sprite memory, 32 bytes
+* copied at once in the real sprite registers
 player_shadow_sprite_65A8:
 	ds.b	4
 wagon_1_shadow_sprite_65AC:
-	ds.b	3
-unknown_65AF:
-	ds.b	1
+	ds.b	4
 unknown_65B0:
 	ds.b	4
 unknown_65B4:
 	ds.b	4
-previous_guard_1_struct_65B8:
+guard_1_shadow_sprite_65B8:
 	ds.b	4
-previous_guard_2_struct_65BC:
-	ds.b	564
+guard_2_shadow_sprite_65BC:
+	ds.b	4
 	.align	2
 mechanical_stair_frame_62AD:
 	ds.w	1

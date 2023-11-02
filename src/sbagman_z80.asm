@@ -79,7 +79,7 @@
 00E4: 3A 6D 62    ld   a,(flash_counter_626D)
 00E7: 3C          inc  a
 00E8: 32 6D 62    ld   (flash_counter_626D),a
-00EB: FD 21 B8 65 ld   iy,previous_guard_1_struct_65B8
+00EB: FD 21 B8 65 ld   iy,guard_1_shadow_sprite_65B8
 00EF: 3A 0D 60    ld   a,(player_screen_600D)
 00F2: 47          ld   b,a
 00F3: 3A 99 60    ld   a,(guard_1_screen_6099)
@@ -88,9 +88,9 @@
 00F9: CD 8C 11    call set_previous_guard_y_255_118C
 00FC: 18 0B       jr   $0109
 00FE: DD 21 94 65 ld   ix,guard_1_struct_6594
-0102: FD 21 B8 65 ld   iy,previous_guard_1_struct_65B8
+0102: FD 21 B8 65 ld   iy,guard_1_shadow_sprite_65B8
 0106: CD D7 D6    call update_sprite_data_d6d7
-0109: FD 21 BC 65 ld   iy,previous_guard_2_struct_65BC
+0109: FD 21 BC 65 ld   iy,guard_2_shadow_sprite_65BC
 010D: 3A 0D 60    ld   a,(player_screen_600D)
 0110: 47          ld   b,a
 0111: 3A 9A 60    ld   a,(guard_2_screen_609A)
@@ -99,7 +99,7 @@
 0117: CD 8C 11    call set_previous_guard_y_255_118C
 011A: 18 0B       jr   $0127
 011C: DD 21 98 65 ld   ix,guard_2_struct_6598
-0120: FD 21 BC 65 ld   iy,previous_guard_2_struct_65BC
+0120: FD 21 BC 65 ld   iy,guard_2_shadow_sprite_65BC
 0124: CD D7 D6    call update_sprite_data_d6d7
 0127: 3A 43 63    ld   a,(unknown_6343)
 012A: FE 01       cp   $01
@@ -3725,7 +3725,7 @@ C307: FE 00       cp   $00
 C309: C8          ret  z
 C30A: CD F3 D0    call $D0F3
 C30D: C9          ret
-C30E: 21 86 65    ld   hl,unknown_6586
+C30E: 21 86 65    ld   hl,elevator_x_screen_4_6586
 C311: AF          xor  a
 C312: 77          ld   (hl),a
 C313: C9          ret
@@ -5075,10 +5075,10 @@ CDCC: AF          xor  a
 CDCD: 32 03 A0    ld   ($A003),a
 CDD0: 32 8F 65    ld   (unknown_658F),a
 CDD3: 32 97 62    ld   (unknown_6297),a
-CDD6: 32 F5 62    ld   (unknown_62F5),a
+CDD6: 32 F5 62    ld   (bomb_must_detonate_62F5),a
 CDD9: 32 FA 62    ld   (unknown_62FA),a
-CDDC: 32 23 63    ld   (unknown_6323),a
-CDDF: 32 24 63    ld   (unknown_6324),a
+CDDC: 32 23 63    ld   (bomb_picked_up_6323),a
+CDDF: 32 24 63    ld   (bomb_timer_6324),a
 CDE2: 3A C7 61    ld   a,(holds_barrow_61C7)
 CDE5: FE 00       cp   $00
 CDE7: CC CC F9    call z,$F9CC
@@ -6698,7 +6698,7 @@ DBE1: DD E1       pop  ix
 DBE3: FD E1       pop  iy
 DBE5: C1          pop  bc
 DBE6: C9          ret
-DBE7: 3A F5 62    ld   a,(unknown_62F5)
+DBE7: 3A F5 62    ld   a,(bomb_must_detonate_62F5)
 DBEA: FE 01       cp   $01
 DBEC: C0          ret  nz
 DBED: AF          xor  a
@@ -6774,7 +6774,7 @@ DCAC: DD 23       inc  ix
 DCAE: FD 23       inc  iy
 DCB0: 10 F7       djnz $DCA9
 DCB2: 3E 01       ld   a,$01
-DCB4: 32 F5 62    ld   (unknown_62F5),a
+DCB4: 32 F5 62    ld   (bomb_must_detonate_62F5),a
 DCB7: 3A 54 60    ld   a,(gameplay_allowed_6054)
 DCBA: FE 00       cp   $00
 DCBC: C8          ret  z
@@ -6816,7 +6816,7 @@ DD09: CD 77 EA    call $EA77
 DD0C: CD 77 EA    call $EA77
 DD0F: CD 77 EA    call $EA77
 DD12: C9          ret
-DD13: 3A F5 62    ld   a,(unknown_62F5)
+DD13: 3A F5 62    ld   a,(bomb_must_detonate_62F5)
 DD16: FE 01       cp   $01
 DD18: C0          ret  nz
 DD19: 3A 34 63    ld   a,(unknown_6334)
@@ -6879,7 +6879,7 @@ DD93: FD 7E 00    ld   a,(iy+$00)
 DD96: FE FF       cp   $FF
 DD98: C0          ret  nz
 DD99: AF          xor  a
-DD9A: 32 F5 62    ld   (unknown_62F5),a
+DD9A: 32 F5 62    ld   (bomb_must_detonate_62F5),a
 DD9D: FD 2A F8 62 ld   iy,(unknown_62F8)
 DDA1: DD 21 FC 62 ld   ix,unknown_62FC
 DDA5: DD 7E 00    ld   a,(ix+$00)
@@ -7043,7 +7043,7 @@ DF88: AF          xor  a
 DF89: FD 77 00    ld   (iy+$00),a
 DF8C: C9          ret
 DF8D: 21 C7 90    ld   hl,$90C7
-DF90: 22 DD 62    ld   (unknown_62DD),hl
+DF90: 22 DD 62    ld   (elevator_5_screen_address_62DD),hl
 DF93: 21 04 E0    ld   hl,$E004
 DF96: 22 DB 62    ld   (unknown_62DB),hl
 DF99: 3E BB       ld   a,$BB
@@ -7089,7 +7089,7 @@ DFFF: CD 8C E5    call $E58C
 E002: C9          ret
 
 E039: CD 8D DF    call $DF8D
-E03C: 2A DD 62    ld   hl,(unknown_62DD)
+E03C: 2A DD 62    ld   hl,(elevator_5_screen_address_62DD)
 E03F: 7D          ld   a,l
 E040: FE C7       cp   $C7
 E042: 38 F5       jr   c,$E039
@@ -7126,7 +7126,7 @@ E080: 78          ld   a,b
 E081: 32 9B 65    ld   (guard_2_y_659B),a
 E084: 3A DF 62    ld   a,(unknown_62DF)
 E087: 47          ld   b,a
-E088: 2A DD 62    ld   hl,(unknown_62DD)
+E088: 2A DD 62    ld   hl,(elevator_5_screen_address_62DD)
 E08B: CD 88 E1    call $E188
 E08E: DD 2A DB 62 ld   ix,(unknown_62DB)
 E092: 3A DF 62    ld   a,(unknown_62DF)
@@ -7137,14 +7137,14 @@ E09C: DD 7E 24    ld   a,(ix+$24)
 E09F: FE 01       cp   $01
 E0A1: CC C7 E0    call z,$E0C7
 E0A4: DD 2A DB 62 ld   ix,(unknown_62DB)
-E0A8: 2A DD 62    ld   hl,(unknown_62DD)
+E0A8: 2A DD 62    ld   hl,(elevator_5_screen_address_62DD)
 E0AB: DD 7E 00    ld   a,(ix+$00)
 E0AE: CD F7 E0    call $E0F7
 E0B1: CD 72 E1    call $E172
 E0B4: 2A DB 62    ld   hl,(unknown_62DB)
 E0B7: CD EC E0    call $E0EC
 E0BA: 22 DB 62    ld   (unknown_62DB),hl
-E0BD: 2A DD 62    ld   hl,(unknown_62DD)
+E0BD: 2A DD 62    ld   hl,(elevator_5_screen_address_62DD)
 E0C0: CD 37 E1    call $E137
 E0C3: CD 51 E1    call $E151
 E0C6: C9          ret
@@ -7153,9 +7153,9 @@ E0CA: FE FF       cp   $FF
 E0CC: CC DE E0    call z,$E0DE
 E0CF: FE FE       cp   $FE
 E0D1: CC E5 E0    call z,$E0E5
-E0D4: 2A DD 62    ld   hl,(unknown_62DD)
+E0D4: 2A DD 62    ld   hl,(elevator_5_screen_address_62DD)
 E0D7: CD EC E0    call $E0EC
-E0DA: 22 DD 62    ld   (unknown_62DD),hl
+E0DA: 22 DD 62    ld   (elevator_5_screen_address_62DD),hl
 E0DD: C9          ret
 E0DE: 21 04 E0    ld   hl,$E004
 E0E1: 22 DB 62    ld   (unknown_62DB),hl
@@ -7624,15 +7624,15 @@ E593: DD 77 00    ld   (ix+$00),a
 E596: DD 23       inc  ix
 E598: 10 F9       djnz $E593
 E59A: AF          xor  a
-E59B: 32 F5 62    ld   (unknown_62F5),a
+E59B: 32 F5 62    ld   (bomb_must_detonate_62F5),a
 E59E: 32 F6 62    ld   (unknown_62F6),a
 E5A1: 32 F7 62    ld   (unknown_62F7),a
 E5A4: 32 F8 62    ld   (unknown_62F8),a
 E5A7: 32 F9 62    ld   (unknown_62F9),a
 E5AA: 32 FA 62    ld   (unknown_62FA),a
 E5AD: 32 FB 62    ld   (unknown_62FB),a
-E5B0: 32 23 63    ld   (unknown_6323),a
-E5B3: 32 24 63    ld   (unknown_6324),a
+E5B0: 32 23 63    ld   (bomb_picked_up_6323),a
+E5B3: 32 24 63    ld   (bomb_timer_6324),a
 E5B6: 32 26 63    ld   (screen_base_logical_address_6326),a
 E5B9: 32 27 63    ld   (unknown_6327),a
 E5BC: 32 E5 62    ld   (unknown_62E5),a
@@ -8507,12 +8507,14 @@ ECA9: 32 00 A0    ld   (interrupt_control_A000),a
 ECAC: F3          di
 ECAD: 3C          inc  a
 ECAE: C3 00 C0    jp   startup_C000
+* not reached
 ECB1: 21 00 05    ld   hl,$0500
 ECB4: CD D9 C5    call $C5D9
 ECB7: 3E 01       ld   a,$01
 ECB9: CD E2 D8    call $D8E2
 ECBC: 3E 40       ld   a,$40
 ECBE: 32 E8 61    ld   (time_61E8),a
+
 ECC1: CD 18 12    call play_intro_1218
 ECC4: CD DB CF    call set_bags_coordinates_easy_level_CFDB
 ECC7: CD E7 CF    call copy_bags_coordinates_player_2_CFE7
@@ -8928,30 +8930,30 @@ F119: CC 2F D1    call z,check_if_level_completed_D12F
 F11C: 3A 11 63    ld   a,(has_bomb_6311)
 F11F: FE 01       cp   $01
 F121: 28 2F       jr   z,$F152
-F123: 3A 23 63    ld   a,(unknown_6323)
+F123: 3A 23 63    ld   a,(bomb_picked_up_6323)
 F126: FE 01       cp   $01
 F128: 20 32       jr   nz,$F15C
 F12A: 3A 34 63    ld   a,(unknown_6334)
 F12D: FE 01       cp   $01
 F12F: 28 2B       jr   z,$F15C
-F131: 3A 24 63    ld   a,(unknown_6324)
+F131: 3A 24 63    ld   a,(bomb_timer_6324)
 F134: 3D          dec  a
-F135: 32 24 63    ld   (unknown_6324),a
+F135: 32 24 63    ld   (bomb_timer_6324),a
 F138: FE 00       cp   $00
 F13A: 20 11       jr   nz,$F14D
 F13C: 3E 01       ld   a,$01
-F13E: 32 F5 62    ld   (unknown_62F5),a
+F13E: 32 F5 62    ld   (bomb_must_detonate_62F5),a
 F141: 3E 01       ld   a,$01
 F143: 32 51 63    ld   (unknown_6351),a
 F146: AF          xor  a
-F147: 32 23 63    ld   (unknown_6323),a
+F147: 32 23 63    ld   (bomb_picked_up_6323),a
 F14A: C3 5C F1    jp   $F15C
 F14D: CD 55 DA    call $DA55
 F150: 18 0A       jr   $F15C
 F152: 3E 01       ld   a,$01
-F154: 32 23 63    ld   (unknown_6323),a
+F154: 32 23 63    ld   (bomb_picked_up_6323),a
 F157: 3E 20       ld   a,$20
-F159: 32 24 63    ld   (unknown_6324),a
+F159: 32 24 63    ld   (bomb_timer_6324),a
 F15C: 3A B6 62    ld   a,(unknown_62B6)
 F15F: FE 01       cp   $01
 F161: 20 05       jr   nz,$F168

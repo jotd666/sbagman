@@ -277,7 +277,7 @@ sbagman_reset:
 	* when A4 is bogus (which originally happens too)
 	sub.l	a4,a4
 
-	jra	l_eca8                             	| [$0000: jp   $1200]
+	jra	game_startup_eca8                             	| [$0000: jp   $1200]
 
 sbagman_irq:
 
@@ -287,9 +287,6 @@ game_tick_0038:
 	* don't stay at 0 ever
 	addq.w	#1,sound_timer
 0:
-	* move that part here else animation is too fast
-	* by doing that each game tick it looks perfect!
-	addq.b	#1,jail_buddy_aniimation_counter_62F0                 	| [$df01: ld   (jail_buddy_aniimation_counter_62F0),a]
 
 
 
@@ -391,7 +388,7 @@ l_00cf:
 	addq.b	#1,flash_counter_626D          	| [$00e4: ld   a,(flash_counter_626D)]
 	                           	| [$00e7: inc  a]
 	           	| [$00e8: ld   (flash_counter_626D),a]
-	lea	previous_guard_1_struct_65B8,a3	| [$00eb: ld   iy,previous_guard_1_struct_65B8]
+	lea	guard_1_shadow_sprite_65B8,a3	| [$00eb: ld   iy,guard_1_shadow_sprite_65B8]
 	move.b	player_screen_600D,d0           	| [$00ef: ld   a,(player_screen_600D)]
 	move.b	d0,d1                           	| [$00f2: ld   b,a]
 	move.b	guard_1_screen_6099,d0          	| [$00f3: ld   a,(guard_1_screen_6099)]
@@ -402,10 +399,10 @@ l_00cf:
 	jra	l_0109                             	| [$00fc: jr   $0109]
 l_00fe:
 	lea	guard_1_struct_6594,a2         	| [$00fe: ld   ix,guard_1_struct_6594]
-	lea	previous_guard_1_struct_65B8,a3	| [$0102: ld   iy,previous_guard_1_struct_65B8]
+	lea	guard_1_shadow_sprite_65B8,a3	| [$0102: ld   iy,guard_1_shadow_sprite_65B8]
 	jbsr	update_sprite_data_d6d7                            	| [$0106: call $D6D7]
 l_0109:
-	lea	previous_guard_2_struct_65BC,a3	| [$0109: ld   iy,previous_guard_2_struct_65BC]
+	lea	guard_2_shadow_sprite_65BC,a3	| [$0109: ld   iy,guard_2_shadow_sprite_65BC]
 	move.b	player_screen_600D,d0           	| [$010d: ld   a,(player_screen_600D)]
 	move.b	d0,d1                           	| [$0110: ld   b,a]
 	move.b	guard_2_screen_609A,d0          	| [$0111: ld   a,(guard_2_screen_609A)]
@@ -415,7 +412,7 @@ l_0109:
 	jra	l_0127                             	| [$011a: jr   $0127]
 l_011c:
 	lea	guard_2_struct_6598,a2         	| [$011c: ld   ix,guard_2_struct_6598]
-	lea	previous_guard_2_struct_65BC,a3	| [$0120: ld   iy,previous_guard_2_struct_65BC]
+	lea	guard_2_shadow_sprite_65BC,a3	| [$0120: ld   iy,guard_2_shadow_sprite_65BC]
 	jbsr	update_sprite_data_d6d7                            	| [$0124: call $D6D7]
 l_0127:
 	move.b	jail_buddy_free_6343,d0                 	| [$0127: ld   a,(jail_buddy_free_6343)]
@@ -581,7 +578,7 @@ l_0290:
        
 l_029e:
 	jbsr	handle_player_object_carry_10C6   	| [$029e: call handle_player_object_carry_10C6]
-	jbsr	l_110c                            	| [$02a1: call $110C]
+	jbsr	attach_pick_sprite_to_player_110c                            	| [$02a1: call $110C]
 	move.b	#0x01,d0                        	| [$02a4: ld   a,$01]
 	move.b	d0,unknown_628A                 	| [$02a6: ld   (unknown_628A),a]
 	move.b	player_screen_600D,d0           	| [$02a9: ld   a,(player_screen_600D)]
@@ -2708,7 +2705,8 @@ l_10fe:
 	move.b	#0x3F,d0                        	| [$1106: ld   a,$3F]
 	move.b	d0,object_held_struct_659C      	| [$1108: ld   (object_held_struct_659C),a]
 	rts                                    	| [$110b: ret]
-l_110c:
+	
+attach_pick_sprite_to_player_110c:
 	tst.b	has_pick_61CF                	| [$110c: ld   a,(has_pick_61CF)]
 	                         	| [$110f: cp   $00]
 	bne.b	0f                               	| [...]
@@ -2719,24 +2717,26 @@ l_110c:
 	move.b	#0x37,d1                        	| [$1119: ld   b,$37]
 	cmp.b	#0x1F,d0                         	| [$1117: cp   $1F]
 	jeq	l_112a                             	| [$111b: jr   z,$112A]
-	move.b	player_struct_6580,d0           	| [$111d: ld   a,(player_struct_6580)]
-	and.b	#0x7F,d0                         	| [$1120: and  $7F]
-	move.b	#0x37,d1                        	| [$1124: ld   b,$37]
+	*move.b	player_struct_6580,d0           	| [$111d: ld   a,(player_struct_6580)]
+	*and.b	#0x7F,d0                         	| [$1120: and  $7F]
+	*move.b	#0x37,d1                        	| [$1124: ld   b,$37]
 	cmp.b	#0x12,d0                         	| [$1122: cp   $12]
 	jeq	l_112a                             	| [$1126: jr   z,$112A]
 	move.b	#0x38,d1                        	| [$1128: ld   b,$38]
 l_112a:
-	move.b	player_y_6583,d0                	| [$112a: ld   a,(player_y_6583)]
-	move.b	d0,sprite_object_y_659F         	| [$112d: ld   (sprite_object_y_659F),a]
-	move.b	player_struct_6580,d0           	| [$1130: ld   a,(player_struct_6580)]
-	and.b	#0x7F,d0                         	| [$1133: and  $7F]
+	move.b	player_y_6583,sprite_object_y_659F                	| [$112a: ld   a,(player_y_6583)]
+	         	| [$112d: ld   (sprite_object_y_659F),a]
+	*move.b	player_struct_6580,d0           	| [$1130: ld   a,(player_struct_6580)]
+	*and.b	#0x7F,d0                         	| [$1133: and  $7F]
 	cmp.b	#0x12,d0                         	| [$1135: cp   $12]
 	jeq	l_114f                             	| [$1137: jr   z,$114F]
+	* direction
 	move.b	player_struct_6580,d0           	| [$1139: ld   a,(player_struct_6580)]
 	and.b	#0x80,d0                         	| [$113c: and  $80]
 	cmp.b	#0x80,d0                         	| [$113e: cp   $80]
 	jeq	l_114f                             	| [$1140: jr   z,$114F]
 	move.b	player_x_6582,d0                	| [$1142: ld   a,(player_x_6582)]
+	* to right: add offset to sprite (vs player)
 	add.b	#0x0C,d0                         	| [$1145: add  a,$0C]
 	move.b	d0,sprite_object_x_659E         	| [$1147: ld   (sprite_object_x_659E),a]
 	move.b	d1,d0                           	| [$114a: ld   a,b]
@@ -2744,10 +2744,12 @@ l_112a:
 	rts                                    	| [$114e: ret]
 l_114f:
 	move.b	player_x_6582,d0                	| [$114f: ld   a,(player_x_6582)]
+	* to left: sub offset to sprite (vs player)
 	sub.b	#0x0C,d0                         	| [$1152: sub  $0C]
 	move.b	d0,sprite_object_x_659E         	| [$1154: ld   (sprite_object_x_659E),a]
 	move.b	d1,d0                           	| [$1157: ld   a,b]
 	or.b	#0x80,d0                          	| [$1158: or   $80]
+	* sprite type
 	move.b	d0,object_held_struct_659C      	| [$115a: ld   (object_held_struct_659C),a]
 	rts                                    	| [$115d: ret]
 
@@ -2758,14 +2760,14 @@ handle_player_object_pickup_115E:
 	move.b	player_previous_input_6050,d0   	| [$1165: ld   a,(player_previous_input_6050)]
 	and.b	#0x80,d0                         	| [$1168: and  $80]
 	cmp.b	#0x80,d0                         	| [$116a: cp   $80]
-	jeq	l_1180                             	| [$116c: jr   z,$1180]
+	jeq	set_object_pickup_flag_1180                             	| [$116c: jr   z,$1180]
 	rts                                    	| [$116e: ret]
 
 object_pickup_test_116F:
 	move.b	player_input_6026,d0            	| [$116f: ld   a,(player_input_6026)]
 	and.b	#0x80,d0                         	| [$1172: and  $80]
 	cmp.b	#0x80,d0                         	| [$1174: cp   $80]
-	jne	l_1186                             	| [$1176: jr   nz,$1186]
+	jne	clear_object_pickup_flag_1186                             	| [$1176: jr   nz,$1186]
 * fire pressed
 	move.b	player_previous_input_6050,d0   	| [$1178: ld   a,(player_previous_input_6050)]
 	and.b	#0x80,d0                         	| [$117b: and  $80]
@@ -2774,11 +2776,13 @@ object_pickup_test_116F:
 	rts                                    	| [$117f: ret  z]  don't pick up anything! [...]
 0:
  *  actual pickup of an object
-l_1180:
+set_object_pickup_flag_1180:
 	move.b	#0x01,pickup_flag_6160                        	| [$1180: ld   a,$01]
 	             	| [$1182: ld   (pickup_flag_6160),a]
 	rts                                    	| [$1185: ret]
-l_1186:
+
+* called at every cycle, not just when dropped
+clear_object_pickup_flag_1186:
                               	| [$1186: ld   a,$00]
 	clr.b	pickup_flag_6160             	| [$1188: ld   (pickup_flag_6160),a]
 	rts                                    	| [$118b: ret]
@@ -4843,7 +4847,7 @@ display_screen_1_C2C9:
 	jbsr	start_level_music_d0f3                            	| [$c30a: call $D0F3]
 	rts                                    	| [$c30d: ret]
 l_c30e:
-	lea	unknown_6586,a0                	| [$c30e: ld   hl,unknown_6586]
+	lea	elevator_x_screen_4_6586,a0                	| [$c30e: ld   hl,elevator_x_screen_4_6586]
 	clr.b	d0                               	| [$c311: xor  a]
 	move.b	d0,(a0)                         	| [$c312: ld   (hl),a]
 	rts                                    	| [$c313: ret]
@@ -5632,8 +5636,8 @@ l_c79c:
 	addq.w	#3,a2                           	| [$c7b3: inc  ix] * 3
 	move.b	#0x10,d0                        	| [$c7b9: ld   a,$10]
 l_c7bb:
-	move.b	d0,(A2)                    	| [$c7bb: ld   (ix+$00),a]
-	addq.w	#1,a2                           	| [$c7be: inc  ix]
+	move.b	d0,(A2)+                    	| [$c7bb: ld   (ix+$00),a]
+	                           	| [$c7be: inc  ix]
 	subq.b	#1,d1                           	| [...]
 	jne	l_c7bb                             	| [$c7c0: djnz $C7BB]
 	move.l	(sp)+,a2                        	| [$c7c2: pop  ix]
@@ -6487,6 +6491,7 @@ l_cd70:
 	cmp.b	d4,d0                            	| [$cd73: cp   e]
 	jcc	l_cd79                             	| [$cd74: jr   nc,$CD79]
 	jbsr	move_guard_2_96_times_3658                            	| [$cd76: call $D0D1]
+* there's only one wagon, part of this code is probably useless now...
 l_cd79:
 	move.b	player_in_wagon_1_601C,d0       	| [$cd79: ld   a,(player_in_wagon_1_601C)]
 	cmp.b	#0x01,d0                         	| [$cd7c: cp   $01]
@@ -6553,10 +6558,10 @@ l_cdcc:
 	                       	| [$cdcd: ld   ($A003),a]
 	clr.b	unknown_658F                 	| [$cdd0: ld   (unknown_658F),a]
 	clr.b	is_player_bullet_in_air_6297                 	| [$cdd3: ld   (is_player_bullet_in_air_6297),a]
-	clr.b	unknown_62F5                 	| [$cdd6: ld   (unknown_62F5),a]
+	clr.b	bomb_must_detonate_62F5                 	| [$cdd6: ld   (bomb_must_detonate_62F5),a]
 	clr.b	unknown_62FA                 	| [$cdd9: ld   (unknown_62FA),a]
-	clr.b	unknown_6323                 	| [$cddc: ld   (unknown_6323),a]
-	clr.b	unknown_6324                 	| [$cddf: ld   (unknown_6324),a]
+	clr.b	bomb_picked_up_6323                 	| [$cddc: ld   (bomb_picked_up_6323),a]
+	clr.b	bomb_timer_6324                 	| [$cddf: ld   (bomb_timer_6324),a]
 	move.b	holds_barrow_61C7,d0            	| [$cde2: ld   a,(holds_barrow_61C7)]
 	                         	| [$cde5: cp   $00]
 	bne.b	0f                               	| [...]
@@ -6760,8 +6765,11 @@ l_cf06:
 
 
 	
-l_cf34:
-* random cpu delay loop on vertical position????
+wait_for_vblank_cf34:
+	moveq	#1,d0
+	jra		osd_wait
+	
+* delay loop on vertical position????
 *	move.b	vertical_beam_pos_A000,d0       	| [$34cf: ld   a,(vertical_beam_pos_A000)]
 *	and.b	#0x3F,d0                         	| [$34d2: and  $3F]
 *	move.b	d0,d1                           	| [$34d4: ld   b,a]
@@ -7564,7 +7572,7 @@ l_d577:
 	add.w	d3,a0                            	| [$d577: add  hl,de]
 	subq.b	#1,d1                           	| [...]
 	jne	l_d570                             	| [$d578: djnz $D570]
-	lea	unknown_65AF,a0                	| [$d57a: ld   hl,unknown_65AF]
+	lea	wagon_1_shadow_sprite_65AC+3,a0                	| [$d57a: ld   hl,unknown_65AF]
 	move.b	#0x03,d1                        	| [$d57d: ld   b,$03]
 l_d57f:
 	subq.b	#1,(a0)                         	| [$d57f: dec  (hl)]
@@ -7638,7 +7646,7 @@ l_d5f4:
 	move.b	#0x35,d0                        	| [$d601: ld   a,$35]
 	move.b	d0,object_held_struct_659C      	| [$d603: ld   (object_held_struct_659C),a]
 	move.b	#0x24,d0                        	| [$d606: ld   a,$24]
-	move.b	d0,unknown_659D                 	| [$d608: ld   (unknown_659D),a]
+	move.b	d0,object_held_color_attrs_659D                 	| [$d608: ld   (object_held_color_attrs_659D),a]
 	rts                                    	| [$d60b: ret]
 l_d60c:
 	tst.b	jail_buddy_free_6343                 	| [$d60c: ld   a,(jail_buddy_free_6343)]
@@ -7671,7 +7679,7 @@ l_d630:
 	or.b	d2,d0                             	| [$d641: or   c]
 	move.b	d0,object_held_struct_659C      	| [$d642: ld   (object_held_struct_659C),a]
 	move.b	#0x08,d0                        	| [$d645: ld   a,$08]
-	move.b	d0,unknown_659D                 	| [$d647: ld   (unknown_659D),a]
+	move.b	d0,object_held_color_attrs_659D                 	| [$d647: ld   (object_held_color_attrs_659D),a]
 	rts                                    	| [$d64a: ret]
 l_d64b:
 	move.b	holds_barrow_61C7,d0            	| [$d64b: ld   a,(holds_barrow_61C7)]
@@ -7965,7 +7973,6 @@ l_d801:
 * < A2 text to write with type/scroll effect
 
 tell_the_story_d82a:
-	jbsr	osd_break
 	clr.b	d0                               	| [$d82a: xor  a]
 	move.b	#0x20,d1                        	| [$d82b: ld   b,$20]
 	move.w	#0x9800,d6                      	| [$d82d: ld   hl,$9800]
@@ -8331,6 +8338,8 @@ l_dabd:
 	move.b	has_bomb_6311,d0                 	| [$dad7: ld   a,(has_bomb_6311)]
 	cmp.b	#0x01,d0                         	| [$dada: cp   $01]
 	jeq	l_db65                             	| [$dadc: jp   z,$DB65]
+	* player doesn't hold any object: check if can
+	* take barrow
 	lea		holds_barrow_61C7,a4       	| [$dadf: ld   bc,holds_barrow_61C7] None
 	lea	barrow_screen_params_61C4,a3   	| [$dae2: ld   iy,barrow_screen_params_61C4]
 	move.b	#0x3A,d0                        	| [$dae6: ld   a,$3A]
@@ -8345,8 +8354,11 @@ l_daf8:
 	lea	struct_swap_buffer_61D0,a3     	| [$dafa: ld   iy,struct_swap_buffer_61D0]
 	move.b	holds_barrow_61C7,d0            	| [$dafe: ld   a,(holds_barrow_61C7)]
 	cmp.b	#0x01,d0                         	| [$db01: cp   $01]
+	* skips if barrow was just taken
 	jeq	l_db4f                             	| [$db03: jp   z,$DB4F]
 l_db06:
+	* player doesn't hold any object: check if can
+	* take pickaxes of this screen
 	movem.w	d1/d2,-(sp)                    	| [$db06: push bc]
 
 	move.l	a3,-(sp)                        	| [$db07: push iy]
@@ -8461,8 +8473,9 @@ l_dbcd:
 
 	movem.w	(sp)+,d1/d2                    	| [$dbe5: pop  bc]
 	rts                                    	| [$dbe6: ret]
+
 l_dbe7:
-	move.b	unknown_62F5,d0                 	| [$dbe7: ld   a,(unknown_62F5)]
+	move.b	bomb_must_detonate_62F5,d0                 	| [$dbe7: ld   a,(bomb_must_detonate_62F5)]
 	cmp.b	#0x01,d0                         	| [$dbea: cp   $01]
 	beq.b	0f                               	| [...]
 	rts                                    	| [$dbec: ret  nz] [...]
@@ -8471,7 +8484,8 @@ l_dbe7:
 	move.b	d0,unknown_6351                 	| [$dbee: ld   (unknown_6351),a]
 	move.w	screen_base_screen_address_6326,picked_up_object_screen_address_61F6             	| [$dbf1: ld   hl,(screen_base_screen_address_6326)]
  		| [$dbf4: ld   (picked_up_object_screen_address_61F6),hl]
-	jbsr	l_f3f3                            	| [$dbf7: call $F3F3]
+	jbsr	restore_object_background_f3f3                            	| [$dbf7: call $F3F3]
+
 	move.w	screen_base_screen_address_6326,d6             	| [$dbfa: ld   hl,(screen_base_screen_address_6326)]
  	move.w	#0x0040,d3                      	| [$dbfd: ld   de,$0040] 64
 	add.w	d3,d6                            	| [$dc00: add  hl,de]
@@ -8479,7 +8493,7 @@ l_dbe7:
 	lea	game_mem+0xDEB6,a0                      	| [$dc04: ld   hl,$DEB6]
 	move.l	a0,unknown_pointer_62F6                 	| [$dc07: ld   (unknown_pointer_62F6),hl]
 	move.w	unknown_screen_address_62F8,d6             	| [$dc0a: ld   iy,(unknown_screen_address_62F8)]
- 	lea	unknown_62FC,a2                	| [$dc0e: ld   ix,unknown_62FC]
+ 	move.w	unknown_62FC,a2                	| [$dc0e: ld   ix,unknown_62FC]
 	jbsr	osd_r_videoram                    	| [$dc12: ld   a,(iy+$00)]
 	move.b	d0,(A2)                    	| [$dc15: ld   (ix+$00),a]
 	READ_VIDEORAM	1                    	| [$dc18: ld   a,(iy+$01)]
@@ -8513,8 +8527,8 @@ l_dc4e:
 	addq.w	#1,a3                           	| [$dc55: inc  iy]
 	subq.b	#1,d1                           	| [...]
 	jne	l_dc4e                             	| [$dc57: djnz $DC4E]
-	jra	l_dc5b                             	| [$dc59: jr   $DC5B]
-l_dc5b:
+	**jra	l_dc5b                             	| [$dc59: jr   $DC5B]
+**l_dc5b:
 	move.l	(sp)+,a3                        	| [$dc5b: pop  iy]
 
 	movem.w	(sp)+,d1/d2                    	| [$dc5d: pop  bc]
@@ -8550,10 +8564,10 @@ l_dca9:
 	addq.w	#1,a3                           	| [$dcae: inc  iy]
 	subq.b	#1,d1                           	| [...]
 	jne	l_dca9                             	| [$dcb0: djnz $DCA9]
-	move.b	#0x01,d0                        	| [$dcb2: ld   a,$01]
-	move.b	d0,unknown_62F5                 	| [$dcb4: ld   (unknown_62F5),a]
-	move.b	gameplay_allowed_6054,d0        	| [$dcb7: ld   a,(gameplay_allowed_6054)]
-	cmp.b	#0x00,d0                         	| [$dcba: cp   $00]
+	move.b	#0x01,bomb_must_detonate_62F5                        	| [$dcb2: ld   a,$01]
+	                 	| [$dcb4: ld   (bomb_must_detonate_62F5),a]
+	tst.b	gameplay_allowed_6054        	| [$dcb7: ld   a,(gameplay_allowed_6054)]
+	                         	| [$dcba: cp   $00]
 	bne.b	0f                               	| [...]
 	rts                                    	| [$dcbc: ret  z] [...]
 0:
@@ -8604,7 +8618,7 @@ l_dcf3:
 	jbsr	l_ea77                            	| [$dd0f: call $EA77]
 	rts                                    	| [$dd12: ret]
 l_dd13:
-	move.b	unknown_62F5,d0                 	| [$dd13: ld   a,(unknown_62F5)]
+	move.b	bomb_must_detonate_62F5,d0                 	| [$dd13: ld   a,(bomb_must_detonate_62F5)]
 	cmp.b	#0x01,d0                         	| [$dd16: cp   $01]
 	beq.b	0f                               	| [...]
 	rts                                    	| [$dd18: ret  nz] [...]
@@ -8674,7 +8688,7 @@ l_dd2b:
 	rts                                    	| [$dd98: ret  nz] [...]
 0:
 	clr.b	d0                               	| [$dd99: xor  a]
-	move.b	d0,unknown_62F5                 	| [$dd9a: ld   (unknown_62F5),a]
+	move.b	d0,bomb_must_detonate_62F5                 	| [$dd9a: ld   (bomb_must_detonate_62F5),a]
 	move.w	unknown_screen_address_62F8,d6             	| [$dd9d: ld   iy,(unknown_screen_address_62F8)]
 	lea	unknown_62FC,a2                	| [$dda1: ld   ix,unknown_62FC]
 	move.b	(A2),d0                    	| [$dda5: ld   a,(ix+$00)]
@@ -8783,8 +8797,8 @@ animate_jail_buddy_def7:
 	rts                                    	| [$defc: ret  z] [...]
 0:
 	move.b	jail_buddy_aniimation_counter_62F0,d0                 	| [$defd: ld   a,(jail_buddy_aniimation_counter_62F0)]
-*	addq.b	#1,d0                           	| [$df00: inc  a]
-*	move.b	d0,jail_buddy_aniimation_counter_62F0                 	| [$df01: ld   (jail_buddy_aniimation_counter_62F0),a]
+	addq.b	#1,d0                           	| [$df00: inc  a]
+	move.b	d0,jail_buddy_aniimation_counter_62F0                 	| [$df01: ld   (jail_buddy_aniimation_counter_62F0),a]
 	cmp.b	#0x0C,d0                         	| [$df04: cp   $0C]
 	bcc.b	0f                               	| [...]
 	rts                                    	| [$df06: ret  nz] [...]
@@ -9638,15 +9652,15 @@ l_e593:
 	subq.b	#1,d1                           	| [...]
 	jne	l_e593                             	| [$e598: djnz $E593]
 	                              	| [$e59a: xor  a]
-	clr.b	unknown_62F5                 	| [$e59b: ld   (unknown_62F5),a]
-	clr.b	unknown_pointer_62F6                 	| [$e59e: ld   (unknown_pointer_62F6),a]
-	clr.b	unknown_62F7                 	| [$e5a1: ld   (unknown_62F7),a]
-	clr.b	unknown_screen_address_62F8                 	| [$e5a4: ld   (unknown_screen_address_62F8),a]
-	clr.b	unknown_62F9                 	| [$e5a7: ld   (unknown_62F9),a]
+	clr.b	bomb_must_detonate_62F5                 	| [$e59b: ld   (bomb_must_detonate_62F5),a]
+	clr.l	unknown_pointer_62F6                 	| [$e59e: ld   (unknown_pointer_62F6),a]
+                	| [$e5a1: ld   (unknown_62F7),a]
+	clr.w	unknown_screen_address_62F8                 	| [$e5a4: ld   (unknown_screen_address_62F8),a]
+	                 	| [$e5a7: ld   (unknown_62F9),a]
 	clr.b	unknown_62FA                 	| [$e5aa: ld   (unknown_62FA),a]
 	clr.b	unknown_62FB                 	| [$e5ad: ld   (unknown_62FB),a]
-	clr.b	unknown_6323                 	| [$e5b0: ld   (unknown_6323),a]
-	clr.b	unknown_6324                 	| [$e5b3: ld   (unknown_6324),a]
+	clr.b	bomb_picked_up_6323                 	| [$e5b0: ld   (bomb_picked_up_6323),a]
+	clr.b	bomb_timer_6324                 	| [$e5b3: ld   (bomb_timer_6324),a]
 	clr.b	screen_base_screen_address_6326                 	| [$e5b6: ld   (screen_base_screen_address_6326),a]
 	clr.b	unknown_6327                 	| [$e5b9: ld   (unknown_6327),a]
 	clr.b	player_in_elevator_5_62E5                 	| [$e5bc: ld   (player_in_elevator_5_62E5),a]
@@ -10770,19 +10784,13 @@ l_ec9a:
 	move.b	d0,unknown_61F3                 	| [$eca4: ld   (unknown_61F3),a]
 	rts                                    	| [$eca7: ret]
 
-l_eca8:
+game_startup_eca8:
     jbsr	osd_disable_vblank_interrupt   	| [$eca8: xor  a]
       	| [$eca9: ld   (interrupt_control_A000),a]
 
 	move.b	#1,d0                           	| [$ecad: inc  a]
 	jra	startup_C000                       	| [$ecae: jp   startup_C000]
-	
-	                      	| [$ecb1: ld   hl,$0500]
-	jbsr	wait_and_check_credits_c5d5                            	| [$ecb4: call $C5D9]
-	move.b	#0x01,d0                        	| [$ecb7: ld   a,$01]
-	jbsr	hw_video_shit_d8e2                            	| [$ecb9: call $D8E2]
-	move.b	#0x40,d0                        	| [$ecbc: ld   a,$40]
-	move.b	d0,time_61E8                    	| [$ecbe: ld   (time_61E8),a]
+
 l_ecc1:
 	jbsr	play_intro_1218                   	| [$ecc1: call play_intro_1218]
 	jbsr	set_bags_coordinates_easy_level_CFDB	| [$ecc4: call set_bags_coordinates_easy_level_CFDB]
@@ -10808,12 +10816,12 @@ l_ecdc:
 	move.b	d0,guard_1_screen_6099          	| [$ecf0: ld   (guard_1_screen_6099),a]
 	jbsr	init_bombs_locations_and_other_stuff_dfbf                            	| [$ecf3: call $DFBF]
 	jbsr	check_if_must_award_gun_d7a9                            	| [$ecf6: call $D7A9]
-l_ecf9:
+mainloop_ecf9:
 	move.b	#0x01,d0                        	| [$ecf9: ld   a,$01]
 	jbsr	osd_enable_vblank_interrupt		| [$ecfd: ld   (interrupt_control_A000),a]
 
 	                       	| [$ed01: ld   a,($A800)]
-	jbsr	l_cf34                            	| [$ed04: call $CF34]
+	jbsr	wait_for_vblank_cf34                            	| [$ed04: call $CF34]
 	jbsr	l_c02e                            	| [$ed07: call $C02E]
 	lea	player_struct_6580,a2          	| [$ed0a: ld   ix,player_struct_6580]
 	lea	guard_1_struct_6594,a3         	| [$ed0e: ld   iy,guard_1_struct_6594]
@@ -10881,7 +10889,7 @@ l_ed5a:
 	move.b	d0,unknown_6055                 	| [$ed94: ld   (unknown_6055),a]
 	move.b	gameplay_allowed_6054,d0        	| [$ed97: ld   a,(gameplay_allowed_6054)]
 	cmp.b	#0x01,d0                         	| [$ed9a: cp   $01]
-	jeq	l_ecf9                             	| [$ed9c: jp   z,$ECF9]
+	jeq	mainloop_ecf9                             	| [$ed9c: jp   z,$ECF9]
 l_ed9f:
 	move.b	must_play_music_6210,d0         	| [$ed9f: ld   a,(must_play_music_6210)]
 	cmp.b	#0x01,d0                         	| [$eda2: cp   $01]
@@ -10892,12 +10900,12 @@ l_ed9f:
 	lea	game_mem+0x56DF,a1                      	| [$edad: ld   de,$56DF]
 	move.w	#0x9311,d6                      	| [$edb0: ld   hl,$9311]
 	jbsr	display_localized_text_CA67       	| [$edb3: call display_localized_text_CA67]
-	jra	l_ecf9                             	| [$edb6: jp   $ECF9]
+	jra	mainloop_ecf9                             	| [$edb6: jp   $ECF9]
 l_edb9:
 	lea	game_mem+0x56F2,a1                      	| [$edb9: ld   de,$56F2]
 	move.w	#0x9311,d6                      	| [$edbc: ld   hl,$9311]
 	jbsr	display_localized_text_CA67       	| [$edbf: call display_localized_text_CA67]
-	jra	l_ecf9                             	| [$edc2: jp   $ECF9]
+	jra	mainloop_ecf9                             	| [$edc2: jp   $ECF9]
 l_edc5:
 	jbsr	l_f8f7                            	| [$edc5: call $F8F7]
 	cmp.b	#0x01,d0                         	| [$edc8: cp   $01]
@@ -11181,9 +11189,10 @@ l_f077:
 0:
 	clr.b	d0                               	| [$f07f: xor  a]
 	move.b	d0,unknown_629F                 	| [$f080: ld   (unknown_629F),a]
-	move.b	has_pick_61CF,d0                	| [$f083: ld   a,(has_pick_61CF)]
-	cmp.b	#0x00,d0                         	| [$f086: cp   $00]
+	tst.b	has_pick_61CF                	| [$f083: ld   a,(has_pick_61CF)]
+	                         	| [$f086: cp   $00]
 	jeq	l_f0ad                             	| [$f088: jr   z,$F0AD]
+	* player has pickaxe
 	lea	guard_2_struct_6598,a2         	| [$f08a: ld   ix,guard_2_struct_6598]
 	lea	object_held_struct_659C,a3     	| [$f08e: ld   iy,object_held_struct_659C]
 	move.b	guard_2_screen_609A,d0          	| [$f092: ld   a,(guard_2_screen_609A)]
@@ -11260,32 +11269,32 @@ l_f0d9:
 	move.b	has_bomb_6311,d0                 	| [$f11c: ld   a,(has_bomb_6311)]
 	cmp.b	#0x01,d0                         	| [$f11f: cp   $01]
 	jeq	l_f152                             	| [$f121: jr   z,$F152]
-	move.b	unknown_6323,d0                 	| [$f123: ld   a,(unknown_6323)]
+	move.b	bomb_picked_up_6323,d0                 	| [$f123: ld   a,(bomb_picked_up_6323)]
 	cmp.b	#0x01,d0                         	| [$f126: cp   $01]
 	jne	l_f15c                             	| [$f128: jr   nz,$F15C]
 	move.b	unknown_6334,d0                 	| [$f12a: ld   a,(unknown_6334)]
 	cmp.b	#0x01,d0                         	| [$f12d: cp   $01]
 	jeq	l_f15c                             	| [$f12f: jr   z,$F15C]
-	move.b	unknown_6324,d0                 	| [$f131: ld   a,(unknown_6324)]
-	subq.b	#1,d0                           	| [$f134: dec  a]
-	move.b	d0,unknown_6324                 	| [$f135: ld   (unknown_6324),a]
+	subq.b	#1,bomb_timer_6324                 	| [$f131: ld   a,(bomb_timer_6324)]
+											| [$f134: dec  a]														| [$f135: ld   (bomb_timer_6324),a]
 											| [$f138: cp   $00]
 	jne	l_f14d                             	| [$f13a: jr   nz,$F14D]
+
 	move.b	#0x01,d0                        	| [$f13c: ld   a,$01]
-	move.b	d0,unknown_62F5                 	| [$f13e: ld   (unknown_62F5),a]
+	move.b	d0,bomb_must_detonate_62F5                 	| [$f13e: ld   (bomb_must_detonate_62F5),a]
 	move.b	#0x01,d0                        	| [$f141: ld   a,$01]
 	move.b	d0,unknown_6351                 	| [$f143: ld   (unknown_6351),a]
 	clr.b	d0                               	| [$f146: xor  a]
-	move.b	d0,unknown_6323                 	| [$f147: ld   (unknown_6323),a]
+	move.b	d0,bomb_picked_up_6323                 	| [$f147: ld   (bomb_picked_up_6323),a]
 	jra	l_f15c                             	| [$f14a: jp   $F15C]
 l_f14d:
 	jbsr	l_da55                            	| [$f14d: call $DA55]
 	jra	l_f15c                             	| [$f150: jr   $F15C]
 l_f152:
 	move.b	#0x01,d0                        	| [$f152: ld   a,$01]
-	move.b	d0,unknown_6323                 	| [$f154: ld   (unknown_6323),a]
+	move.b	d0,bomb_picked_up_6323                 	| [$f154: ld   (bomb_picked_up_6323),a]
 	move.b	#0x20,d0                        	| [$f157: ld   a,$20]
-	move.b	d0,unknown_6324                 	| [$f159: ld   (unknown_6324),a]
+	move.b	d0,bomb_timer_6324                 	| [$f159: ld   (bomb_timer_6324),a]
 l_f15c:
 	move.b	unknown_62B6,d0                 	| [$f15c: ld   a,(unknown_62B6)]
 	cmp.b	#0x01,d0                         	| [$f15f: cp   $01]
@@ -11312,7 +11321,7 @@ l_f17f:
 	move.b	d0,guard_2_not_moving_timeout_counter_6097	| [$f187: ld   (guard_2_not_moving_timeout_counter_6097),a]
 l_f18a:
 	                                    	| [$f18a: nop]
-	jra	l_ecf9                             	| [$f18b: jp   $ECF9]
+	jra	mainloop_ecf9                             	| [$f18b: jp   $ECF9]
 l_f18e:
 	bsr		read_rom                         	| [$f18e: ld   a,(hl)]
 	lea	game_mem+0x239E,a0                      	| [$f18f: ld   hl,$239E]
@@ -11427,11 +11436,11 @@ l_f262:
 
 	move.l	a2,-(sp)                        	| [$f262: push ix]
 	jbsr	l_f2c2                            	| [$f264: call $F2C2]
-	move.b	unknown_659D,d0                 	| [$f267: ld   a,(unknown_659D)]
+	move.b	object_held_color_attrs_659D,d0                 	| [$f267: ld   a,(object_held_color_attrs_659D)]
 	cmp.b	#0x24,d0                         	| [$f26a: cp   $24]
 	jne	l_f279                             	| [$f26c: jr   nz,$F279]
 	move.b	#0x20,d0                        	| [$f26e: ld   a,$20]
-	move.b	d0,unknown_659D                 	| [$f270: ld   (unknown_659D),a]
+	move.b	d0,object_held_color_attrs_659D                 	| [$f270: ld   (object_held_color_attrs_659D),a]
 	jbsr	l_f2c2                            	| [$f273: call $F2C2]
 	jbsr	l_f2c2                            	| [$f276: call $F2C2]
 l_f279:
@@ -11658,7 +11667,7 @@ l_f3ed:
 	bcs.b	0f                               	| [...]
 	rts                                    	| [$f3f2: ret  nc] [...]
 0:
-l_f3f3:
+restore_object_background_f3f3:
 	move.w	picked_up_object_screen_address_61F6,d6	| [$f3f3: ld   hl,(picked_up_object_screen_address_61F6)]
  	lsr.w	#8,d6                           	| [$f3f6: ld   a,h]
 	                         	| [$f3f7: cp   $00]
@@ -11830,7 +11839,7 @@ l_f4a7:
 	                         	| [$f4ba: cp   $00]
 	bne.b	0f                               	| [...]
 	rts                                    	| [$f4bc: ret  z] [...]
-0:
+0:	
 	lea	object_held_struct_659C,a2     	| [$f4bd: ld   ix,object_held_struct_659C]
 	lea	unknown_615A,a3                	| [$f4c1: ld   iy,unknown_615A]
 	move.b	player_screen_600D,d0           	| [$f4c5: ld   a,(player_screen_600D)]
@@ -11856,13 +11865,13 @@ l_f4a7:
 
 test_pickup_flag_F4E3:
 	clr.b	d1                               	| [$f4e3: ld   b,$00]
-	move.b	pickup_flag_6160,d0             	| [$f4e5: ld   a,(pickup_flag_6160)]
-	cmp.b	#0x00,d0                         	| [$f4e8: cp   $00]
+	tst.b	pickup_flag_6160             	| [$f4e5: ld   a,(pickup_flag_6160)]
+	                         	| [$f4e8: cp   $00]
 	bne.b	0f                               	| [...]
 	rts                                    	| [$f4ea: ret  z] [...]
 0:
-	clr.b	d0                               	| [$f4eb: xor  a]
-	move.b	d0,pickup_flag_6160             	| [$f4ec: ld   (pickup_flag_6160),a]
+										| [$f4eb: xor  a]
+	clr.b	pickup_flag_6160             	| [$f4ec: ld   (pickup_flag_6160),a]
 	move.b	#0x01,d1                        	| [$f4ef: ld   b,$01]
 	rts                                    	| [$f4f1: ret]
 l_f4f2:
@@ -11873,7 +11882,8 @@ l_f4f2:
 	move.w	#0x13,d1                        	| [$f4f5: ld   bc,$0013] 19
 	move.w	d0,-(sp)                        	| [$f4f8: push af]
 	move.b	is_key_hunt_phase_6341,d0                 	| [$f4f9: ld   a,(is_key_hunt_phase_6341)]
-	cmp.b	#0x01,d0                         	| [$f4fc: cp   $01]
+	* was cmp but cmp doesn't set X flag, sub does
+	subq.b	#0x01,d0                         	| [$f4fc: cp   $01]
 	roxr.b	#1,d4                           	| [$f4fe: rr   e]
 	move.w	(sp)+,d0                        	| [$f500: pop  af]
 	roxl.b	#1,d4                           	| [$f501: rl   e]
@@ -12694,10 +12704,10 @@ l_fa68:
 	move.b	d0,(0x02,a2)                    	| [$fa75: ld   (ix+$02),a]
 	st.b	d0                                	| [$fa78: ld   a,$FF]
 	move.b	d0,(0x03,a2)                    	| [$fa7a: ld   (ix+$03),a]
-	clr.b	d0                               	| [$fa7d: xor  a]
-	move.b	d0,has_bag_6158                 	| [$fa7e: ld   (has_bag_6158),a]
-	move.b	d0,holds_barrow_61C7            	| [$fa81: ld   (holds_barrow_61C7),a]
-	move.b	d0,has_bomb_6311                 	| [$fa84: ld   (has_bomb_6311),a]
+	                               	| [$fa7d: xor  a]
+	clr.b	has_bag_6158                 	| [$fa7e: ld   (has_bag_6158),a]
+	clr.b	holds_barrow_61C7            	| [$fa81: ld   (holds_barrow_61C7),a]
+	clr.b	has_bomb_6311                 	| [$fa84: ld   (has_bomb_6311),a]
 	jbsr	init_bombs_locations_and_other_stuff_dfbf                            	| [$fa87: call $DFBF]
 	move.b	number_of_players_617D,d0       	| [$fa8a: ld   a,(number_of_players_617D)]
 	cmp.b	#0x01,d0                         	| [$fa8d: cp   $01]
@@ -12940,7 +12950,7 @@ pick_up_object_FC0B:
 	move.b	(0x04,a3),d0                    	| [$fc18: ld   a,(iy+$04)]
 	move.b	d0,object_held_struct_659C                    	| [$fc1b: ld   (ix+$1c),a]
 	move.b	(0x05,a3),d0                    	| [$fc1e: ld   a,(iy+$05)]
-	move.b	d0,unknown_659D                    	| [$fc21: ld   (ix+$1d),a]
+	move.b	d0,object_held_color_attrs_659D                    	| [$fc21: ld   (ix+$1d),a]
 	                               	| [$fc24: xor  a]
 	* zero out object address: no longer drawn in the scenery, player has it
 	clr.b	(A3)                    	| [$fc25: ld   (iy+$00),a]

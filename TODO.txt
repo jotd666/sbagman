@@ -1,9 +1,16 @@
 - guard monitoring doesn't work?? when waiting for elevator 5, guard
   disappears (unknown_6156??)
-- unknown_pointer_62DB MSB gets corrupted
+- unknown_pointer_62DB MSB gets corrupted: e22c loads 62DA,
+  e291 writes a3+1!!
+
 - test elevator level 4 doesn't carry player at ground level! lifts player
   then drops him!!!!
 - pick pickaxe/barrow/bag/bomb problem!
+* pickaxe: stays stuck
+* bag: ignored!
+* bomb: error, dbfd called with screen_base_screen_address_6326 = 0 !
+* barrow: disappears immediately
+
 - dies: too long wait
 - gun status not flashing in the bottom
 
@@ -21,5 +28,6 @@
 
 unknown_6334: has key?
 
-z80 conv: review move.w into address register inc hl/dec hl => subq.w
-
+z80 conv: 
+- review move.w into address register inc hl/dec hl => subq.w
+- cmp + roxr/roxl
