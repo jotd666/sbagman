@@ -5,12 +5,8 @@
 
 - test elevator level 4 doesn't carry player at ground level! lifts player
   then drops him!!!!
-- pick pickaxe/barrow/bomb problem!
-* pickaxe: stays stuck
-* bomb: error, dropped immediately
-* bomb: dbfd called with screen_base_screen_address_6326 = 0 !
-* barrow: disappears immediately
-
+- bomb exploding: missing explosion tiles + doesn't restore background
+- guard sometimes stuck climbing down stairs (until sees player)
 - sync in mainloop makes 50Hz not 60
 - dies: too long wait
 - gun status not flashing in the bottom
@@ -26,8 +22,7 @@
 - debug: l_f4f2
 - check TODO (almost no sfx are active...)
 
-unknown_6334: has key?
 
 z80 conv: 
 - review move.w into address register inc hl/dec hl => subq.w
-- cmp + roxr/roxl
+

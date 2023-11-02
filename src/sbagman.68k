@@ -273,9 +273,6 @@ sbagman_reset:
 	* we need to set this variable to 2 once out of 5 calls
 	move.b	#1,vb_ticks_count
 
-	* initialize A4 properly, to be able to detect
-	* when A4 is bogus (which originally happens too)
-	sub.l	a4,a4
 
 	jra	game_startup_eca8                             	| [$0000: jp   $1200]
 
@@ -886,7 +883,7 @@ l_0515:
 l_0538:
 	move.b	bag_falling_6159,d0             	| [$0538: ld   a,(bag_falling_6159)]
 	move.b	d0,d1                           	| [$053b: ld   b,a]
-	move.b	unknown_6334,d0                 	| [$053c: ld   a,(unknown_6334)]
+	move.b	bomb_just_dropped_6334,d0                 	| [$053c: ld   a,(bomb_just_dropped_6334)]
 	or.b	d1,d0                             	| [$053f: or   b]
 	                         	| [$0540: cp   $00]
 	bne.b	0f                               	| [...]
@@ -4525,6 +4522,7 @@ check_breakable_wall_present_c0df:
 	move.w	#0x05,d1                        	| [$c0ed: ld   bc,$0005] 5
 	jbsr	cpir                              	| [$c0f0: cpir]
 	rts                                    	| [$c0f2: ret]
+
 l_c0f3:
 	bsr		read_rom                         	| [$c0f3: ld   a,(hl)]
 	cmp.b	#0x51,d0                         	| [$c0f4: cp   $51]
@@ -4551,20 +4549,20 @@ l_c10d:
 	bne.b	0f
 	rts
 0:
-	                           	| [$c10d: inc  bc]
-	                         	| [$c10e: ld   a,(bc)]
-	addq.b	#1,(1,a4)                           	| [$c10f: inc  a]
-	                         	| [$c110: ld   (bc),a]
+	* DO NOT OPTIMIZE as D0 is needed         	| [$c10d: inc  bc]
+	move.b	(1,a4),d0                         	| [$c10e: ld   a,(bc)]
+	addq.b	#1,d0                           	| [$c10f: inc  a]
+	move.b	d0,(1,a4)                         	| [$c110: ld   (bc),a]
 	                           	| [$c111: dec  bc]
 	cmp.b	#0x03,d0                         	| [$c112: cp   $03]
 	bcc.b	0f                               	| [...]
 	rts                                    	| [$c114: ret  c] [...]
 0:
-	clr.b	d0                               	| [$c115: xor  a]
+	                               	| [$c115: xor  a]
 	                           	| [$c116: inc  bc]
-	move.b	d0,(a4)                         	| [$c117: ld   (bc),a]
+	clr.b	(1,a4)                         	| [$c117: ld   (bc),a]
 	                           	| [$c118: dec  bc]
-	move.b	d0,(1,a4)                         	| [$c119: ld   (bc),a]
+	clr.b	(a4)                         	| [$c119: ld   (bc),a]
 	rts                                    	| [$c11a: ret]
 l_c11b:
 
@@ -5077,11 +5075,11 @@ l_c427:
 	lea	bags_coordinates_609C,a2       	| [$c439: ld   ix,bags_coordinates_609C]
 	lea	bags_coordinates_617F,a3       	| [$c43d: ld   iy,bags_coordinates_617F]
 	move.b	#0x3B,d1                        	| [$c441: ld   b,$3B]
-	jbsr	l_c47e                            	| [$c443: call $C47E]
+	jbsr	swap_arrays_c47e                            	| [$c443: call $C47E]
 	lea	barrow_screen_params_61C4,a2   	| [$c446: ld   ix,barrow_screen_params_61C4]
 	lea	unknown_screen_address_61FA,a3 	| [$c44a: ld   iy,unknown_screen_address_61FA]
 	move.b	#0x03,d1                        	| [$c44e: ld   b,$03]
-	jbsr	l_c47e                            	| [$c450: call $C47E]
+	jbsr	swap_arrays_c47e                            	| [$c450: call $C47E]
 	move.b	lives_6056,d0                   	| [$c453: ld   a,(lives_6056)]
 	move.w	d0,-(sp)                        	| [$c456: push af]
 	move.b	unknown_617E,d0                 	| [$c457: ld   a,(unknown_617E)]
@@ -5101,17 +5099,17 @@ l_c427:
 	move.w	(sp)+,d0                        	| [$c479: pop  af]
 	move.b	d0,unknown_6340                 	| [$c47a: ld   (unknown_6340),a]
 	rts                                    	| [$c47d: ret]
-l_c47e:
+swap_arrays_c47e:
 	move.b	(A2),d0                    	| [$c47e: ld   a,(ix+$00)]
-	move.w	d0,-(sp)                        	| [$c481: push af]
-	move.b	(A3),d0                    	| [$c482: ld   a,(iy+$00)]
-	move.b	d0,(A2)                    	| [$c485: ld   (ix+$00),a]
-	move.w	(sp)+,d0                        	| [$c488: pop  af]
+	                        	| [$c481: push af]
+	move.b	(A3),(A2)                    	| [$c482: ld   a,(iy+$00)]
+                    	| [$c485: ld   (ix+$00),a]
+	                        	| [$c488: pop  af]
 	move.b	d0,(A3)                    	| [$c489: ld   (iy+$00),a]
 	addq.w	#1,a2                           	| [$c48c: inc  ix]
 	addq.w	#1,a3                           	| [$c48e: inc  iy]
 	subq.b	#1,d1                           	| [...]
-	jne	l_c47e                             	| [$c490: djnz $C47E]
+	jne	swap_arrays_c47e                             	| [$c490: djnz $C47E]
 	rts                                    	| [$c492: ret]
 
 guard_collision_with_pick_C493:
@@ -7321,10 +7319,10 @@ l_d34d:
 * > D1: 0 or 1 depending on tile type
 test_non_blocking_tiles_D36C:
 	move.w	d0,-(sp)                        	| [$d36c: push af]
-	movem.w	d3/d4,-(sp)                    	| [$d36d: push de]
+	movem.w	d3/d4/d6,-(sp)                    	| [$d36d: push de]
                       	| [$d36d: push de]
 
-	move.w	d6,-(sp)
+	
 	clr.b	d1                               	| [$d36f: ld   b,$00]
 	jbsr	l_d391                            	| [$d371: call $D391]
 	jne	l_d38d                             	| [$d374: jr   nz,$D38D]
@@ -7340,10 +7338,11 @@ test_non_blocking_tiles_D36C:
 	jne	l_d38d                             	| [$d389: jr   nz,$D38D]
 	move.b	#0x01,d1                        	| [$d38b: ld   b,$01]
 l_d38d:
-	move.w	(sp)+,d6                        	| [$d38d: pop  hl]
-	movem.w	(sp)+,d3/d4                    	| [$d38e: pop  de]
+	                        	| [$d38d: pop  hl]
+	movem.w	(sp)+,d3/d4/d6                    	| [$d38e: pop  de]
 	move.w	(sp)+,d0                        	| [$d38f: pop  af]
 	rts                                    	| [$d390: ret]
+
 l_d391:
 	bsr		osd_r_videoram                         	| [$d391: ld   a,(hl)]
 	cmp.b	#0xE0,d0                         	| [$d392: cp   $E0]
@@ -8228,7 +8227,7 @@ l_da4c:
 	move.b	d0,(a0)                         	| [$da53: ld   (hl),a]
 	rts                                    	| [$da54: ret]
 l_da55:
-	move.b	unknown_6334,d0                 	| [$da55: ld   a,(unknown_6334)]
+	move.b	bomb_just_dropped_6334,d0                 	| [$da55: ld   a,(bomb_just_dropped_6334)]
 	cmp.b	#0x01,d0                         	| [$da58: cp   $01]
 	bne.b	0f                               	| [...]
 	rts                                    	| [$da5a: ret  z] [...]
@@ -8324,7 +8323,7 @@ l_dabd:
 	beq.b	0f                               	| [...]
 	rts                                    	| [$dac2: ret  nz] [...]
 0:
-	move.b	unknown_6334,d0                 	| [$dac3: ld   a,(unknown_6334)]
+	move.b	bomb_just_dropped_6334,d0                 	| [$dac3: ld   a,(bomb_just_dropped_6334)]
 	cmp.b	#0x01,d0                         	| [$dac6: cp   $01]
 	bne.b	0f                               	| [...]
 	rts                                    	| [$dac8: ret  z] [...]
@@ -8374,7 +8373,7 @@ l_db06:
 	jbsr	check_object_pickup_FBCC          	| [$db22: call check_object_pickup_FBCC]
 	move.l	(sp)+,a3                        	| [$db25: pop  iy]
 	addq.w	#3,a3                           	| [$db27: inc  iy] * 3
-	jbsr	swap_3_bytes_DBC2                 	| [$db2d: call swap_3_bytes_DBC2]
+	jbsr	swap_3_bytes_pickaxe_params_DBC2                 	| [$db2d: call swap_3_bytes_pickaxe_params_DBC2]
 
 	movem.w	(sp)+,d1/d2                    	| [$db30: pop  bc]
 	subq.b	#1,d1                           	| [...]
@@ -8409,7 +8408,7 @@ l_db6b:
 
 	move.l	a3,-(sp)                        	| [$db6c: push iy]
 	lea		has_bomb_6311,a4            	| [$db6e: ld   bc,has_bomb_6311] None
-	lea	bomb_1_screen_pointer_630E,a3                	| [$db71: ld   iy,bomb_1_screen_pointer_630E]
+	lea	bomb_1_screen_address_630E,a3                	| [$db71: ld   iy,bomb_1_screen_address_630E]
 	move.b	#0x35,d0                        	| [$db75: ld   a,$35]
 	move.b	d0,(0x04,a3)                    	| [$db77: ld   (iy+$04),a]
 	move.b	#0x24,d0                        	| [$db7a: ld   a,$24]
@@ -8420,13 +8419,13 @@ l_db6b:
 	jbsr	check_object_pickup_FBCC          	| [$db87: call check_object_pickup_FBCC]
 	move.l	(sp)+,a3                        	| [$db8a: pop  iy]
 	addq.w	#3,a3                           	| [$db8c: inc  iy] * 3
-	jbsr	l_dbb5                            	| [$db92: call $DBB5]
+	jbsr	swap_3_bytes_bomb_params_dbb5                            	| [$db92: call $DBB5]
 
 	movem.w	(sp)+,d1/d2                    	| [$db95: pop  bc]
 	subq.b	#1,d1                           	| [...]
 	jne	l_db6b                             	| [$db96: djnz $DB6B]
 	lea		has_bomb_6311,a4            	| [$db98: ld   bc,has_bomb_6311] None
-	lea	bomb_1_screen_pointer_630E,a3                	| [$db9b: ld   iy,bomb_1_screen_pointer_630E]
+	lea	bomb_1_screen_address_630E,a3                	| [$db9b: ld   iy,bomb_1_screen_address_630E]
 	move.b	#0x32,d0                        	| [$db9f: ld   a,$32]
 	move.b	d0,(0x04,a3)                    	| [$dba1: ld   (iy+$04),a]
 	move.b	#0x24,d0                        	| [$dba4: ld   a,$24]
@@ -8437,17 +8436,17 @@ l_db6b:
 	jbsr	check_object_pickup_FBCC          	| [$dbb1: call check_object_pickup_FBCC]
 l_dbb4:
 	rts                                    	| [$dbb4: ret]
-l_dbb5:
+swap_3_bytes_bomb_params_dbb5:
 	movem.w	d1/d2,-(sp)                    	| [$dbb5: push bc]
 
 	move.l	a3,-(sp)                        	| [$dbb6: push iy]
 
 	move.l	a2,-(sp)                        	| [$dbb8: push ix]
 	move.b	#0x03,d1                        	| [$dbba: ld   b,$03]
-	lea	bomb_1_screen_pointer_630E,a2                	| [$dbbc: ld   ix,bomb_1_screen_pointer_630E]
+	lea	bomb_1_screen_address_630E,a2                	| [$dbbc: ld   ix,bomb_1_screen_address_630E]
 	jra	l_dbcd                             	| [$dbc0: jr   $DBCD]
 
-swap_3_bytes_DBC2:
+swap_3_bytes_pickaxe_params_DBC2:
 	movem.w	d1/d2,-(sp)                    	| [$dbc2: push bc]
 
 	move.l	a3,-(sp)                        	| [$dbc3: push iy]
@@ -8623,7 +8622,7 @@ l_dd13:
 	beq.b	0f                               	| [...]
 	rts                                    	| [$dd18: ret  nz] [...]
 0:
-	move.b	unknown_6334,d0                 	| [$dd19: ld   a,(unknown_6334)]
+	move.b	bomb_just_dropped_6334,d0                 	| [$dd19: ld   a,(bomb_just_dropped_6334)]
 	cmp.b	#0x01,d0                         	| [$dd1c: cp   $01]
 	bne.b	0f                               	| [...]
 	rts                                    	| [$dd1e: ret  z] [...]
@@ -8894,23 +8893,23 @@ init_bombs_locations_and_other_stuff_dfbf:
 	move.w	#0xDF2D,d6                      	| [$dfc2: ld   hl,$DF2D]
 	move.w	d6,jail_buddy_aniimation_rom_address_62F1                 	| [$dfc5: ld   (jail_buddy_aniimation_rom_address_62F1),hl]
 	move.w	#0x9263,d6                      	| [$dfc8: ld   hl,$9263]
-	STORE_WORD	d6,bomb_1_screen_pointer_630E                 	| [$dfcb: ld   (bomb_1_screen_pointer_630E),hl]
+	STORE_WORD	d6,bomb_1_screen_address_630E                 	| [$dfcb: ld   (bomb_1_screen_address_630E),hl]
 	move.b	#0x01,d0                        	| [$dfce: ld   a,$01]
 	move.b	d0,bomb_1_screen_6310                 	| [$dfd0: ld   (bomb_1_screen_6310),a]
 	move.w	#0x913C,d6                      	| [$dfd3: ld   hl,$913C]
-	STORE_WORD	d6,bomb_2_screen_pointer_6315                 	| [$dfd6: ld   (bomb_2_screen_pointer_6315),hl]
+	STORE_WORD	d6,bomb_2_screen_address_6315                 	| [$dfd6: ld   (bomb_2_screen_address_6315),hl]
 	move.b	#0x02,d0                        	| [$dfd9: ld   a,$02]
 	move.b	d0,bomb_2_screen_6317                 	| [$dfdb: ld   (bomb_2_screen_6317),a]
 	move.w	#0x9254,d6                      	| [$dfde: ld   hl,$9254]
-	STORE_WORD	d6,bomb_3_screen_pointer_6318                 	| [$dfe1: ld   (unknown_6318),hl]
+	STORE_WORD	d6,bomb_3_screen_address_6318                 	| [$dfe1: ld   (unknown_6318),hl]
 	move.b	#0x03,d0                        	| [$dfe4: ld   a,$03]
 	move.b	d0,bomb_3_screen_631A                 	| [$dfe6: ld   (bomb_3_screen_631A),a]
 	move.w	#0x912E,d6                      	| [$dfe9: ld   hl,$912E]
-	STORE_WORD	d6,bomb_4_screen_pointer_631B                 	| [$dfec: ld   (unknown_631B),hl]
+	STORE_WORD	d6,bomb_4_screen_address_631B                 	| [$dfec: ld   (unknown_631B),hl]
 	move.b	#0x04,d0                        	| [$dfef: ld   a,$04]
 	move.b	d0,bomb_4_screen_631D                 	| [$dff1: ld   (bomb_4_screen_631D),a]
 	move.w	#0x927C,d6                      	| [$dff4: ld   hl,$927C]
-	STORE_WORD	d6,bomb_5_screen_pointer_631E                 	| [$dff7: ld   (unknown_631E),hl]
+	STORE_WORD	d6,bomb_5_screen_address_631E                 	| [$dff7: ld   (unknown_631E),hl]
 	move.b	#0x05,d0                        	| [$dffa: ld   a,$05]
 	move.b	d0,bomb_5_screen_6320                 	| [$dffc: ld   (bomb_5_screen_6320),a]
 	jbsr	l_e58c                            	| [$dfff: call $E58C]
@@ -9602,38 +9601,40 @@ l_e487:
 	move.b	d0,(0x03,a3)                    	| [$e4a0: ld   (iy+$03),a]
 	rts                                    	| [$e4a3: ret]
 
+* < D0: screen number
+* < D6: logical address
 
 convert_logical_to_screen_address_E55E:
 	cmp.b	#0x01,d0                         	| [$e55e: cp   $01]
 	jne	l_e566                             	| [$e560: jr   nz,$E566]
-	move.b	d5,d0                           	| [$e562: ld   a,h]
-	add.b	#0x50,d0                         	| [$e563: add  a,$50]
+	                           	| [$e562: ld   a,h]
+	add.w	#0x5000,d6                         	| [$e563: add  a,$50]
 	rts                                    	| [$e565: ret]
 l_e566:
 	cmp.b	#0x02,d0                         	| [$e566: cp   $02]
 	jne	l_e56e                             	| [$e568: jr   nz,$E56E]
-	move.b	d5,d0                           	| [$e56a: ld   a,h]
-	add.b	#0x4C,d0                         	| [$e56b: add  a,$4C]
+	                           	| [$e56a: ld   a,h]
+	add.w	#0x4C00,d6                         	| [$e56b: add  a,$4C]
 	rts                                    	| [$e56d: ret]
 l_e56e:
 	cmp.b	#0x03,d0                         	| [$e56e: cp   $03]
 	jne	l_e576                             	| [$e570: jr   nz,$E576]
-	move.b	d5,d0                           	| [$e572: ld   a,h]
-	add.b	#0x48,d0                         	| [$e573: add  a,$48]
+	                           	| [$e572: ld   a,h]
+	add.w	#0x4800,d6                         	| [$e573: add  a,$48]
 	rts                                    	| [$e575: ret]
 l_e576:
 	cmp.b	#0x04,d0                         	| [$e576: cp   $04]
 	jne	l_e57e                             	| [$e578: jr   nz,$E57E]
-	move.b	d5,d0                           	| [$e57a: ld   a,h]
-	add.b	#0x60,d0                         	| [$e57b: add  a,$60]
+	                           	| [$e57a: ld   a,h]
+	add.w	#0x6000,d6                         	| [$e57b: add  a,$60]
 	rts                                    	| [$e57d: ret]
 l_e57e:
 	cmp.b	#0x05,d0                         	| [$e57e: cp   $05]
 	beq.b	0f                               	| [...]
 	rts                                    	| [$e580: ret  nz] [...]
 0:
-	move.b	d5,d0                           	| [$e581: ld   a,h]
-	add.b	#0x5C,d0                         	| [$e582: add  a,$5C]
+	                           	| [$e581: ld   a,h]
+	add.w	#0x5C00,d6                         	| [$e582: add  a,$5C]
 	rts                                    	| [$e584: ret]
 
 memset_E585:
@@ -11054,6 +11055,14 @@ l_ef26:
 	move.w	#-0x20,d1                        	| [$ef34: ld   bc,$FFE0] 65504
 	move.w	guard_1_logical_address_6038,d6	| [$ef37: ld   hl,(guard_1_logical_address_6038)]
 	lea	guard_1_struct_6594,a2         	| [$ef3a: ld   ix,guard_1_struct_6594]
+	* initialize A4 properly, to be able to detect
+	* when A4 is bogus (which originally happens too, but works
+	* by luck because BC is often $FFxx it points on ROM and
+	* the values are 1) non writable 2) compatible)
+	* if A4 is set to whatever the value, first it corrupts the memory
+	* it points to and second it can be > 3 which makes game release teh*
+	* pickaxe / bomb / barrow immediately (or rather lose it)
+	sub.l	a4,a4
 	jbsr	l_c098                            	| [$ef3e: call $C098]
 	move.w	guard_2_logical_address_6078,d6	| [$ef41: ld   hl,(guard_2_logical_address_6078)]
 	lea	guard_2_in_elevator_6077,a3    	| [$ef44: ld   iy,guard_2_in_elevator_6077]
@@ -11062,6 +11071,8 @@ l_ef26:
 	move.w	#-0x20,d1                        	| [$ef4f: ld   bc,$FFE0] 65504
 	move.w	guard_2_logical_address_6078,d6	| [$ef52: ld   hl,(guard_2_logical_address_6078)]
 	lea	guard_2_struct_6598,a2         	| [$ef55: ld   ix,guard_2_struct_6598]
+	* zero a4 (see above)
+	sub.l	a4,a4
 	jbsr	l_c098                            	| [$ef59: call $C098]
 	            	| [$ef5c: ld   a,(io_read_shit_B800)]
 	move.w	player_logical_address_6009,d6	| [$ef5f: ld   hl,(player_logical_address_6009)]
@@ -11272,7 +11283,7 @@ l_f0d9:
 	move.b	bomb_picked_up_6323,d0                 	| [$f123: ld   a,(bomb_picked_up_6323)]
 	cmp.b	#0x01,d0                         	| [$f126: cp   $01]
 	jne	l_f15c                             	| [$f128: jr   nz,$F15C]
-	move.b	unknown_6334,d0                 	| [$f12a: ld   a,(unknown_6334)]
+	move.b	bomb_just_dropped_6334,d0                 	| [$f12a: ld   a,(bomb_just_dropped_6334)]
 	cmp.b	#0x01,d0                         	| [$f12d: cp   $01]
 	jeq	l_f15c                             	| [$f12f: jr   z,$F15C]
 	subq.b	#1,bomb_timer_6324                 	| [$f131: ld   a,(bomb_timer_6324)]
@@ -11540,7 +11551,7 @@ l_f2cb:
 	bne.b	0f                               	| [...]
 	rts                                    	| [$f2fc: ret  z] [...]
 0:
-	move.b	unknown_6334,d0                 	| [$f2fd: ld   a,(unknown_6334)]
+	move.b	bomb_just_dropped_6334,d0                 	| [$f2fd: ld   a,(bomb_just_dropped_6334)]
 	cmp.b	#0x01,d0                         	| [$f300: cp   $01]
 	bne.b	0f                               	| [...]
 	rts                                    	| [$f302: ret  z] [...]
@@ -13042,20 +13053,20 @@ drop_object_FC55:
 	move.b	d1,d0                           	| [$fc8e: ld   a,b]
 
 	movem.w	(sp)+,d1/d2                    	| [$fc8f: pop  bc]
-	tst.b	d0                         	| [$fc90: cp   $00]
+											| [$fc90: cp   $00]
 	jeq	l_d3a7                             	| [$fc92: jp   z,$D3A7]
-	movem.w	(sp)+,d5/d6                         	| [$fc95: pop  hl]
+	movem.w	(sp),d5/d6                         	| [$fc95: pop  hl]
 	jbsr	read_rom                          	| [$fc96: ld   a,(hl)]
 
-	movem.w	d5/d6,-(sp)                        	| [$fc99: push hl]
+	                        	| [$fc99: push hl]
 	cmp.b	#0xE0,d0                         	| [$fc97: cp   $E0]
 	jeq	l_d3a7                             	| [$fc9a: jp   z,$D3A7]
-	move.l	(sp)+,a0                        	| [$fc9d: pop  hl]
+	movem.w	(sp)+,d5/d6                        	| [$fc9d: pop  hl]
 * useless code: pushes hl to sub $20 to it then pops it
 * without using the computing value
 
 
-	movem.w	(sp)+,d5/d6                       	| [$fca7: pop  hl]
+										| [$fca7: pop  hl]
 * hl is the same here as in 21F3 so test cannot be true, ever
 * I'm disabling this
 *	jbsr	read_rom                         	| [$2205: ld   a,(hl)]
@@ -13081,6 +13092,7 @@ l_fcb9:
 	cmp.b	#0x01,d0                         	| [$fcbf: cp   $01]
 	jeq	l_fcd3                             	| [$fcc1: jr   z,$FCD3]
 l_fcc3:
+	* has to be bomb
 	clr.b	d0                               	| [$fcc3: xor  a]
 	move.b	d0,(A3)                    	| [$fcc4: ld   (iy+$00),a]
 	move.b	d0,(0x01,a3)                    	| [$fcc7: ld   (iy+$01),a]
@@ -13088,7 +13100,7 @@ l_fcc3:
 	jbsr	exx                               	| [$fccb: exx]
 	move.b	d0,(a4)                         	| [$fccc: ld   (bc),a]
 	move.b	#0x01,d0                        	| [$fccd: ld   a,$01]
-	move.b	d0,unknown_6334                 	| [$fccf: ld   (unknown_6334),a]
+	move.b	d0,bomb_just_dropped_6334                 	| [$fccf: ld   (bomb_just_dropped_6334),a]
 	rts                                    	| [$fcd2: ret]
 l_fcd3:
 	* mark as object released
@@ -13100,8 +13112,8 @@ l_fcd3:
 	move.b	(0x06,a3),d0                    	| [$fcdb: ld   a,(iy+$06)]
 	* object is dropped: draw object as tiles again
 	jbsr	draw_object_tiles_CE7C            	| [$fcde: call draw_object_tiles_CE7C]
-	st.b	d0                                	| [$fce1: ld   a,$FF]
-	move.b	d0,sprite_object_y_659F         	| [$fce3: ld   (sprite_object_y_659F),a]
+	                                	| [$fce1: ld   a,$FF]
+	st.b	sprite_object_y_659F         	| [$fce3: ld   (sprite_object_y_659F),a]
 	rts                                    	| [$fce6: ret]
 l_fce7:
 	subq.w	#1,d6                           	| [$fce7: dec  hl]
@@ -13251,7 +13263,7 @@ l_fdef:
 
 	move.l	a3,-(sp)                        	| [$fdf0: push iy]
 	move.l	a1,-(sp)                        	| [$fdf2: push de]
-	jbsr	swap_3_bytes_DBC2                 	| [$fdf3: call swap_3_bytes_DBC2]
+	jbsr	swap_3_bytes_pickaxe_params_DBC2                 	| [$fdf3: call swap_3_bytes_pickaxe_params_DBC2]
 	* decode screen address (now big endian, we changed the ROM source)
 	LOAD_AX_BE_WORD_DY	a1,d6
 	                         	| [$fdf6: ld   a,(de)]
@@ -13306,7 +13318,7 @@ l_fe24:
 	* draw bombs
 	move.b	player_screen_600D,d0           	| [$fe33: ld   a,(player_screen_600D)]
 	move.b	d0,d1                           	| [$fe36: ld   b,a]
-	lea	bomb_1_screen_pointer_630E,a3                	| [$fe37: ld   iy,bomb_1_screen_pointer_630E]
+	lea	bomb_1_screen_address_630E,a3                	| [$fe37: ld   iy,bomb_1_screen_address_630E]
 	move.b	(0x02,a3),d0                    	| [$fe3b: ld   a,(iy+$02)]
 	cmp.b	d1,d0                            	| [$fe3e: cp   b]
 	jne	l_fe63                             	| [$fe3f: jr   nz,$FE63]
@@ -13339,14 +13351,14 @@ l_fe24:
 	jbsr	draw_object_tiles_CE7C            	| [$fe60: call draw_object_tiles_CE7C]
 l_fe63:
 	move.b	#0x04,d1                        	| [$fe63: ld   b,$04]
-	lea	bomb_2_screen_pointer_6315,a3                	| [$fe65: ld   iy,bomb_2_screen_pointer_6315]
-	lea	bomb_1_screen_pointer_630E,a1                	| [$fe69: ld   de,bomb_1_screen_pointer_630E]
+	lea	bomb_2_screen_address_6315,a3                	| [$fe65: ld   iy,bomb_2_screen_address_6315]
+	lea	bomb_1_screen_address_630E,a1                	| [$fe69: ld   de,bomb_1_screen_address_630E]
 l_fe6c:
 	movem.w	d1/d2,-(sp)                    	| [$fe6c: push bc]
 
 	move.l	a3,-(sp)                        	| [$fe6d: push iy]
 	move.l	a1,-(sp)                    	| [$fe6f: push de]
-	jbsr	l_dbb5                            	| [$fe70: call $DBB5]
+	jbsr	swap_3_bytes_bomb_params_dbb5                            	| [$fe70: call $DBB5]
 	LOAD_AX_BE_WORD_DY	a1,d6
 		| [$fe73: ld   a,(de)]
 		| [$fe74: ld   l,a]
@@ -13356,23 +13368,28 @@ l_fe6c:
 		| [$fe77: ld   h,a]
 		| [$fe78: dec  de]
 	move.b	player_screen_600D,d0           	| [$fe79: ld   a,(player_screen_600D)]
-	move.l	(sp)+,a3                        	| [$fe7c: pop  iy]
+	move.l	(sp),a3                        	| [$fe7c: pop  iy]
+											| [$fe81: push iy]
 	cmp.b	(0x02,a3),d0                     	| [$fe7e: cp   (iy+$02)]
+	jne		l_fea1                             	| [$fe83: jr   nz,$FEA1]
 
-	move.l	a3,-(sp)                        	| [$fe81: push iy]
-	jne	l_fea1                             	| [$fe83: jr   nz,$FEA1]
-	jbsr		read_rom                         	| [$fe85: ld   a,(hl)]
+	* jotd: when a bomb is picked up, an address is zeroed
+	* but game still reads from that instead of screen memory
+	* just skip that (same fix as for the pickaxe)
+	tst.w	d6
+	jeq	l_fea1
+	jbsr	osd_r_videoram                         	| [$fe85: ld   a,(hl)]
 	jbsr	is_background_tile_for_object_drop_CFF3	| [$fe86: call is_background_tile_for_object_drop_CFF3]
-	jne	l_fea1                             	| [$fe89: jr   nz,$FEA1]
+	jne		l_fea1                             	| [$fe89: jr   nz,$FEA1]
 
-	move.w	d6,-(sp)                        	| [$fe8b: push hl]
-	movem.w	d3/d4,-(sp)                    	| [$fe8c: push de]
+	                        	| [$fe8b: push hl]
+	movem.w	d3/d4/d6,-(sp)                    	| [$fe8c: push de]
 	move.w	#0x0020,d3                      	| [$fe8d: ld   de,$0020] 32
 	add.w	d3,d6                            	| [$fe90: add  hl,de]
-	jbsr		read_rom                         	| [$fe91: ld   a,(hl)]
+	jbsr	osd_r_videoram                         	| [$fe91: ld   a,(hl)]
 	jbsr	is_background_tile_for_object_drop_CFF3	| [$fe92: call is_background_tile_for_object_drop_CFF3]
-	movem.w	(sp)+,d3/d4                    	| [$fe95: pop  de]
-	movem.w	(sp)+,d6                        	| [$fe96: pop  hl]
+	movem.w	(sp)+,d3/d4/d6                    	| [$fe95: pop  de]
+	                        	| [$fe96: pop  hl]
 	jne	l_fea1                             	| [$fe97: jr   nz,$FEA1]
 	move.b	#0x24,d0                        	| [$fe99: ld   a,$24]
 	exg	d0,d7                              	| [$fe9b: ex   af,af']
@@ -13380,7 +13397,7 @@ l_fe6c:
 	move.b	#0xD4,d0                        	| [$fe9c: ld   a,$D4]
 	jbsr	draw_object_tiles_CE7C            	| [$fe9e: call draw_object_tiles_CE7C]
 l_fea1:
-	movem.w	(sp)+,d3/d4                    	| [$fea1: pop  de]
+	move.l	(sp)+,a1                    	| [$fea1: pop  de]
 	move.l	(sp)+,a3                        	| [$fea2: pop  iy]
 
 	movem.w	(sp)+,d1/d2                    	| [$fea4: pop  bc]
@@ -13388,16 +13405,18 @@ l_fea1:
 	subq.b	#1,d1                           	| [...]
 	jne	l_fe6c                             	| [$feab: djnz $FE6C]
 	rts                                    	| [$fead: ret]
+
+
 l_feae:
-	move.b	unknown_6334,d0                 	| [$feae: ld   a,(unknown_6334)]
+	tst.b	bomb_just_dropped_6334                 	| [$feae: ld   a,(bomb_just_dropped_6334)]
 	                         	| [$feb1: cp   $00]
 	bne.b	0f                               	| [...]
 	rts                                    	| [$feb3: ret  z] [...]
-0:
+0:	
 	lea	object_held_struct_659C,a2     	| [$feb4: ld   ix,object_held_struct_659C]
 	lea	unknown_615A,a3                	| [$feb8: ld   iy,unknown_615A]
-	move.b	player_screen_600D,d0           	| [$febc: ld   a,(player_screen_600D)]
-	move.b	d0,current_guard_screen_index_6098	| [$febf: ld   (current_guard_screen_index_6098),a]
+	move.b	player_screen_600D,current_guard_screen_index_6098           	| [$febc: ld   a,(player_screen_600D)]
+						| [$febf: ld   (current_guard_screen_index_6098),a]
 	jbsr	compute_logical_address_from_xy_EAEF	| [$fec2: call compute_logical_address_from_xy_EAEF]
 	jbsr		read_rom                         	| [$fec5: ld   a,(hl)]
 
@@ -13411,13 +13430,14 @@ l_feae:
 0:
 	move.b	player_screen_600D,d0           	| [$fed1: ld   a,(player_screen_600D)]
 	jbsr	convert_logical_to_screen_address_f2b2                            	| [$fed4: call $F2B2]
+	
 	move.w	d6,screen_base_screen_address_6326                 	| [$fed7: ld   (screen_base_screen_address_6326),hl]
 	move.b	#0x24,d0                        	| [$feda: ld   a,$24]
 	exg	d0,d7                              	| [$fedc: ex   af,af']
 	move.b	#0xD4,d0                        	| [$fedd: ld   a,$D4]
 	jbsr	draw_object_tiles_CE7C            	| [$fedf: call draw_object_tiles_CE7C]
-	clr.b	d0                               	| [$fee2: ld   a,$00]
-	move.b	d0,unknown_6334                 	| [$fee4: ld   (unknown_6334),a]
+	                               	| [$fee2: ld   a,$00]
+	clr.b	bomb_just_dropped_6334                 	| [$fee4: ld   (bomb_just_dropped_6334),a]
 	st.b	d0                                	| [$fee7: ld   a,$FF]
 	move.b	d0,sprite_object_y_659F         	| [$fee9: ld   (sprite_object_y_659F),a]
 	rts                                    	| [$feec: ret]

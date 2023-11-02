@@ -213,11 +213,11 @@
 	.global	unknown_65B4
 	.global	stack_top_67F0
 	.global	wagon_data_658A
-	.global	bomb_1_screen_pointer_630E
-	.global	bomb_2_screen_pointer_6315
-	.global	bomb_3_screen_pointer_6318
-	.global	bomb_4_screen_pointer_631B
-	.global	bomb_5_screen_pointer_631E
+	.global	bomb_1_screen_address_630E
+	.global	bomb_2_screen_address_6315
+	.global	bomb_3_screen_address_6318
+	.global	bomb_4_screen_address_631B
+	.global	bomb_5_screen_address_631E
 
 	.global	screen_base_screen_address_6326
 	.global	unknown_609F
@@ -287,7 +287,7 @@
 	.global	unknown_632A
 	.global	unknown_screen_address_632F
 	.global	unknown_6332
-	.global	unknown_6334
+	.global	bomb_just_dropped_6334
 	.global	unknown_6336
 	.global	unknown_6337
 	.global	unknown_6338
@@ -832,7 +832,7 @@ unknown_6304:
 
 * bomb stuff (we can't align, leave mapping as is!)
 
-bomb_1_screen_pointer_630E:
+bomb_1_screen_address_630E:
 	ds.w	1
 bomb_1_screen_6310:
 	ds.b	1
@@ -842,19 +842,19 @@ unknown_6312:
 	ds.b	2
 unknown_6314:
 	ds.b	1
-bomb_2_screen_pointer_6315:
+bomb_2_screen_address_6315:
 	ds.w	1
 bomb_2_screen_6317:
 	ds.b	1
-bomb_3_screen_pointer_6318:
+bomb_3_screen_address_6318:
 	ds.w	1
 bomb_3_screen_631A:
 	ds.b	1
-bomb_4_screen_pointer_631B:
+bomb_4_screen_address_631B:
 	ds.w	1
 bomb_4_screen_631D:
 	ds.b	1
-bomb_5_screen_pointer_631E:
+bomb_5_screen_address_631E:
 	ds.w	1
 bomb_5_screen_6320:
 	ds.b	3
@@ -875,7 +875,7 @@ unknown_screen_address_632F:
 	ds.b	3
 unknown_6332:
 	ds.b	2
-unknown_6334:
+bomb_just_dropped_6334:
 	ds.b	2
 unknown_6336:
 	ds.b	1

@@ -504,7 +504,7 @@
 0537: C9          ret
 0538: 3A 59 61    ld   a,(bag_falling_6159)
 053B: 47          ld   b,a
-053C: 3A 34 63    ld   a,(unknown_6334)
+053C: 3A 34 63    ld   a,(bomb_just_dropped_6334)
 053F: B0          or   b
 0540: FE 00       cp   $00
 0542: C8          ret  z
@@ -6510,7 +6510,7 @@ DA4E: 2A 95 60    ld   hl,(guard_direction_pointer_6095)
 DA51: 3E 80       ld   a,$80
 DA53: 77          ld   (hl),a
 DA54: C9          ret
-DA55: 3A 34 63    ld   a,(unknown_6334)
+DA55: 3A 34 63    ld   a,(bomb_just_dropped_6334)
 DA58: FE 01       cp   $01
 DA5A: C8          ret  z
 DA5B: 2A 26 63    ld   hl,(screen_base_logical_address_6326)
@@ -6576,7 +6576,7 @@ DABC: C9          ret
 DABD: 3A 60 61    ld   a,(pickup_flag_6160)
 DAC0: FE 01       cp   $01
 DAC2: C0          ret  nz
-DAC3: 3A 34 63    ld   a,(unknown_6334)
+DAC3: 3A 34 63    ld   a,(bomb_just_dropped_6334)
 DAC6: FE 01       cp   $01
 DAC8: C8          ret  z
 DAC9: 3A CF 61    ld   a,(has_pick_61CF)
@@ -6819,7 +6819,7 @@ DD12: C9          ret
 DD13: 3A F5 62    ld   a,(bomb_must_detonate_62F5)
 DD16: FE 01       cp   $01
 DD18: C0          ret  nz
-DD19: 3A 34 63    ld   a,(unknown_6334)
+DD19: 3A 34 63    ld   a,(bomb_just_dropped_6334)
 DD1C: FE 01       cp   $01
 DD1E: C8          ret  z
 DD1F: 3A FA 62    ld   a,(unknown_62FA)
@@ -8933,7 +8933,7 @@ F121: 28 2F       jr   z,$F152
 F123: 3A 23 63    ld   a,(bomb_picked_up_6323)
 F126: FE 01       cp   $01
 F128: 20 32       jr   nz,$F15C
-F12A: 3A 34 63    ld   a,(unknown_6334)
+F12A: 3A 34 63    ld   a,(bomb_just_dropped_6334)
 F12D: FE 01       cp   $01
 F12F: 28 2B       jr   z,$F15C
 F131: 3A 24 63    ld   a,(bomb_timer_6324)
@@ -9145,7 +9145,7 @@ F2F6: C8          ret  z
 F2F7: 3A 5E 61    ld   a,(bag_sliding_615E)
 F2FA: FE 01       cp   $01
 F2FC: C8          ret  z
-F2FD: 3A 34 63    ld   a,(unknown_6334)
+F2FD: 3A 34 63    ld   a,(bomb_just_dropped_6334)
 F300: FE 01       cp   $01
 F302: C8          ret  z
 F303: FD 21 9C 60 ld   iy,bags_coordinates_609C
@@ -10378,7 +10378,7 @@ FCCA: AF          xor  a
 FCCB: D9          exx
 FCCC: 02          ld   (bc),a
 FCCD: 3E 01       ld   a,$01
-FCCF: 32 34 63    ld   (unknown_6334),a
+FCCF: 32 34 63    ld   (bomb_just_dropped_6334),a
 FCD2: C9          ret
 FCD3: AF          xor  a
 FCD4: 02          ld   (bc),a
@@ -10608,7 +10608,7 @@ FEA7: FD 23       inc  iy
 FEA9: FD 23       inc  iy
 FEAB: 10 BF       djnz $FE6C
 FEAD: C9          ret
-FEAE: 3A 34 63    ld   a,(unknown_6334)
+FEAE: 3A 34 63    ld   a,(bomb_just_dropped_6334)
 FEB1: FE 00       cp   $00
 FEB3: C8          ret  z
 FEB4: DD 21 9C 65 ld   ix,object_held_struct_659C
@@ -10631,7 +10631,7 @@ FEDC: 08          ex   af,af'
 FEDD: 3E D4       ld   a,$D4
 FEDF: CD 7C CE    call draw_object_tiles_CE7C
 FEE2: 3E 00       ld   a,$00
-FEE4: 32 34 63    ld   (unknown_6334),a
+FEE4: 32 34 63    ld   (bomb_just_dropped_6334),a
 FEE7: 3E FF       ld   a,$FF
 FEE9: 32 9F 65    ld   (sprite_object_y_659F),a
 FEEC: C9          ret
