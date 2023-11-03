@@ -268,7 +268,7 @@
 	.global	jail_buddy_aniimation_counter_62F0
 	.global	bomb_must_detonate_62F5
 
-	.global	unknown_62FA
+	.global	bomb_explosion_frame_timer_62FA
 	.global	unknown_62FB
 	.global	bomb_explosion_tile_backup_buffer_62FC
 	.global	bomb_explosion_attr_backup_buffer_6304
@@ -823,7 +823,7 @@ bomb_explosion_tiles_pointer_62F6:
 explosion_screen_address_62F8:
 	ds.w	2
 
-unknown_62FA:
+bomb_explosion_frame_timer_62FA:
 	ds.b	1
 unknown_62FB:
 	ds.b	1

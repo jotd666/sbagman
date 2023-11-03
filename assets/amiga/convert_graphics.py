@@ -34,14 +34,15 @@ NB_POSSIBLE_SPRITES = 128  # not a lot are really used
 used_sprites = {}
 
 
-def add_sprites(start,stop,clut,name,mirror=True):
+def add_sprites(start,stop,clut,name,mirror=True,multiple=False):
     for i in range(start,stop+1):
-        add_sprite(i,clut,name,mirror)
-def add_sprite(start,clut,name,mirror=True):
+        add_sprite(i,clut,name,mirror,multiple)
+def add_sprite(start,clut,name,mirror=True,multiple=False):
     if start in used_sprites:
         used_sprites[start]["clut"].add(clut)
     else:
-        used_sprites[start] = {"name":name,"clut":{clut},"mirror":mirror}
+        used_sprites[start] = {"name":name,"clut":{clut},
+                                "mirror":mirror,"multiple":multiple}
 
 
 
@@ -220,11 +221,14 @@ with open(os.path.join(src_dir,"palette.68k"),"w") as f:
 # combination instead of ripping them from running game. Besides, the game has a tendency
 # to display sprites with wrong clut (briefly but would still be logged)
 
-add_sprites(0x21,0x31,0xC,"guard")
-add_sprite(0x3F,0xC,"guard",True)  #guard sliding
+add_sprites(0x21,0x31,0xC,"guard",multiple=True)
+add_sprite(0x3F,0xC,"guard",mirror=True,multiple=True)  #guard sliding
 # player frames symmetric but sometimes not useful
 # (saves memory!)
-add_sprites(0x11,0x20,0x8,"player",True)
+add_sprites(0x11,0x19,0x8,"player",mirror=True)
+add_sprites(0x1B,0x20,0x8,"player",mirror=True)
+add_sprite(0x1A,0x8,"player",mirror=True,multiple=True)
+# only multiple frame is the one where bagman clings to handle (for jail buddy)
 
 # pick frames
 add_sprites(0x77,0x78,0x9,"pickaxe")
@@ -240,7 +244,6 @@ add_sprite(0x35,4,"wagon",False)
 add_sprite(0x10,0xC,"shot",False)
 add_sprite(0x33,4,"elevator",False)
 add_sprite(0x33,8,"elevator",False)
-#add_sprites(0x10,xx,"elevator",False)  # from Super Bagman ?
 # bag
 add_sprite(0x7F,0x9,"bag",True)  # yellow
 add_sprite(0x7F,0x4,"bag",True)  # blue
@@ -336,7 +339,7 @@ for k,data in used_sprites.items():
             left_2 = bytearray(left)
             left_2[0x3C:0x44] = bytearray([0,0,255,255,0,0,255,255])
 
-            red_elevator = {"left":bytes(left_2),"name":"red_elevator","mirror":False}
+            red_elevator = {"left":bytes(left_2),"name":"red_elevator","mirror":False,"multiple":False}
         if dump_sprites:
             scaled = ImageOps.scale(img,5,0)
             scaled.save(os.path.join(sprites_dump_dir,outname))
@@ -408,11 +411,24 @@ with open(os.path.join(src_dir,"graphics.68k"),"w") as f:
     for i in range(NB_POSSIBLE_SPRITES):
         sprite = used_sprites.get(i)
         if sprite:
+            multiple = sprite["multiple"]
             name = f"{sprite['name']}_{i:02x}"
-            for j in range(8):
-                f.write(f"{name}_{j}_left:")
+            if multiple:
+                # 8 copies of the sprite data (wasteful but simple, and only for a few
+                # sprites like guards)
+                for j in range(8):
+                    f.write(f"{name}_{j}_left:")
+                    bitplanelib.dump_asm_bytes(sprite["left"],f,mit_format=True)
+                    if sprite["mirror"]:
+                        f.write(f"{name}_{j}_right:")
+                        bitplanelib.dump_asm_bytes(sprite["right"],f,mit_format=True)
+            else:
+                # only one copy of the sprite data, as it's only used once at a time
+                for j in range(8):
+                    f.write(f"{name}_{j}_left:\n")
                 bitplanelib.dump_asm_bytes(sprite["left"],f,mit_format=True)
                 if sprite["mirror"]:
-                    f.write(f"{name}_{j}_right:")
+                    for j in range(8):
+                        f.write(f"{name}_{j}_right:\n")
                     bitplanelib.dump_asm_bytes(sprite["right"],f,mit_format=True)
 
