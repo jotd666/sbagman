@@ -113,14 +113,14 @@ with open(sndfile,"w") as fst,open(outfile,"w") as fw:
             wav_file = os.path.join(sound_dir,wav_name+".wav")
 
             def get_sox_cmd(sr,output):
-                return [sox,"--volume","1.0",wav_file,"--channels","1","--bits","8","-r",str(sr),"--encoding","signed-integer",output]
+                return [sox,"--volume","0.92",wav_file,"--channels","1","--bits","8","-r",str(sr),"--encoding","signed-integer",output]
 
 
             used_sampling_rate = details["sample_rate"]
             used_priority = details.get("priority",1)
 
             cmd = get_sox_cmd(used_sampling_rate,raw_file)
-
+            print(f"Processing {wav_name}...")
             subprocess.check_call(cmd)
             with open(raw_file,"rb") as f:
                 contents = f.read()
@@ -132,7 +132,7 @@ with open(sndfile,"w") as fst,open(outfile,"w") as fw:
             maxsigned = max(signed_data)
             minsigned = min(signed_data)
 
-            amp_ratio = max(maxsigned,abs(minsigned))/128
+            amp_ratio = max(maxsigned,abs(minsigned))/120
 
             wav = os.path.splitext(wav_name)[0]
             sound_table[sound_index] = "    SOUND_ENTRY {},{},{},{},{},{}\n".format(wav,len(signed_data)//2,channel,used_sampling_rate,int(64*amp_ratio),used_priority)

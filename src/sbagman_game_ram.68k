@@ -50,7 +50,7 @@
 	.global	guard_1_shadow_sprite_65B8
 	.global	guard_2_shadow_sprite_65BC
 	.global	score_ten_thousands_player_1_6178
-	.global	current_guard_screen_index_6098
+	.global	current_character_screen_index_6098
 	.global	time_61E8
 	.global	is_intermission_6274
 	.global	extra_life_awarded_6286
@@ -63,7 +63,7 @@
 	.global	unknown_600C
 	.global	player_in_elevator_4_6013
 	.global	player_in_elevator_4_6014
-	.global	unknown_6015
+	.global	elevator_4_going_down_6015
 	.global	wagon_direction_array_6016
 	.global	unknown_6019
 	.global	unknown_601A
@@ -220,7 +220,7 @@
 	.global	bomb_5_screen_address_631E
 
 	.global	screen_base_screen_address_6326
-	.global	unknown_609F
+	.global	unknown_address_609F
 	.global	unknown_60A1
 	.global	act_number_60D3
 	.global	unknown_61B6
@@ -253,7 +253,7 @@
 	.global	unknown_62C4
 	.global	unknown_62CB
 	.global	unknown_62D2
-	.global	unknown_62D3
+	.global	player_inertia_after_slide_62D3
 	.global	unknown_62D6
 	.global	unknown_62DA
 	.global	elevator_5_direction_62df
@@ -270,8 +270,8 @@
 
 	.global	unknown_62FA
 	.global	unknown_62FB
-	.global	unknown_62FC
-	.global	unknown_6304
+	.global	bomb_explosion_tile_backup_buffer_62FC
+	.global	bomb_explosion_attr_backup_buffer_6304
 	.global	bomb_1_screen_6310
 	.global	has_bomb_6311
 	.global	unknown_6312
@@ -303,7 +303,7 @@
 	.global	unknown_634C
 	.global	unknown_634D
 	.global	unknown_6351
-	.global	unknown_6352
+	.global	gun_flash_timer_6352
 	.global	unknown_6353
 	.global	unknown_6356
 	.global	unknown_6358
@@ -315,10 +315,10 @@
 	.global	unknown_658E
 	.global	unknown_658F
 	.global	unknown_6595
-	.global	unknown_pointer_62F6
+	.global	bomb_explosion_tiles_pointer_62F6
 	.global	unknown_pointer_633D
 	.global	jail_buddy_aniimation_rom_address_62F1
-	.global	unknown_screen_address_62F8
+	.global	explosion_screen_address_62F8
 	.global	unknown_699A
 	
 number_of_credits_6000:
@@ -352,7 +352,7 @@ player_in_elevator_4_6013:
 	ds.b	1
 player_in_elevator_4_6014:
 	ds.b	1
-unknown_6015:
+elevator_4_going_down_6015:
 	ds.b	1
 * 601C = 6016+6 don't add data in between!
 wagon_direction_array_6016:
@@ -481,7 +481,7 @@ guard_direction_pointer_6095:
 	ds.l	1
 guard_2_not_moving_timeout_counter_6097:
 	ds.b	1
-current_guard_screen_index_6098:
+current_character_screen_index_6098:
 	ds.b	1
 guard_1_screen_6099:
 	ds.b	1
@@ -491,7 +491,8 @@ unknown_609B:
 	ds.b	1
 bags_coordinates_609C:
 	ds.b	3
-unknown_609F:
+	.align	2
+unknown_address_609F:
 	ds.b	2
 unknown_60A1:
 	ds.b	50
@@ -777,12 +778,14 @@ unknown_62CB:
 	ds.b	7
 unknown_62D2:
 	ds.b	1
-unknown_62D3:
+player_inertia_after_slide_62D3:
 	ds.b	3
+	* guard 1 inertia: 62D7
 unknown_62D6:
 	ds.b	4
+	* guard 2 inertia: 62DB
 unknown_62DA:
-	ds.b	1
+	ds.b	2		| adding 1 byte to correct original game bug (overwrite to pointer 62DB)
 	.align	2
 unknown_pointer_62DB:
 	ds.l	1
@@ -814,19 +817,19 @@ jail_buddy_aniimation_rom_address_62F1:
 bomb_must_detonate_62F5:
 	ds.b	1
 	.align	2
-unknown_pointer_62F6:
+bomb_explosion_tiles_pointer_62F6:
 	ds.l	1
 
-unknown_screen_address_62F8:
+explosion_screen_address_62F8:
 	ds.w	2
 
 unknown_62FA:
 	ds.b	1
 unknown_62FB:
 	ds.b	1
-unknown_62FC:
+bomb_explosion_tile_backup_buffer_62FC:
 	ds.b	8
-unknown_6304:
+bomb_explosion_attr_backup_buffer_6304:
 	ds.b	10
 	
 
@@ -910,7 +913,7 @@ unknown_634D:
 	ds.b	4
 unknown_6351:
 	ds.b	1
-unknown_6352:
+gun_flash_timer_6352:
 	ds.b	1
 unknown_6353:
 	ds.b	3

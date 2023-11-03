@@ -90,10 +90,13 @@ used_cluts[0x254] = [0x8]
 used_cluts.update({k:[0xF] for k in range(0x334,0x33A)})
 
 # gun
-used_cluts[0x3BD] = [0x6]
+used_cluts[0x3BD] = [0x5,0x6]
 # highscore arrows
 
 used_cluts.update({k:[0x4] for k in range(0x255,0x25D)})
+
+# bomb exploding
+used_cluts.update({k:[8] for k in range(0x367,0x37E)})
 
 # bagman title/character tile anims
 
@@ -229,6 +232,8 @@ add_sprites(0x77,0x78,0x9,"pickaxe")
 #add_sprites(0x77,0x79,0x9)  # intro: pick has a different color!
 # barrow frames
 add_sprites(0x7A,0x7B,0x8,"barrow",False)
+# barrow on slope
+add_sprite(0x73,0x8,"barrow",False)
 # wagon
 add_sprite(0x35,4,"wagon",False)
 # elevators!!

@@ -1,16 +1,41 @@
+- only one occurrence of a sprite: merge all sprite frames
+  into one when generating, no risks of conflicts, would save a lot of mem
+  (also do it on bagman)
+  * player (except for wagon cling/jail buddy)
+  * wagon (only for sbagman)
+  * pickaxe
+  * barrow
+  * bomb
+  * bag
+  * gun bullet
+  * elevator
+or the other way round!
+  * multiple guards
+  * multiple clinging players (sbagman)
+  * multiple wagons (bagman)
+  
+- objects background doesn't restore properly!
+- draw_explosion_frame_dd2b doesn't work
+- guard doesn't seem killed by bomb
 - guard monitoring doesn't work?? when waiting for elevator 5, guard
   disappears (unknown_6156??)
-- unknown_pointer_62DB MSB gets corrupted: e22c loads 62DA,
-  e291 writes a3+1!!
+- record bomb sound, insert at dccd
 
 - test elevator level 4 doesn't carry player at ground level! lifts player
-  then drops him!!!!
-- bomb exploding: missing explosion tiles + doesn't restore background
-- guard sometimes stuck climbing down stairs (until sees player)
-- sync in mainloop makes 50Hz not 60
-- dies: too long wait
-- gun status not flashing in the bottom
+  slightly then drops him!!!! works at other levels!!!
+  
+  	cmp.b	(0x03,a2),d0                     	| [$0a8e: cp   (ix+$03)]
+	jne	player_not_in_elevator_0a6d                             	| [$0a91: jr   nz,$0A6D]
+l_0a93:
+	move.b	current_guard_screen_index_6098,d0	| [$0a93: ld   a,(current_guard_screen_index_6098)]
+	cmp.b	#0x04,d0                         	| [$0a96: cp   $04]
+	jne	player_not_in_elevator_0a6d                             	| [$0a98: jr   nz,$0A6D]
+	tst.b	fatal_fall_height_reached_604E	| [$0a9a: ld   a,(fatal_fall_height_reached_604E)]
 
+* real machine: player Y = e0, elevator = e1
+
+- guard sometimes stuck climbing down stairs (until sees player)
+- sync in mainloop makes 50Hz not 60: use a simple flag instead of osd_wait
 - armurerie in english at screen 3: doesn't work despite tiles defined!
 - write a script to detect move.w to/from ram
 - highscore when not reached a highscore: check time
@@ -18,11 +43,8 @@
   by bomb blue
 - big bagman fingers animation is wrong
 - reduce memory footprint (> 1MB!)
-- new code unknown_609F D1AE
+- new code unknown_address_609F D1AE
 - debug: l_f4f2
 - check TODO (almost no sfx are active...)
 
-
-z80 conv: 
-- review move.w into address register inc hl/dec hl => subq.w
 

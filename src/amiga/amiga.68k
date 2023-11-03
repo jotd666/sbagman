@@ -237,6 +237,10 @@ _user:
 	beq.b	2f
 	or.l	#2,misc_options
 2:
+	move.l	(A0)+,D0	| GUNSATSTART/S
+	beq.b	2f
+	or.l	#4,misc_options
+2:
 
 	move.l	(A0)+,D0	| SKILL/S
 	beq.b	2f
@@ -330,6 +334,8 @@ _user:
 	beq.b	0f
 	bset	#5,d0
 0:
+	btst	#2,d1
+	sne		guns_at_start_flag
 	move.b	d0,dip_switches
 
 
@@ -1060,13 +1066,6 @@ osd_sound_start:
 	movem.l	(a7)+,d0/d1/a0/a6
 	rts
 0:
-	* some sounds seem to be missing/blank in the real game
-	lsr.w	#3,d0
-	cmp.b	#0x14,d0	| when hatching
-	beq.b	1b
-	cmp.b	#0x6,d0		| game over
-	beq.b	1b
-	
 	bra.b	1b
 	* music
 4:
@@ -2102,6 +2101,18 @@ handle_keyboard:
 
 	cmp.b	#0x55,d0	| F6 key
 	bne.b	0f
+	* high X
+	move.b	#0xD8,player_struct_6580+2
+	clr.b	lives_6056
+0:
+	cmp.b	#0x56,d0	| F7 key
+	bne.b	0f
+	* low Y
+	move.b	#0x1A,player_struct_6580+3
+	clr.b	lives_6056
+0:
+	cmp.b	#0x57,d0	| F8 key
+	bne.b	0f
 	* game over, no lives
 	move.b	#1,player_death_flag_6025
 	clr.b	lives_6056
@@ -2167,7 +2178,7 @@ program_args_end:
 read_args_string:
 	.byte	read_args_string_end-read_args_string
 	.ascii	"INVINCIBLE/S,INFLIVES/S,INFTIME/S,INFPICK/S,"
-	.ascii	"CHEATKEYS/S,HARDBAGS/S,FRENCH/S,SKILL/K/N,STARTLIVES/K/N"
+	.ascii	"CHEATKEYS/S,HARDBAGS/S,FRENCH/S,GUNSATSTART/S,SKILL/K/N,STARTLIVES/K/N"
 read_args_string_end:
 	.align	2
 

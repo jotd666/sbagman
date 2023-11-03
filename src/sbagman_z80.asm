@@ -246,7 +246,7 @@
 02A4: 3E 01       ld   a,$01
 02A6: 32 8A 62    ld   (unknown_628A),a
 02A9: 3A 0D 60    ld   a,(player_screen_600D)
-02AC: 32 98 60    ld   (current_guard_screen_index_6098),a
+02AC: 32 98 60    ld   (current_character_screen_index_6098),a
 02AF: 21 14 60    ld   hl,unknown_6014
 02B2: DD 21 80 65 ld   ix,player_struct_6580
 02B6: CD B1 0A    call $0AB1
@@ -267,7 +267,7 @@
 02DB: FE 01       cp   $01
 02DD: 28 44       jr   z,$0323
 02DF: 3A 0D 60    ld   a,(player_screen_600D)
-02E2: 32 98 60    ld   (current_guard_screen_index_6098),a
+02E2: 32 98 60    ld   (current_character_screen_index_6098),a
 02E5: 21 08 60    ld   hl,unknown_6008
 02E8: 7E          ld   a,(hl)
 02E9: FE 00       cp   $00
@@ -295,7 +295,7 @@
 031D: CD 82 0B    call $0B82
 0320: 3A 00 B8    ld   a,($B800)
 0323: 3A 0D 60    ld   a,(player_screen_600D)
-0326: 32 98 60    ld   (current_guard_screen_index_6098),a
+0326: 32 98 60    ld   (current_character_screen_index_6098),a
 0329: DD 21 80 65 ld   ix,player_struct_6580
 032D: FD 21 14 60 ld   iy,unknown_6014
 0331: CD DB 0A    call handle_elevators_0ADB
@@ -387,7 +387,7 @@
 0413: FE 01       cp   $01
 0415: C4 BB 05    call nz,guard_ladder_movement_05bb
 0418: 3A 9A 60    ld   a,(guard_2_screen_609A)
-041B: 32 98 60    ld   (current_guard_screen_index_6098),a
+041B: 32 98 60    ld   (current_character_screen_index_6098),a
 041E: 21 7B 60    ld   hl,guard_2_in_elevator_607B
 0421: DD 21 98 65 ld   ix,guard_2_struct_6598
 0425: CD B1 0A    call $0AB1
@@ -411,14 +411,14 @@
 0455: FE 01       cp   $01
 0457: 28 12       jr   z,$046B
 0459: 3A 9A 60    ld   a,(guard_2_screen_609A)
-045C: 32 98 60    ld   (current_guard_screen_index_6098),a
+045C: 32 98 60    ld   (current_character_screen_index_6098),a
 045F: 3A 7B 60    ld   a,(guard_2_in_elevator_607B)
 0462: 4F          ld   c,a
 0463: 3A 7A 60    ld   a,(unknown_607A)
 0466: 06 26       ld   b,$26
 0468: CD 82 0B    call $0B82
 046B: 3A 99 60    ld   a,(guard_1_screen_6099)
-046E: 32 98 60    ld   (current_guard_screen_index_6098),a
+046E: 32 98 60    ld   (current_character_screen_index_6098),a
 0471: 21 3B 60    ld   hl,guard_1_in_elevator_603B
 0474: DD 21 94 65 ld   ix,guard_1_struct_6594
 0478: CD B1 0A    call $0AB1
@@ -441,7 +441,7 @@
 04A5: FE 01       cp   $01
 04A7: 28 12       jr   z,$04BB
 04A9: 3A 99 60    ld   a,(guard_1_screen_6099)
-04AC: 32 98 60    ld   (current_guard_screen_index_6098),a
+04AC: 32 98 60    ld   (current_character_screen_index_6098),a
 04AF: 3A 3B 60    ld   a,(guard_1_in_elevator_603B)
 04B2: 4F          ld   c,a
 04B3: 3A 3A 60    ld   a,(unknown_603A)
@@ -802,9 +802,9 @@ guard_unconditional_move_0722:
 0758: 3E 01       ld   a,$01
 075A: DD 77 02    ld   (ix+$02),a
 	;; increase screen index
-075D: 3A 98 60    ld   a,(current_guard_screen_index_6098)
+075D: 3A 98 60    ld   a,(current_character_screen_index_6098)
 0760: 3C          inc  a
-0761: 32 98 60    ld   (current_guard_screen_index_6098),a
+0761: 32 98 60    ld   (current_character_screen_index_6098),a
 0764: F1          pop  af
 0765: C9          ret
 0766: DD 7E 02    ld   a,(ix+$02)
@@ -816,9 +816,9 @@ guard_unconditional_move_0722:
 0771: 3E F0       ld   a,$F0
 0773: DD 77 02    ld   (ix+$02),a
 	;; decrease screen index
-0776: 3A 98 60    ld   a,(current_guard_screen_index_6098)
+0776: 3A 98 60    ld   a,(current_character_screen_index_6098)
 0779: 3D          dec  a
-077A: 32 98 60    ld   (current_guard_screen_index_6098),a
+077A: 32 98 60    ld   (current_character_screen_index_6098),a
 077D: AF          xor  a
 077E: FD 2A 93 60 ld   iy,(guard_struct_pointer_6093)
 0782: FD 77 00    ld   (iy+$00),a
@@ -1180,7 +1180,7 @@ handle_elevator_stops_0A40:
 0A51: 32 11 60    ld   (elevator_timer_current_screen_6011),a
 0A54: 32 12 60    ld   (elevator_not_moving_6012),a
 0A57: 3C          inc  a
-0A58: 32 15 60    ld   (unknown_6015),a
+0A58: 32 15 60    ld   (elevator_4_going_down_6015),a
 0A5B: FD 21 72 0A ld   iy,$0A72
 0A5F: 06 09       ld   b,$09
 0A61: DD 7E 02    ld   a,(ix+$02)
@@ -1207,7 +1207,7 @@ handle_elevator_stops_0A40:
 0A8C: C6 02       add  a,$02
 0A8E: DD BE 03    cp   (ix+$03)
 0A91: 20 DA       jr   nz,$0A6D
-0A93: 3A 98 60    ld   a,(current_guard_screen_index_6098)
+0A93: 3A 98 60    ld   a,(current_character_screen_index_6098)
 0A96: FE 04       cp   $04
 0A98: 20 D3       jr   nz,$0A6D
 0A9A: 3A 4E 60    ld   a,(fatal_fall_height_reached_604E)
@@ -1226,7 +1226,7 @@ handle_elevator_stops_0A40:
 0AAF: 77          ld   (hl),a
 0AB0: C9          ret
 
-0AB1: 3A 98 60    ld   a,(current_guard_screen_index_6098)
+0AB1: 3A 98 60    ld   a,(current_character_screen_index_6098)
 0AB4: FE 04       cp   $04
 0AB6: 20 0E       jr   nz,$0AC6
 0AB8: FD 21 C9 0A ld   iy,$0AC9
@@ -1252,7 +1252,7 @@ handle_elevators_0ADB:
 0AEB: 7E          ld   a,(hl)
 0AEC: FE 1A       cp   $1A
 0AEE: 38 4A       jr   c,$0B3A
-0AF0: 3A 15 60    ld   a,(unknown_6015)
+0AF0: 3A 15 60    ld   a,(elevator_4_going_down_6015)
 0AF3: FE 01       cp   $01
 0AF5: CA 03 0B    jp   z,$0B03
 0AF8: 7E          ld   a,(hl)
@@ -1262,7 +1262,7 @@ handle_elevators_0ADB:
 0B00: CA 7C 0B    jp   z,$0B7C
 0B03: 35          dec  (hl)
 0B04: AF          xor  a
-0B05: 32 15 60    ld   (unknown_6015),a
+0B05: 32 15 60    ld   (elevator_4_going_down_6015),a
 0B08: FD 7E 00    ld   a,(iy+$00)
 0B0B: FE 01       cp   $01
 0B0D: 20 0F       jr   nz,$0B1E
@@ -1341,7 +1341,7 @@ handle_elevators_0ADB:
 0BA3: C0          ret  nz
 0BA4: 3E 0D       ld   a,$0D
 0BA6: 47          ld   b,a
-0BA7: 3A 98 60    ld   a,(current_guard_screen_index_6098)
+0BA7: 3A 98 60    ld   a,(current_character_screen_index_6098)
 0BAA: B8          cp   b
 0BAB: C0          ret  nz
 0BAC: 3E 01       ld   a,$01
@@ -2130,7 +2130,7 @@ speech_management_1192:
 11BF: C9          ret
 guard_1_walk_movement_11C0:
 11C0: 3A 99 60    ld   a,(guard_1_screen_6099)
-11C3: 32 98 60    ld   (current_guard_screen_index_6098),a
+11C3: 32 98 60    ld   (current_character_screen_index_6098),a
 11C6: 2A 38 60    ld   hl,(guard_1_logical_address_6038)
 11C9: 22 44 60    ld   (stored_logical_address_6044),hl
 11CC: FD 21 57 60 ld   iy,guard_1_not_moving_timeout_counter_6057
@@ -2140,12 +2140,12 @@ guard_1_walk_movement_11C0:
 11DB: FD 21 27 60 ld   iy,guard_1_direction_6027
 11DF: CD 7E 06    call guard_walk_movement_067E
 11E2: 3A 00 B8    ld   a,(io_read_shit_B800)    ; kick watchdog
-11E5: 3A 98 60    ld   a,(current_guard_screen_index_6098)
+11E5: 3A 98 60    ld   a,(current_character_screen_index_6098)
 11E8: 32 99 60    ld   (guard_1_screen_6099),a
 11EB: C9          ret
 guard_2_walk_movement_11EC:
 11EC: 3A 9A 60    ld   a,(guard_2_screen_609A)
-11EF: 32 98 60    ld   (current_guard_screen_index_6098),a
+11EF: 32 98 60    ld   (current_character_screen_index_6098),a
 11F2: 2A 78 60    ld   hl,(guard_2_logical_address_6078)
 11F5: 22 44 60    ld   (stored_logical_address_6044),hl
 11F8: FD 21 97 60 ld   iy,guard_2_not_moving_timeout_counter_6097
@@ -2155,7 +2155,7 @@ guard_2_walk_movement_11EC:
 1207: FD 21 67 60 ld   iy,guard_2_direction_6067
 120B: CD 7E 06    call guard_walk_movement_067E
 120E: 3A 00 B8    ld   a,(io_read_shit_B800)
-1211: 3A 98 60    ld   a,(current_guard_screen_index_6098)
+1211: 3A 98 60    ld   a,(current_character_screen_index_6098)
 1214: 32 9A 60    ld   (guard_2_screen_609A),a
 1217: C9          ret
 
@@ -2170,7 +2170,7 @@ play_intro_1218:
 1229: 3E 01       ld   a,$01
 122B: 32 0D 60    ld   (player_screen_600D),a
 122E: 32 03 A0    ld   ($A003),a
-1231: 32 98 60    ld   (current_guard_screen_index_6098),a
+1231: 32 98 60    ld   (current_character_screen_index_6098),a
 1234: 32 99 60    ld   (guard_1_screen_6099),a
 1237: 32 9A 60    ld   (guard_2_screen_609A),a
 123A: AF          xor  a
@@ -3127,7 +3127,7 @@ draw_big_bagman_23DD:
 557D: 3A 9A 60    ld   a,(guard_2_screen_609A)
 5580: 18 03       jr   $5585
 5582: 3A 0D 60    ld   a,(player_screen_600D)
-5585: 32 98 60    ld   (current_guard_screen_index_6098),a
+5585: 32 98 60    ld   (current_character_screen_index_6098),a
 5588: CD 8C 55    call $558C
 558B: C9          ret
 558C: CD AC 55    call $55AC
@@ -3159,7 +3159,7 @@ draw_big_bagman_23DD:
 55BC: 21 00 40    ld   hl,$4000
 55BF: 19          add  hl,de
 55C0: 10 FD       djnz $55BF
-55C2: 3A 98 60    ld   a,(current_guard_screen_index_6098)
+55C2: 3A 98 60    ld   a,(current_character_screen_index_6098)
 55C5: FE 01       cp   $01
 55C7: C8          ret  z
 55C8: FE 02       cp   $02
@@ -3958,7 +3958,7 @@ C4B9: 3E 01       ld   a,$01
 C4BB: C9          ret
 
 guard_wait_for_elevator_test_C4BC:
-C4BC: 3A 98 60    ld   a,(current_guard_screen_index_6098)
+C4BC: 3A 98 60    ld   a,(current_character_screen_index_6098)
 C4BF: FE 05       cp   $05
 C4C1: CA B7 D9    jp   z,$D9B7
 C4C4: 47          ld   b,a
@@ -4023,7 +4023,7 @@ C532: 2A 95 60    ld   hl,(guard_direction_pointer_6095)
 C535: AF          xor  a
 C536: 77          ld   (hl),a
 C537: C9          ret
-C538: 3A 98 60    ld   a,(current_guard_screen_index_6098)
+C538: 3A 98 60    ld   a,(current_character_screen_index_6098)
 C53B: FE 05       cp   $05
 C53D: C8          ret  z
 C53E: 2A 46 61    ld   hl,(unknown_pointer_6146)
@@ -4084,7 +4084,7 @@ C594: AF          xor  a
 C595: 77          ld   (hl),a
 C596: C9          ret
 C597: 3A 99 99    ld   a,($9999)
-C59A: 3A 98 60    ld   a,(current_guard_screen_index_6098)
+C59A: 3A 98 60    ld   a,(current_character_screen_index_6098)
 C59D: FE 04       cp   $04
 C59F: 28 03       jr   z,$C5A4
 C5A1: FE 05       cp   $05
@@ -5669,7 +5669,7 @@ D295: 32 42 61    ld   (ay_sound_start_6142),a
 D298: C9          ret
 D299: C9          ret
 D29A: 3A 0D 60    ld   a,(player_screen_600D)
-D29D: 32 98 60    ld   (current_guard_screen_index_6098),a
+D29D: 32 98 60    ld   (current_character_screen_index_6098),a
 D2A0: FD 21 61 61 ld   iy,unknown_6161
 D2A4: DD 21 84 65 ld   ix,elevator_struct_6584
 D2A8: CD EF EA    call compute_logical_address_from_xy_EAEF
@@ -5753,7 +5753,7 @@ D33A: 2A 95 60    ld   hl,(guard_direction_pointer_6095)
 D33D: 22 03 62    ld   (unknown_pointer_6203),hl
 D340: 3A 0B 60    ld   a,(way_clear_flag_600B)
 D343: 32 05 62    ld   (unknown_6205),a
-D346: 3A 98 60    ld   a,(current_guard_screen_index_6098)
+D346: 3A 98 60    ld   a,(current_character_screen_index_6098)
 D349: 32 F9 61    ld   (unknown_61F9),a
 D34C: C9          ret
 D34D: 2A FF 61    ld   hl,(unknown_61FF)
@@ -5765,7 +5765,7 @@ D35C: 22 95 60    ld   (guard_direction_pointer_6095),hl
 D35F: 3A 05 62    ld   a,(unknown_6205)
 D362: 32 0B 60    ld   (way_clear_flag_600B),a
 D365: 3A F9 61    ld   a,(unknown_61F9)
-D368: 32 98 60    ld   (current_guard_screen_index_6098),a
+D368: 32 98 60    ld   (current_character_screen_index_6098),a
 D36B: C9          ret
 
 test_non_blocking_tiles_D36C:
@@ -5838,7 +5838,7 @@ D3ED: 22 15 62    ld   (guard_struct_pointer_6215),hl
 D3F0: 2A 78 60    ld   hl,(guard_2_logical_address_6078)
 D3F3: 11 7B 60    ld   de,guard_2_in_elevator_607B
 D3F6: 3A 9A 60    ld   a,(guard_2_screen_609A)
-D3F9: 32 98 60    ld   (current_guard_screen_index_6098),a
+D3F9: 32 98 60    ld   (current_character_screen_index_6098),a
 D3FC: 01 12 62    ld   bc,unknown_6212
 D3FF: CD 41 D4    call $D441
 D402: CD B1 EA    call update_guard_1_screen_address_from_xy_EAB1
@@ -5861,7 +5861,7 @@ D42B: 22 15 62    ld   (guard_struct_pointer_6215),hl
 D42E: 2A 38 60    ld   hl,(guard_1_logical_address_6038)
 D431: 11 3B 60    ld   de,guard_1_in_elevator_603B
 D434: 3A 99 60    ld   a,(guard_1_screen_6099)
-D437: 32 98 60    ld   (current_guard_screen_index_6098),a
+D437: 32 98 60    ld   (current_character_screen_index_6098),a
 D43A: 01 11 62    ld   bc,unknown_6211
 D43D: CD 41 D4    call $D441
 D440: C9          ret
@@ -5926,7 +5926,7 @@ D4BB: 21 52 27    ld   hl,$2752
 D4BE: 22 54 61    ld   (unknown_6154),hl
 D4C1: AF          xor  a
 D4C2: 32 F5 61    ld   (unknown_61F5),a
-D4C5: 3A 98 60    ld   a,(current_guard_screen_index_6098)
+D4C5: 3A 98 60    ld   a,(current_character_screen_index_6098)
 D4C8: 47          ld   b,a
 D4C9: 3A 0D 60    ld   a,(player_screen_600D)
 D4CC: B8          cp   b
@@ -7852,9 +7852,9 @@ E782: FE 00       cp   $00
 E784: 20 05       jr   nz,$E78B
 E786: 3E E0       ld   a,$E0
 E788: 32 1F 92    ld   ($921F),a
-E78B: 3A 52 63    ld   a,(unknown_6352)
+E78B: 3A 52 63    ld   a,(gun_flash_timer_6352)
 E78E: C6 04       add  a,$04
-E790: 32 52 63    ld   (unknown_6352),a
+E790: 32 52 63    ld   (gun_flash_timer_6352),a
 E793: FE 80       cp   $80
 E795: 38 05       jr   c,$E79C
 E797: 3E E0       ld   a,$E0
@@ -7984,19 +7984,19 @@ E890: FE F0       cp   $F0
 E892: D2 14 E9    jp   nc,$E914
 E895: DD E5       push ix
 E897: 3A 0D 60    ld   a,(player_screen_600D)
-E89A: 32 98 60    ld   (current_guard_screen_index_6098),a
+E89A: 32 98 60    ld   (current_character_screen_index_6098),a
 E89D: DD 21 80 65 ld   ix,player_struct_6580
 E8A1: 21 25 60    ld   hl,player_death_flag_6025
 E8A4: 11 25 60    ld   de,player_death_flag_6025
 E8A7: CD DE E8    call $E8DE
 E8AA: 3A 99 60    ld   a,(guard_1_screen_6099)
-E8AD: 32 98 60    ld   (current_guard_screen_index_6098),a
+E8AD: 32 98 60    ld   (current_character_screen_index_6098),a
 E8B0: DD 21 94 65 ld   ix,guard_1_struct_6594
 E8B4: 21 9F 62    ld   hl,unknown_629F
 E8B7: 11 56 61    ld   de,unknown_6156
 E8BA: CD DE E8    call $E8DE
 E8BD: 3A 9A 60    ld   a,(guard_2_screen_609A)
-E8C0: 32 98 60    ld   (current_guard_screen_index_6098),a
+E8C0: 32 98 60    ld   (current_character_screen_index_6098),a
 E8C3: DD 21 98 65 ld   ix,guard_2_struct_6598
 E8C7: 21 A7 62    ld   hl,unknown_62A7
 E8CA: 11 57 61    ld   de,unknown_6157
@@ -8008,7 +8008,7 @@ E8D6: 3A 8E 65    ld   a,(unknown_658E)
 E8D9: 80          add  a,b
 E8DA: 32 8E 65    ld   (unknown_658E),a
 E8DD: C9          ret
-E8DE: 3A 98 60    ld   a,(current_guard_screen_index_6098)
+E8DE: 3A 98 60    ld   a,(current_character_screen_index_6098)
 E8E1: 47          ld   b,a
 E8E2: 3A 0D 60    ld   a,(player_screen_600D)
 E8E5: B8          cp   b
@@ -8257,7 +8257,7 @@ EAE3: 18 03       jr   $EAE8
 
 compute_player_logical_address_from_xy_EAE5:
 EAE5: 3A 0D 60    ld   a,(player_screen_600D)
-EAE8: 32 98 60    ld   (current_guard_screen_index_6098),a
+EAE8: 32 98 60    ld   (current_character_screen_index_6098),a
 EAEB: CD EF EA    call compute_logical_address_from_xy_EAEF
 EAEE: C9          ret
 
@@ -8291,7 +8291,7 @@ EB1F: CB 14       rl   h
 EB21: 7C          ld   a,h
 EB22: F6 40       or   $40
 EB24: 67          ld   h,a
-EB25: 3A 98 60    ld   a,(current_guard_screen_index_6098)
+EB25: 3A 98 60    ld   a,(current_character_screen_index_6098)
 EB28: FE 01       cp   $01
 EB2A: C8          ret  z
 EB2B: FE 02       cp   $02
@@ -8652,7 +8652,7 @@ EE11: CC 56 F7    call z,$F756
 EE14: FB          ei
 EE15: 32 00 B0    ld   (dip_switch_B000),a
 EE18: 3A 99 60    ld   a,(guard_1_screen_6099)
-EE1B: 32 98 60    ld   (current_guard_screen_index_6098),a
+EE1B: 32 98 60    ld   (current_character_screen_index_6098),a
 EE1E: FD 21 94 65 ld   iy,guard_1_struct_6594
 EE22: FD 22 93 60 ld   (guard_struct_pointer_6093),iy
 EE26: DD 21 27 60 ld   ix,guard_1_direction_6027
@@ -8684,7 +8684,7 @@ EE7A: ED 53 91 60 ld   (guard_logical_address_6091),de
 EE7E: DD 21 35 60 ld   ix,guard_1_ladder_frame_6035
 EE82: D4 B8 FB    call nc,choose_guard_random_direction_FBB8
 EE85: 3A 9A 60    ld   a,(guard_2_screen_609A)
-EE88: 32 98 60    ld   (current_guard_screen_index_6098),a
+EE88: 32 98 60    ld   (current_character_screen_index_6098),a
 EE8B: FD 21 98 65 ld   iy,guard_2_struct_6598
 EE8F: FD 22 93 60 ld   (guard_struct_pointer_6093),iy
 EE93: DD 21 67 60 ld   ix,guard_2_direction_6067
@@ -8796,7 +8796,7 @@ EFC8: 22 95 60    ld   (guard_direction_pointer_6095),hl
 EFCB: 21 44 61    ld   hl,unknown_6144
 EFCE: 22 46 61    ld   (unknown_pointer_6146),hl
 EFD1: 3A 99 60    ld   a,(guard_1_screen_6099)
-EFD4: 32 98 60    ld   (current_guard_screen_index_6098),a
+EFD4: 32 98 60    ld   (current_character_screen_index_6098),a
 EFD7: DD 21 80 65 ld   ix,player_struct_6580
 EFDB: FD 21 94 65 ld   iy,guard_1_struct_6594
 EFDF: ED 5B 38 60 ld   de,(guard_1_logical_address_6038)
@@ -8821,7 +8821,7 @@ F009: 22 95 60    ld   (guard_direction_pointer_6095),hl
 F00C: 21 45 61    ld   hl,unknown_6145
 F00F: 22 46 61    ld   (unknown_pointer_6146),hl
 F012: 3A 9A 60    ld   a,(guard_2_screen_609A)
-F015: 32 98 60    ld   (current_guard_screen_index_6098),a
+F015: 32 98 60    ld   (current_character_screen_index_6098),a
 F018: DD 21 80 65 ld   ix,player_struct_6580
 F01C: FD 21 98 65 ld   iy,guard_2_struct_6598
 F020: ED 5B 78 60 ld   de,(guard_2_logical_address_6078)
@@ -8991,7 +8991,7 @@ F1A5: C8          ret  z
 F1A6: DD 21 9C 65 ld   ix,object_held_struct_659C
 F1AA: FD 21 5A 61 ld   iy,unknown_615A
 F1AE: 3A 0D 60    ld   a,(player_screen_600D)
-F1B1: 32 98 60    ld   (current_guard_screen_index_6098),a
+F1B1: 32 98 60    ld   (current_character_screen_index_6098),a
 F1B4: DD 35 03    dec  (ix+$03)
 F1B7: CD EF EA    call compute_logical_address_from_xy_EAEF
 F1BA: DD 21 9C 65 ld   ix,object_held_struct_659C
@@ -9015,7 +9015,7 @@ F1DE: 32 59 61    ld   (bag_falling_6159),a
 F1E1: DD 21 9C 65 ld   ix,object_held_struct_659C
 F1E5: FD 21 5A 61 ld   iy,unknown_615A
 F1E9: 3A 0D 60    ld   a,(player_screen_600D)
-F1EC: 32 98 60    ld   (current_guard_screen_index_6098),a
+F1EC: 32 98 60    ld   (current_character_screen_index_6098),a
 F1EF: CD EF EA    call compute_logical_address_from_xy_EAEF
 F1F2: 7E          ld   a,(hl)
 F1F3: E5          push hl
@@ -9382,7 +9382,7 @@ F4BC: C8          ret  z
 F4BD: DD 21 9C 65 ld   ix,object_held_struct_659C
 F4C1: FD 21 5A 61 ld   iy,unknown_615A
 F4C5: 3A 0D 60    ld   a,(player_screen_600D)
-F4C8: 32 98 60    ld   (current_guard_screen_index_6098),a
+F4C8: 32 98 60    ld   (current_character_screen_index_6098),a
 F4CB: CD EF EA    call compute_logical_address_from_xy_EAEF
 F4CE: FB          ei
 F4CF: 2B          dec  hl
@@ -9449,7 +9449,7 @@ F533: C9          ret
 	;; branch found:	what do we decide??
 F534: DD E5       push ix
 F536: FD 22 4B 60 ld   (unknown_pointer_604B),iy
-F53A: 3A 98 60    ld   a,(current_guard_screen_index_6098)
+F53A: 3A 98 60    ld   a,(current_character_screen_index_6098)
 F53D: 47          ld   b,a
 F53E: 3A 0D 60    ld   a,(player_screen_600D)
 F541: B8          cp   b
@@ -10309,7 +10309,7 @@ FC54: C8          ret  z
 drop_object_FC55:
 FC55: DD 21 9C 65 ld   ix,object_held_struct_659C
 FC59: 3A 0D 60    ld   a,(player_screen_600D)
-FC5C: 32 98 60    ld   (current_guard_screen_index_6098),a
+FC5C: 32 98 60    ld   (current_character_screen_index_6098),a
 FC5F: CD EF EA    call compute_logical_address_from_xy_EAEF
 FC62: 3A 11 63    ld   a,(has_bomb_6311)
 FC65: FE 01       cp   $01
@@ -10404,7 +10404,7 @@ FCF8: FD 7E 00    ld   a,(iy+$00)
 FCFB: FE 01       cp   $01
 FCFD: C8          ret  z
 FCFE: 3A 99 60    ld   a,(guard_1_screen_6099)
-FD01: 32 98 60    ld   (current_guard_screen_index_6098),a
+FD01: 32 98 60    ld   (current_character_screen_index_6098),a
 FD04: DD E5       push ix
 FD06: 21 00 05    ld   hl,$0500
 FD09: CD 90 5C    call add_to_score_5C90
@@ -10427,7 +10427,7 @@ FD37: FD 7E 00    ld   a,(iy+$00)
 FD3A: FE 01       cp   $01
 FD3C: C8          ret  z
 FD3D: 3A 9A 60    ld   a,(guard_2_screen_609A)
-FD40: 32 98 60    ld   (current_guard_screen_index_6098),a
+FD40: 32 98 60    ld   (current_character_screen_index_6098),a
 FD43: DD E5       push ix
 FD45: 21 00 05    ld   hl,$0500
 FD48: CD 90 5C    call add_to_score_5C90
@@ -10614,7 +10614,7 @@ FEB3: C8          ret  z
 FEB4: DD 21 9C 65 ld   ix,object_held_struct_659C
 FEB8: FD 21 5A 61 ld   iy,unknown_615A
 FEBC: 3A 0D 60    ld   a,(player_screen_600D)
-FEBF: 32 98 60    ld   (current_guard_screen_index_6098),a
+FEBF: 32 98 60    ld   (current_character_screen_index_6098),a
 FEC2: CD EF EA    call compute_logical_address_from_xy_EAEF
 FEC5: 7E          ld   a,(hl)
 FEC6: E5          push hl

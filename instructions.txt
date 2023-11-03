@@ -2,6 +2,9 @@ Amiga controls:
 
 joystick in port 1 or keyboard
 
+- directions / arrows: walk/climb
+- fire 1 / ctrl: pick up objects / jump
+- fire 2 / space: shoot gun (when available)
    
 * misc:
 
@@ -18,8 +21,8 @@ Command line arguments (no whdload, but 1.3 compatible)
 
 Usage:
 
-bagman INVINCIBLE/S,INFLIVES/S,INFTIME/S,INFPICK/S,
-       CHEATKEYS/S,HARDBAGS/S,SKILL/K/N,STARTLIVES/K/N
+sbagman INVINCIBLE/S,INFLIVES/S,INFTIME/S,INFPICK/S,
+       CHEATKEYS/S,HARDBAGS/S,FRENCH/S,GUNATSTART/S,SKILL/K/N,STARTLIVES/K/N
 
 Options/dipswitches:
 
@@ -33,8 +36,11 @@ CHEATKEYS: cheat keys:
 * F3: add 10000 points (and make guards slightly faster each time)
 * F4: toggle guard 1 inactive
 * F5: toggle guard 2 inactive
-* F6: game over
+* F6: teleport player at right
+* F7: teleport player up
+* F8: game over
 FRENCH: localize some parts in french
+GUNATSTART: everyone get guns (like in ACT 2+)
 HARDBAGS: start with hard level bags layout
 SKILL: difficulty dip switch
 STARTLIVES: 2,3,4,5 lives dip switch

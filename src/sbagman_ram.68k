@@ -11,6 +11,7 @@
 	.global	hard_bags_flag
 	.global infinite_lives_flag
 	.global infinite_time_flag
+	.global	guns_at_start_flag
 	.global infinite_pickaxe_time_flag
 	.global	next_bag_completes_level_flag
 	.global last_played_sound_timer_table
@@ -57,6 +58,8 @@ high_score_beaten:
 invincible_flag:
 	.byte	0
 infinite_lives_flag:
+	.byte	0
+guns_at_start_flag:
 	.byte	0
 infinite_time_flag:
 	.byte	0
