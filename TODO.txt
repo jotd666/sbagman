@@ -1,11 +1,8 @@
-- bagman can't "climb down the stairs" at level 1!!!! also
-  doesn't fall in holes at screen 2
-- elevator at level 5 completely buggy...used to work before!
-- objects background doesn't restore properly! test again???
-- draw_explosion_frame_dd2b doesn't work
 - guard doesn't seem killed by bomb
 - guard monitoring doesn't work?? when waiting for elevator 5, guard
-  disappears (unknown_6156??)
+  disappears (unknown_6156??: move.b	d6,d0                           	| [$da3e: ld   a,l])
+  debug MAME da3e
+  
 - record bomb sound, insert at dccd
 - gun cheat doesn't work properly. act 2 gun set must happen too soon
   vs start of the game
@@ -20,6 +17,8 @@ l_0a93:
 	cmp.b	#0x04,d0                         	| [$0a96: cp   $04]
 	jne	player_not_in_elevator_0a6d                             	| [$0a98: jr   nz,$0A6D]
 	tst.b	fatal_fall_height_reached_604E	| [$0a9a: ld   a,(fatal_fall_height_reached_604E)]
+
+- draw_explosion_frame_dd2b seems incorrect
 
 * real machine/68k port: player Y = e0, elevator = e1
   Y alignment occurs when player is in being lifted by elevator

@@ -821,7 +821,7 @@ bomb_explosion_tiles_pointer_62F6:
 	ds.l	1
 
 explosion_screen_address_62F8:
-	ds.w	2
+	ds.w	1
 
 bomb_explosion_frame_timer_62FA:
 	ds.b	1

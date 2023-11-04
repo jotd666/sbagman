@@ -36,6 +36,14 @@
 	clr.b	\addr
 	.endm
 	
+	.macro	LEA_ROM			offset,dest
+	.ifle		\offset-0x6000
+	lea			game_mem+\offset,\dest
+	.else
+	lea			game_mem+\offset-0xC000+0x6000,\dest
+	.endif
+	.endm
+	
 	.macro	READ_COLORRAM	offset
 	move.w	d6,-(sp)
 	add.w	#\offset,d6
@@ -170,7 +178,7 @@ is_invincible:
 0:
 	cmp.b	d0,d0
 	rts
-	
+
 * < D6: ROM offset
 read_rom:
 	move.w	d6,-(sp)
@@ -842,7 +850,7 @@ l_04bb:
 	jbsr	l_e1c0                            	| [$04ca: call $E1C0]
 	jbsr	l_e1cc                            	| [$04cd: call $E1CC]
 	jbsr	l_e869                            	| [$04d0: call $E869]
-	jbsr	l_e03c                            	| [$04d3: call $E03C]
+	jbsr	handle_elevator_5_e03c                            	| [$04d3: call $E03C]
 	jbsr	l_df42                            	| [$04d6: call $DF42]
 	jbsr	update_bomb_explosion_frame_timer_dd13                            	| [$04d9: call $DD13]
 	jbsr	l_d60c                            	| [$04dc: call $D60C]
@@ -1418,7 +1426,7 @@ l_0820:
 	move.b	d0,(A3)                    	| [$082c: ld   (iy+$00),a]
 	rts                                    	| [$082f: ret]
 l_0830:
-	lea	game_mem+0x084F,a1                      	| [$0830: ld   de,$084F]
+	LEA_ROM	       0x084F,a1                      	| [$0830: ld   de,$084F]
 	moveq	#0,d0
 	move.b	player_in_wagon_flag_13_602F,d0 	| [$0833: ld   a,(player_in_wagon_flag_13_602F)]
 	cmp.b	#0x04,d0                         	| [$0836: cp   $04]
@@ -1682,7 +1690,7 @@ l_09a0:
 * of lack of available sprites introduced by shot sprite?
 move_wagon_09A6:
 	lea	wagon_direction_array_6016,a2  	| [$09a6: ld   ix,wagon_direction_array_6016]
-	lea	game_mem+0x0A3C,a3                      	| [$09aa: ld   iy,$0A3C]
+	LEA_ROM	       0x0A3C,a3                      	| [$09aa: ld   iy,$0A3C]
 	lea	wagon_data_658A,a0             	| [$09ae: ld   hl,wagon_data_658A]
 	jbsr	l_09b5                            	| [$09b1: call $09B5]
 	rts                                    	| [$09b4: ret]
@@ -1794,7 +1802,7 @@ handle_elevator_stops_0A40:
 	clr.b	elevator_not_moving_screen_4_6012     	| [$0a54: ld   (elevator_not_moving_screen_4_6012),a]
 	                           	| [$0a57: inc  a]
 	move.b	#1,elevator_4_going_down_6015                 	| [$0a58: ld   (elevator_4_going_down_6015),a]
-	lea	game_mem+0x0A72,a3                      	| [$0a5b: ld   iy,$0A72]
+	LEA_ROM	       0x0A72,a3                      	| [$0a5b: ld   iy,$0A72]
 	move.b	#0x09,d1                        	| [$0a5f: ld   b,$09]
 	* test player X against elevator X (0xC4 <= PX <= 0xCC)
 	* (would have been faster with 2 cmps...)
@@ -1868,7 +1876,7 @@ l_0ab1:
 	move.b	current_character_screen_index_6098,d0	| [$0ab1: ld   a,(current_character_screen_index_6098)]
 	cmp.b	#0x04,d0                         	| [$0ab4: cp   $04]
 	jne	l_0ac6                             	| [$0ab6: jr   nz,$0AC6]
-	lea	game_mem+0x0AC9,a3                      	| [$0ab8: ld   iy,$0AC9]
+	LEA_ROM	       0x0AC9,a3                      	| [$0ab8: ld   iy,$0AC9]
 	move.b	#0x12,d1                        	| [$0abc: ld   b,$12]
 	move.b	(a0),d0                         	| [$0abe: ld   a,(hl)]
 	move.w	d0,-(sp)                        	| [$0abf: push af]
@@ -2018,7 +2026,7 @@ l_0b82:
 	move.b	#0x01,d0                        	| [$0bac: ld   a,$01]
 	move.b	d0,unknown_61F5                 	| [$0bae: ld   (unknown_61F5),a]
 	** TODO sound play which sound????
-	*lea	game_mem+0xD9AB,a0                      	| [$0bb1: ld   hl,$D9AB]
+	*LEA_ROM	       0xD9AB,a0                      	| [$0bb1: ld   hl,$D9AB]
 	*jbsr	play_sample_EC84                  	| [$0bb4: call play_sample_EC84]
 	rts                                    	| [$0bb7: ret]
 l_0bb8:
@@ -2393,7 +2401,7 @@ l_0dd9:
 
 check_against_space_tiles_0E05:
 	move.b	d0,d2                           	| [$0e05: ld   c,a]
-	lea	game_mem+0x1BA7,a1                      	| [$0e06: ld   de,$1BA7]
+	LEA_ROM	       0x1BA7,a1                      	| [$0e06: ld   de,$1BA7]
 	move.b	#0x24-1,d1                        	| [$0e09: ld   b,$24]
 l_0e0b:
 	cmp.b	(a1)+,d0                         	| [$0e0b: ld   a,(de)]
@@ -2934,12 +2942,12 @@ l_126e:
 	move.b	#0x01,d0                        	| [$1286: ld   a,$01]
 	move.b	d0,gameplay_allowed_6054        	| [$1288: ld   (gameplay_allowed_6054),a]
 	lea	player_struct_6580,a1          	| [$128b: ld   de,player_struct_6580]
-	lea	game_mem+0x1559,a0                      	| [$128e: ld   hl,$1559]
+	LEA_ROM	       0x1559,a0                      	| [$128e: ld   hl,$1559]
 	move.w	#0x04,d1                        	| [$1291: ld   bc,$0004] 4
 	jbsr	ldir                              	| [$1294: ldir]
 
 	lea	guard_1_struct_6594,a1         	| [$1296: ld   de,guard_1_struct_6594]
-	lea	game_mem+0x1561,a0                      	| [$1299: ld   hl,$1561]
+	LEA_ROM	       0x1561,a0                      	| [$1299: ld   hl,$1561]
 	move.w	#0x04,d1                        	| [$129c: ld   bc,$0004] 4
 	jbsr	ldir                              	| [$129f: ldir]
 	move.b	is_intermission_6274,d0         	| [$12a1: ld   a,(is_intermission_6274)]
@@ -2949,22 +2957,22 @@ l_126e:
 	
 	* VA presente
 0:
-	lea	game_mem+0x4C00,a1                      	| [$12a7: ld   de,$4C00]
+	LEA_ROM	       0x4C00,a1                      	| [$12a7: ld   de,$4C00]
 	move.w	#0x91A5,d6                      	| [$12aa: ld   hl,$91A5]
 	move.b	#0x16,d0                        	| [$12ad: ld   a,$16]
 	exg	d0,d7                              	| [$12af: ex   af,af']
 	jbsr	write_text_55f0                            	| [$12b0: call $55F0]
-	lea	game_mem+0x4C0B,a1                      	| [$12b3: ld   de,$4C0B]
+	LEA_ROM	       0x4C0B,a1                      	| [$12b3: ld   de,$4C0B]
 	move.w	#0x91A6,d6                      	| [$12b6: ld   hl,$91A6]
 	move.b	#0x16,d0                        	| [$12b9: ld   a,$16]
 	exg	d0,d7                              	| [$12bb: ex   af,af']
 	jbsr	write_text_55f0                            	| [$12bc: call $55F0]
-	lea	game_mem+0x4C16,a1                      	| [$12bf: ld   de,$4C16]
+	LEA_ROM	       0x4C16,a1                      	| [$12bf: ld   de,$4C16]
 	move.w	#0x91A7,d6                      	| [$12c2: ld   hl,$91A7]
 	move.b	#0x16,d0                        	| [$12c5: ld   a,$16]
 	exg	d0,d7                              	| [$12c7: ex   af,af']
 	jbsr	write_text_55f0                            	| [$12c8: call $55F0]
-	lea	game_mem+0x4C21,a1                      	| [$12cb: ld   de,$4C21]
+	LEA_ROM	       0x4C21,a1                      	| [$12cb: ld   de,$4C21]
 	move.w	#0x91AA,d6                      	| [$12ce: ld   hl,$91AA]
 	move.b	#0x13,d0                        	| [$12d1: ld   a,$13]
 	exg	d0,d7                              	| [$12d3: ex   af,af']
@@ -3007,7 +3015,7 @@ l_12f8:
 
 	move.l	a0,-(sp)                        	| [$130d: push hl]
 	* starts a tune (which one?)
-	*lea	game_mem+0x3800,a0                      	| [$130e: ld   hl,$3800]
+	*LEA_ROM	       0x3800,a0                      	| [$130e: ld   hl,$3800]
 	*move.b	a0,ay_sound_pointer_6140        	| [$1311: ld   (ay_sound_pointer_6140),hl]
 	*clr.b	d0                               	| [$1314: xor  a]
 	*move.b	d0,ay_sound_start_6142          	| [$1315: ld   (ay_sound_start_6142),a]
@@ -3322,12 +3330,12 @@ l_14fd:
 	jbsr	clear_screen_C3B7                 	| [$1521: call clear_screen_C3B7]
 	move.b	#0x04,d0                        	| [$1524: ld   a,$04]
 	jbsr	change_attribute_everywhere_C3A3  	| [$1526: call change_attribute_everywhere_C3A3]
-	lea	game_mem+0x1FA1,a2                      	| [$1529: ld   ix,$1FA1]
+	LEA_ROM	       0x1FA1,a2                      	| [$1529: ld   ix,$1FA1]
 	jbsr	osd_read_dipswitches                       	| [$152d: ld   a,($B000)]
  	and.b	#0x20,d0                         	| [$1530: and  $20]
 	cmp.b	#0x20,d0                         	| [$1532: cp   $20]
 	jne	l_153a                             	| [$1534: jr   nz,$153A]
-	lea	game_mem+0x1DA5,a2                      	| [$1536: ld   ix,$1DA5]
+	LEA_ROM	       0x1DA5,a2                      	| [$1536: ld   ix,$1DA5]
 l_153a:
 	* jotd: added this else guard sprite remains
 	jbsr	zero_sprites
@@ -3670,11 +3678,11 @@ l_1731:
 	move.b	player_input_6026,d0            	| [$1737: ld   a,(player_input_6026)]
 	and.b	#0x03,d0                         	| [$173a: and  $03]
 	move.b	d0,player_input_6026            	| [$173c: ld   (player_input_6026),a]
-	lea	game_mem+0x1820,a2                      	| [$173f: ld   ix,$1820]
+	LEA_ROM	       0x1820,a2                      	| [$173f: ld   ix,$1820]
 	move.b	is_key_hunt_phase_6341,d0                 	| [$1743: ld   a,(is_key_hunt_phase_6341)]
 	cmp.b	#0x01,d0                         	| [$1746: cp   $01]
 	jeq	l_174e                             	| [$1748: jr   z,$174E]
-	lea	game_mem+0x1848,a2                      	| [$174a: ld   ix,$1848]
+	LEA_ROM	       0x1848,a2                      	| [$174a: ld   ix,$1848]
 l_174e:
 	lea	player_struct_6580,a3          	| [$174e: ld   iy,player_struct_6580]
 	move.w	#0x0004,d3                      	| [$1752: ld   de,$0004] 4
@@ -3795,27 +3803,27 @@ l_17f1:
 
 l_1918:
 	move.b	d3,d0				| [$1918] ld   a,d
-	lea	game_mem+0x224E,a3                      	| [$1919: ld   iy,$224E]
+	LEA_ROM	       0x224E,a3                      	| [$1919: ld   iy,$224E]
 	cmp.b	#0x34,d0                         	| [$191d: cp   $34]
 	bcc.b	0f                               	| [...]
 	rts                                    	| [$191f: ret  c] [...]
 0:
-	lea	game_mem+0x225D,a3                      	| [$1920: ld   iy,$225D]
+	LEA_ROM	       0x225D,a3                      	| [$1920: ld   iy,$225D]
 	cmp.b	#0x38,d0                         	| [$1924: cp   $38]
 	bcc.b	0f                               	| [...]
 	rts                                    	| [$1926: ret  c] [...]
 0:
-	lea	game_mem+0x21E8,a3                      	| [$1927: ld   iy,$21E8]
+	LEA_ROM	       0x21E8,a3                      	| [$1927: ld   iy,$21E8]
 	cmp.b	#0x44,d0                         	| [$192b: cp   $44]
 	bcc.b	0f                               	| [...]
 	rts                                    	| [$192d: ret  c] [...]
 0:
-	lea	game_mem+0x2209,a3                      	| [$192e: ld   iy,$2209]
+	LEA_ROM	       0x2209,a3                      	| [$192e: ld   iy,$2209]
 	cmp.b	#0x48,d0                         	| [$1932: cp   $48]
 	bcc.b	0f                               	| [...]
 	rts                                    	| [$1934: ret  c] [...]
 0:
-	lea	game_mem+0x2230,a3                      	| [$1935: ld   iy,$2230]
+	LEA_ROM	       0x2230,a3                      	| [$1935: ld   iy,$2230]
 	rts                                    	| [$1939: ret]
 
  * not the same screen as player:	 decide something?
@@ -3834,7 +3842,7 @@ guide_guard_on_hidden_screen_193A:
 	move.b	d1,d0                           	| [$1941: ld   a,b]
 	cmp.b	#0x01,d0                         	| [$1942: cp   $01]
 	jne	l_194c                             	| [$1944: jr   nz,$194C]
-	lea	game_mem+0x2275,a3                      	| [$1946: ld   iy,$2275]
+	LEA_ROM	       0x2275,a3                      	| [$1946: ld   iy,$2275]
 	jra	l_1995                             	| [$194a: jr   $1995]
 l_194c:
 	cmp.b	#0x02,d0                         	| [$194c: cp   $02]
@@ -3843,10 +3851,10 @@ l_194c:
 	move.b	player_screen_600D,d0           	| [$1951: ld   a,(player_screen_600D)]
 	cmp.b	d1,d0                            	| [$1954: cp   b]
 	jcc	l_195d                             	| [$1955: jr   nc,$195D]
-	lea	game_mem+0x2293,a3                      	| [$1957: ld   iy,$2293]
+	LEA_ROM	       0x2293,a3                      	| [$1957: ld   iy,$2293]
 	jra	l_1995                             	| [$195b: jr   $1995]
 l_195d:
-	lea	game_mem+0x22BA,a3                      	| [$195d: ld   iy,$22BA]
+	LEA_ROM	       0x22BA,a3                      	| [$195d: ld   iy,$22BA]
 	jra	l_1995                             	| [$1961: jr   $1995]
 l_1963:
 	cmp.b	#0x03,d0                         	| [$1963: cp   $03]
@@ -3855,10 +3863,10 @@ l_1963:
 	move.b	player_screen_600D,d0           	| [$1968: ld   a,(player_screen_600D)]
 	cmp.b	d1,d0                            	| [$196b: cp   b]
 	jcc	l_1974                             	| [$196c: jr   nc,$1974]
-	lea	game_mem+0x22E1,a3                      	| [$196e: ld   iy,$22E1]
+	LEA_ROM	       0x22E1,a3                      	| [$196e: ld   iy,$22E1]
 	jra	l_1995                             	| [$1972: jr   $1995]
 l_1974:
-	lea	game_mem+0x22FF,a3                      	| [$1974: ld   iy,$22FF]
+	LEA_ROM	       0x22FF,a3                      	| [$1974: ld   iy,$22FF]
 	jra	l_1995                             	| [$1978: jr   $1995]
 l_197a:
 	cmp.b	#0x04,d0                         	| [$197a: cp   $04]
@@ -3867,13 +3875,13 @@ l_197a:
 	move.b	player_screen_600D,d0           	| [$197f: ld   a,(player_screen_600D)]
 	cmp.b	d1,d0                            	| [$1982: cp   b]
 	jcc	l_198b                             	| [$1983: jr   nc,$198B]
-	lea	game_mem+0x231D,a3                      	| [$1985: ld   iy,$231D]
+	LEA_ROM	       0x231D,a3                      	| [$1985: ld   iy,$231D]
 	jra	l_1995                             	| [$1989: jr   $1995]
 l_198b:
-	lea	game_mem+0x232C,a3                      	| [$198b: ld   iy,$232C]
+	LEA_ROM	       0x232C,a3                      	| [$198b: ld   iy,$232C]
 	jra	l_1995                             	| [$198f: jr   $1995]
 l_1991:
-	lea	game_mem+0x233B,a3                      	| [$1991: ld   iy,$233B]
+	LEA_ROM	       0x233B,a3                      	| [$1991: ld   iy,$233B]
 l_1995:
 	movem.w	(sp)+,d3/d4                    	| [$1995: pop  de]
 l_1996:
@@ -3943,48 +3951,48 @@ l_23ed:
 	subq.b	#1,d1                           	| [...]
 	jne	l_23ed                             	| [$23f2: djnz $23ED]
 	move.w	(sp)+,d6                        	| [$23f4: pop  hl]
-	lea	game_mem+0x254E,a2                      	| [$23f5: ld   ix,$254E]
+	LEA_ROM	       0x254E,a2                      	| [$23f5: ld   ix,$254E]
 	* set D3 as it's used in 250F
 	move.w	#-0x20,d3                      	| [$23f9: ld   de,$FFE0]
 	add.w	d3,d6                            	| [$23fc: add  hl,de]
 	move.b	#0x2C,d0                        	| [$23fd: ld   a,$2C]
 	exg	d0,d7                              	| [$23ff: ex   af,af']
 	jbsr	draw_big_bagman_row_250f                            	| [$2400: call $250F]
-	lea	game_mem+0x2557,a2                      	| [$2403: ld   ix,$2557]
+	LEA_ROM	       0x2557,a2                      	| [$2403: ld   ix,$2557]
 	jbsr	draw_big_bagman_row_250f                            	| [$2407: call $250F]
-	lea	game_mem+0x2561,a2                      	| [$240a: ld   ix,$2561]
+	LEA_ROM	       0x2561,a2                      	| [$240a: ld   ix,$2561]
 	jbsr	draw_big_bagman_row_250f                            	| [$240e: call $250F]
-	lea	game_mem+0x256B,a2                      	| [$2411: ld   ix,$256B]
+	LEA_ROM	       0x256B,a2                      	| [$2411: ld   ix,$256B]
 	jbsr	draw_big_bagman_row_250f                            	| [$2415: call $250F]
-	lea	game_mem+0x2577,a2                      	| [$2418: ld   ix,$2577]
+	LEA_ROM	       0x2577,a2                      	| [$2418: ld   ix,$2577]
 	jbsr	draw_big_bagman_row_250f                            	| [$241c: call $250F]
-	lea	game_mem+0x2586,a2                      	| [$241f: ld   ix,$2586]
+	LEA_ROM	       0x2586,a2                      	| [$241f: ld   ix,$2586]
 	jbsr	draw_big_bagman_row_250f                            	| [$2423: call $250F]
-	lea	game_mem+0x2597,a2                      	| [$2426: ld   ix,$2597]
+	LEA_ROM	       0x2597,a2                      	| [$2426: ld   ix,$2597]
 	jbsr	draw_big_bagman_row_250f                            	| [$242a: call $250F]
 	move.b	#0x28,d0                        	| [$242d: ld   a,$28]
 	exg	d0,d7                              	| [$242f: ex   af,af']
-	lea	game_mem+0x25A8,a2                      	| [$2430: ld   ix,$25A8]
+	LEA_ROM	       0x25A8,a2                      	| [$2430: ld   ix,$25A8]
 	jbsr	draw_big_bagman_row_250f                            	| [$2434: call $250F]
-	lea	game_mem+0x25B9,a2                      	| [$2437: ld   ix,$25B9]
+	LEA_ROM	       0x25B9,a2                      	| [$2437: ld   ix,$25B9]
 	jbsr	draw_big_bagman_row_250f                            	| [$243b: call $250F]
-	lea	game_mem+0x25CA,a2                      	| [$243e: ld   ix,$25CA]
+	LEA_ROM	       0x25CA,a2                      	| [$243e: ld   ix,$25CA]
 	jbsr	draw_big_bagman_row_250f                            	| [$2442: call $250F]
-	lea	game_mem+0x25DB,a2                      	| [$2445: ld   ix,$25DB]
+	LEA_ROM	       0x25DB,a2                      	| [$2445: ld   ix,$25DB]
 	jbsr	draw_big_bagman_row_250f                            	| [$2449: call $250F]
-	lea	game_mem+0x25F0,a2                      	| [$244c: ld   ix,$25F0]
+	LEA_ROM	       0x25F0,a2                      	| [$244c: ld   ix,$25F0]
 	jbsr	draw_big_bagman_row_250f                            	| [$2450: call $250F]
-	lea	game_mem+0x2605,a2                      	| [$2453: ld   ix,$2605]
+	LEA_ROM	       0x2605,a2                      	| [$2453: ld   ix,$2605]
 	jbsr	draw_big_bagman_row_250f                            	| [$2457: call $250F]
-	lea	game_mem+0x261A,a2                      	| [$245a: ld   ix,$261A]
+	LEA_ROM	       0x261A,a2                      	| [$245a: ld   ix,$261A]
 	jbsr	draw_big_bagman_row_250f                            	| [$245e: call $250F]
 	move.b	#0x18,d0                        	| [$2461: ld   a,$18]
 	exg	d0,d7                              	| [$2463: ex   af,af']
-	lea	game_mem+0x262F,a2                      	| [$2464: ld   ix,$262F]
+	LEA_ROM	       0x262F,a2                      	| [$2464: ld   ix,$262F]
 	jbsr	draw_big_bagman_row_250f                            	| [$2468: call $250F]
 	move.b	#0x1C,d0                        	| [$246b: ld   a,$1C]
 	exg	d0,d7                              	| [$246d: ex   af,af']
-	lea	game_mem+0x2533,a3                      	| [$246e: ld   iy,$2533]
+	LEA_ROM	       0x2533,a3                      	| [$246e: ld   iy,$2533]
 	
 	and.w	#0x00FF,d2                               	| [$2472: ld   b,$00]
 	add.w	d2,a3                            	| [$2474: add  iy,bc]
@@ -4005,51 +4013,51 @@ l_23ed:
 	jeq	l_24ff                             	| [$2493: jr   z,$24FF]
 	jra	l_2507                             	| [$2495: jr   $2507]
 l_2497:
-	lea	game_mem+0x2644,a2                      	| [$2497: ld   ix,$2644]
+	LEA_ROM	       0x2644,a2                      	| [$2497: ld   ix,$2644]
 	jbsr	draw_big_bagman_row_250f                            	| [$249b: call $250F]
-	lea	game_mem+0x2659,a2                      	| [$249e: ld   ix,$2659]
+	LEA_ROM	       0x2659,a2                      	| [$249e: ld   ix,$2659]
 	jbsr	draw_big_bagman_row_250f                            	| [$24a2: call $250F]
-	lea	game_mem+0x2663,a2                      	| [$24a5: ld   ix,$2663]
+	LEA_ROM	       0x2663,a2                      	| [$24a5: ld   ix,$2663]
 	jbsr	draw_big_bagman_row_250f                            	| [$24a9: call $250F]
 	rts                                    	| [$24ac: ret]
 l_24ad:
-	lea	game_mem+0x2682,a2                      	| [$24ad: ld   ix,$2682]
+	LEA_ROM	       0x2682,a2                      	| [$24ad: ld   ix,$2682]
 	jbsr	draw_big_bagman_row_250f                            	| [$24b1: call $250F]
-	lea	game_mem+0x2697,a2                      	| [$24b4: ld   ix,$2697]
+	LEA_ROM	       0x2697,a2                      	| [$24b4: ld   ix,$2697]
 	jbsr	draw_big_bagman_row_250f                            	| [$24b8: call $250F]
-	lea	game_mem+0x26A3,a2                      	| [$24bb: ld   ix,$26A3]
+	LEA_ROM	       0x26A3,a2                      	| [$24bb: ld   ix,$26A3]
 	jbsr	draw_big_bagman_row_250f                            	| [$24bf: call $250F]
 	rts                                    	| [$24c2: ret]
 l_24c3:
-	lea	game_mem+0x26C2,a2                      	| [$24c3: ld   ix,$26C2]
+	LEA_ROM	       0x26C2,a2                      	| [$24c3: ld   ix,$26C2]
 	jbsr	draw_big_bagman_row_250f                            	| [$24c7: call $250F]
-	lea	game_mem+0x26D7,a2                      	| [$24ca: ld   ix,$26D7]
+	LEA_ROM	       0x26D7,a2                      	| [$24ca: ld   ix,$26D7]
 	jbsr	draw_big_bagman_row_250f                            	| [$24ce: call $250F]
-	lea	game_mem+0x26E2,a2                      	| [$24d1: ld   ix,$26E2]
+	LEA_ROM	       0x26E2,a2                      	| [$24d1: ld   ix,$26E2]
 	jbsr	draw_big_bagman_row_250f                            	| [$24d5: call $250F]
 	rts                                    	| [$24d8: ret]
 l_24d9:
-	lea	game_mem+0x2702,a2                      	| [$24d9: ld   ix,$2702]
+	LEA_ROM	       0x2702,a2                      	| [$24d9: ld   ix,$2702]
 	jbsr	draw_big_bagman_row_250f                            	| [$24dd: call $250F]
-	lea	game_mem+0x2717,a2                      	| [$24e0: ld   ix,$2717]
+	LEA_ROM	       0x2717,a2                      	| [$24e0: ld   ix,$2717]
 	jbsr	draw_big_bagman_row_250f                            	| [$24e4: call $250F]
-	lea	game_mem+0x2721,a2                      	| [$24e7: ld   ix,$2721]
+	LEA_ROM	       0x2721,a2                      	| [$24e7: ld   ix,$2721]
 	jbsr	draw_big_bagman_row_250f                            	| [$24eb: call $250F]
 	rts                                    	| [$24ee: ret]
 l_24ef:
-	lea	game_mem+0x266D,a2                      	| [$24ef: ld   ix,$266D]
+	LEA_ROM	       0x266D,a2                      	| [$24ef: ld   ix,$266D]
 	jbsr	draw_big_bagman_row_250f                            	| [$24f3: call $250F]
 	rts                                    	| [$24f6: ret]
 l_24f7:
-	lea	game_mem+0x26AD,a2                      	| [$24f7: ld   ix,$26AD]
+	LEA_ROM	       0x26AD,a2                      	| [$24f7: ld   ix,$26AD]
 	jbsr	draw_big_bagman_row_250f                            	| [$24fb: call $250F]
 	rts                                    	| [$24fe: ret]
 l_24ff:
-	lea	game_mem+0x26ED,a2                      	| [$24ff: ld   ix,$26ED]
+	LEA_ROM	       0x26ED,a2                      	| [$24ff: ld   ix,$26ED]
 	jbsr	draw_big_bagman_row_250f                            	| [$2503: call $250F]
 	rts                                    	| [$2506: ret]
 l_2507:
-	lea	game_mem+0x272B,a2                      	| [$2507: ld   ix,$272B]
+	LEA_ROM	       0x272B,a2                      	| [$2507: ld   ix,$272B]
 	jbsr	draw_big_bagman_row_250f                            	| [$250b: call $250F]
 	rts                                    	| [$250e: ret]
 	
@@ -4284,7 +4292,7 @@ l_5c9a:
 	jra	l_5e46                             	| [$5c9a: jp   $5E46]
 
 l_5ca0:
-	lea	game_mem+0x5D44,a2                      	| [$5ca0: ld   ix,$5D44]
+	LEA_ROM	       0x5D44,a2                      	| [$5ca0: ld   ix,$5D44]
 	lea	player_struct_6580,a3          	| [$5ca4: ld   iy,player_struct_6580]
 	move.w	#0x0004,d3                      	| [$5ca8: ld   de,$0004] 4
 	move.b	unknown_6288,d0                 	| [$5cab: ld   a,(unknown_6288)]
@@ -4410,7 +4418,7 @@ l_c006:
 	jbsr	clear_screen_C3B7                 	| [$c00e: call clear_screen_C3B7]
 	jbsr	osd_enable_display                       	| [$c011: ld   a,$01]
 		                       	| [$c013: ld   ($A003),a]
-	lea	game_mem+0x1A8C,a0                      	| [$c016: ld   hl,$1A8C]
+	LEA_ROM	       0x1A8C,a0                      	| [$c016: ld   hl,$1A8C]
 	lea	high_score_table_6217,a1       	| [$c019: ld   de,high_score_table_6217]
 	move.w	#0x50,d1                        	| [$c01c: ld   bc,$0050] 80
 	jbsr	ldir                              	| [$c01f: ldir]
@@ -4445,7 +4453,7 @@ l_c047:
 	jeq	l_c061                             	| [$c04c: jr   z,$C061]
 	jbsr	l_c08b                            	| [$c04e: call $C08B]
 	jeq	l_c063                             	| [$c051: jr   z,$C063]
-	lea	game_mem+0x575A,a1                      	| [$c053: ld   de,$575A]
+	LEA_ROM	       0x575A,a1                      	| [$c053: ld   de,$575A]
 	jbsr	display_localized_text_CA67       	| [$c056: call display_localized_text_CA67]
 	jbsr	l_c073                            	| [$c059: call $C073]
 	move.b	#0x01,d0                        	| [$c05c: ld   a,$01]
@@ -4454,7 +4462,7 @@ l_c061:	                        	| [$c061: pop  af]
 	addq.w	#4,sp		| 32-bit stack pop
 	rts                                    	| [$c062: ret]
 l_c063:
-	lea	game_mem+0x5763,a1                      	| [$c063: ld   de,$5763]
+	LEA_ROM	       0x5763,a1                      	| [$c063: ld   de,$5763]
 	jbsr	display_localized_text_CA67       	| [$c066: call display_localized_text_CA67]
 	jbsr	l_c073                            	| [$c069: call $C073]
 	move.b	#0x01,d0                        	| [$c06c: ld   a,$01]
@@ -4468,7 +4476,7 @@ l_c073:
 	rts                                    	| [$c07b: ret]
 l_c07c:
 	jbsr	l_c08b                            	| [$c07c: call $C08B]
-	lea	game_mem+0x576C,a1                      	| [$c07f: ld   de,$576C]
+	LEA_ROM	       0x576C,a1                      	| [$c07f: ld   de,$576C]
 	jbsr	display_localized_text_CA67       	| [$c082: call display_localized_text_CA67]
 	clr.b	d0                               	| [$c085: xor  a]
 	move.b	d0,unknown_626E                 	| [$c086: ld   (unknown_626E),a]
@@ -4558,7 +4566,7 @@ check_breakable_wall_present_c0df:
 	jne	l_c0dc                             	| [$c0e4: jr   nz,$C0DC]
 	move.w	#0x91F3,d6                      	| [$c0e6: ld   hl,$91F3]
 	jbsr	osd_r_videoram                         	| [$c0e9: ld   a,(hl)]
-	lea	game_mem+0x19DB,a0                      	| [$c0ea: ld   hl,$19DB]
+	LEA_ROM	       0x19DB,a0                      	| [$c0ea: ld   hl,$19DB]
 	move.w	#0x05,d1                        	| [$c0ed: ld   bc,$0005] 5
 	jbsr	cpir                              	| [$c0f0: cpir]
 	rts                                    	| [$c0f2: ret]
@@ -4567,8 +4575,8 @@ l_c0f3:
 	bsr		read_rom                         	| [$c0f3: ld   a,(hl)]
 	cmp.b	#0x51,d0                         	| [$c0f4: cp   $51]
 	jeq	l_c10d                             	| [$c0f6: jr   z,$C10D]
-	lea	game_mem+0x1A12,a3                      	| [$c0f8: ld   iy,$1A12]
-	lea	game_mem+0x19E0,a1                      	| [$c0fc: ld   de,$19E0]
+	LEA_ROM	       0x1A12,a3                      	| [$c0f8: ld   iy,$1A12]
+	LEA_ROM	       0x19E0,a1                      	| [$c0fc: ld   de,$19E0]
 	movem.w	d1/d2,-(sp)                    	| [$c0ff: push bc]
 	move.b	d0,d2                           	| [$c100: ld   c,a]
 	move.b	#0x08,d1                        	| [$c101: ld   b,$08]
@@ -4638,7 +4646,7 @@ l_c12a:
 	cmp.b	#0x51,d0                         	| [$c13f: cp   $51]
 	jeq	l_c14f                             	| [$c141: jr   z,$C14F]
 	move.b	d0,d2                           	| [$c143: ld   c,a]
-	lea	game_mem+0x19E8,a1                      	| [$c144: ld   de,$19E8]
+	LEA_ROM	       0x19E8,a1                      	| [$c144: ld   de,$19E8]
 	move.b	#0x30,d1                        	| [$c147: ld   b,$30]
 l_c149:
 	move.b	(a1)+,d0                         	| [$c149: ld   a,(de)]
@@ -4696,7 +4704,7 @@ display_screen_5_c189:
 	move.b	#0x3F,d0                        	| [$c18c: ld   a,$3F]
 	jbsr	change_attribute_everywhere_C3A3  	| [$c18e: call change_attribute_everywhere_C3A3]
 	            	| [$c191: ld   a,(io_read_shit_B800)]
-	lea	game_mem+0x3400,a0                      	| [$c194: ld   hl,$3400]
+	LEA_ROM	       0x3400,a0                      	| [$c194: ld   hl,$3400]
 	move.w	#0x9000,d6                      	| [$c197: ld   de,$9000]
 	move.w	#0x400-1,d1                        	| [$c19a: ld   bc,$0400] 1024
 0:
@@ -4722,7 +4730,7 @@ display_screen_4_c1c1:
 	move.b	#0x3F,d0                        	| [$c1c4: ld   a,$3F]
 	jbsr	change_attribute_everywhere_C3A3  	| [$c1c6: call change_attribute_everywhere_C3A3]
 	            	| [$c1c9: ld   a,(io_read_shit_B800)]
-	lea	game_mem+0x3000,a0                      	| [$c1cc: ld   hl,$3000]
+	LEA_ROM	       0x3000,a0                      	| [$c1cc: ld   hl,$3000]
 	move.w	#0x9000,d6                      	| [$c1cf: ld   de,$9000]
 	move.w	#0x400-1,d1                        	| [$c1d2: ld   bc,$0400] 1024
 0:
@@ -4764,7 +4772,7 @@ display_screen_3_c20e:
 	move.b	#0x3F,d0                        	| [$c211: ld   a,$3F]
 	jbsr	change_attribute_everywhere_C3A3  	| [$c213: call change_attribute_everywhere_C3A3]
 	            	| [$c216: ld   a,(io_read_shit_B800)]
-	lea	game_mem+0x4800,a0                      	| [$c219: ld   hl,$4800]
+	LEA_ROM	       0x4800,a0                      	| [$c219: ld   hl,$4800]
 	move.w	#0x9000,d6                      	| [$c21c: ld   de,$9000]
 	move.w	#0x0400-1,d1                        	| [$c21f: ld   bc,$0400] 1024
                     	| [$c222: ldir]
@@ -4815,7 +4823,7 @@ display_screen_2_c272:
 	move.b	#0x3F,d0                        	| [$c275: ld   a,$3F]
 	jbsr	change_attribute_everywhere_C3A3  	| [$c277: call change_attribute_everywhere_C3A3]
 	            	| [$c27a: ld   a,(io_read_shit_B800)]
-	lea	game_mem+0x4400,a0                      	| [$c27d: ld   hl,$4400]
+	LEA_ROM	       0x4400,a0                      	| [$c27d: ld   hl,$4400]
 	move.w	#0x9000,d6                      	| [$c280: ld   de,$9000]
 	move.w	#0x0400-1,d1                        	| [$c283: ld   bc,$0400] 1024
 0:
@@ -4865,7 +4873,7 @@ display_screen_1_C2C9:
 	move.b	#0x3F,d0                        	| [$c2cc: ld   a,$3F]
 	jbsr	change_attribute_everywhere_C3A3  	| [$c2ce: call change_attribute_everywhere_C3A3]
 	            	| [$c2d1: ld   a,(io_read_shit_B800)]
-	lea	game_mem+0x4000,a0                      	| [$c2d4: ld   hl,$4000]
+	LEA_ROM	       0x4000,a0                      	| [$c2d4: ld   hl,$4000]
 	move.w	#0x9000,d6                      	| [$c2d7: ld   de,$9000]
 	move.w	#0x400-1,d1                        	| [$c2da: ld   bc,$0400] 1024
 0:
@@ -4909,7 +4917,7 @@ init_guard_directions_and_wagons_C314:
 	move.b	d0,guard_1_direction_6027       	| [$c31e: ld   (guard_1_direction_6027),a]
 	move.b	#0x40,d0                        	| [$c321: ld   a,$40]
 	move.b	d0,guard_2_direction_6067       	| [$c323: ld   (guard_2_direction_6067),a]
-	lea	game_mem+0x1A1B,a0                      	| [$c326: ld   hl,$1A1B]
+	LEA_ROM	       0x1A1B,a0                      	| [$c326: ld   hl,$1A1B]
 	            	| [$c329: ld   a,(io_read_shit_B800)]
 	lea	wagon_1_struct_6588,a1         	| [$c32c: ld   de,wagon_1_struct_6588]
 	move.w	#0x14,d1                        	| [$c32f: ld   bc,$0014] 20
@@ -5088,7 +5096,7 @@ l_c3e3:
 	move.b	unknown_628C,d0                 	| [$c3f7: ld   a,(unknown_628C)]
 	cmp.b	#0x01,d0                         	| [$c3fa: cp   $01]
 	jeq	l_c407                             	| [$c3fc: jr   z,$C407]
-	lea	game_mem+0x56C3,a1                      	| [$c3fe: ld   de,$56C3]
+	LEA_ROM	       0x56C3,a1                      	| [$c3fe: ld   de,$56C3]
 	* write "PUSH START BUTTON" to screen
 	move.w	#0x93AF,d6                      	| [$c401: ld   hl,$93AF]
 	jbsr	display_localized_text_CA67       	| [$c404: call display_localized_text_CA67]
@@ -5209,7 +5217,7 @@ guard_wait_for_elevator_test_C4BC:
 	move.l	a0,-(sp)                        	| [$c4cc: push hl]
 
 	move.l	a3,-(sp)                        	| [$c4cd: push iy]
-	lea	game_mem+0x1BD1,a3                      	| [$c4cf: ld   iy,$1BD1]
+	LEA_ROM	       0x1BD1,a3                      	| [$c4cf: ld   iy,$1BD1]
 l_c4d3:
 	LOAD_AX_BE_WORD_DY	a3,d6                    	| [$c4d3: ld   a,(iy+$00)]
 	                           	| [$c4d6: ld   h,a]
@@ -5839,23 +5847,23 @@ busy_wait_c887:
 	rts                                    	| [$c89a: ret]
 draw_hiscore_frames_c89b:
 	move.w	#0x9325,d6                      	| [$c89b: ld   hl,$9325]
-	lea	game_mem+0x574F,a1                      	| [$c89e: ld   de,$574F]
+	LEA_ROM	       0x574F,a1                      	| [$c89e: ld   de,$574F]
 	jbsr	display_localized_text_CA67       	| [$c8a1: call display_localized_text_CA67]
 	move.w	#0x9205,d6                      	| [$c8a4: ld   hl,$9205]
-	lea	game_mem+0x5755,a1                      	| [$c8a7: ld   de,$5755]
+	LEA_ROM	       0x5755,a1                      	| [$c8a7: ld   de,$5755]
 	jbsr	display_localized_text_CA67       	| [$c8aa: call display_localized_text_CA67]
 	move.w	#0x92E3,d6                      	| [$c8ad: ld   hl,$92E3]
-	lea	game_mem+0x5690,a1                      	| [$c8b0: ld   de,$5690]
+	LEA_ROM	       0x5690,a1                      	| [$c8b0: ld   de,$5690]
 	jbsr	display_localized_text_CA67       	| [$c8b3: call display_localized_text_CA67]
 	move.w	#0x9883,d6                      	| [$c8b6: ld   hl,$9883]
 	move.b	#0x0E,d0                        	| [$c8b9: ld   a,$0E]
 	jbsr	write_attribute_on_line_5605      	| [$c8bb: call write_attribute_on_line_5605]
-	lea	game_mem+0x4D00,a1                      	| [$c8be: ld   de,$4D00]
+	LEA_ROM	       0x4D00,a1                      	| [$c8be: ld   de,$4D00]
 	move.w	#0x9382,d6                      	| [$c8c1: ld   hl,$9382]
 	move.b	#0x12,d0                        	| [$c8c4: ld   a,$12]
 	exg	d0,d7                              	| [$c8c6: ex   af,af']
  	jbsr	write_text_55f0                            	| [$c8c7: call $55F0]
-	lea	game_mem+0x4D1B,a1                      	| [$c8ca: ld   de,$4D1B]
+	LEA_ROM	       0x4D1B,a1                      	| [$c8ca: ld   de,$4D1B]
 	move.w	#0x9390,d6                      	| [$c8cd: ld   hl,$9390]
 	move.b	#0x12,d0                        	| [$c8d0: ld   a,$12]
 	exg	d0,d7                              	| [$c8d2: ex   af,af']
@@ -5962,24 +5970,24 @@ high_score_entry_c969:
 	move.b	#0x01,d0                        	| [$c969: ld   a,$01]
 	move.b	d0,unknown_6267                 	| [$c96b: ld   (unknown_6267),a]
 	move.w	#0x9372,d6                      	| [$c96e: ld   hl,$9372]
-	lea	game_mem+0x571E,a1                      	| [$c971: ld   de,$571E]
+	LEA_ROM	       0x571E,a1                      	| [$c971: ld   de,$571E]
 	* "MOVE JOYSTICK"
 	jbsr	display_localized_text_CA67       	| [$c974: call display_localized_text_CA67]
 	move.w	#0x9373,d6                      	| [$c977: ld   hl,$9373]
 	* "TO DISPLAY YOUR NAME"
-	lea	game_mem+0x5737,a1                      	| [$c97a: ld   de,$5737]
+	LEA_ROM	       0x5737,a1                      	| [$c97a: ld   de,$5737]
 	jbsr	display_localized_text_CA67       	| [$c97d: call display_localized_text_CA67]
 	move.w	#0x937D,d6                      	| [$c980: ld   hl,$937D]
 	* "END BY ACTION BUTTON"
-	lea	game_mem+0x5775,a1                      	| [$c983: ld   de,$5775]
+	LEA_ROM	       0x5775,a1                      	| [$c983: ld   de,$5775]
 	jbsr	display_localized_text_CA67       	| [$c986: call display_localized_text_CA67]
 	* horizontal bars
-	lea	game_mem+0x4D00,a1                      	| [$c989: ld   de,$4D00]
+	LEA_ROM	       0x4D00,a1                      	| [$c989: ld   de,$4D00]
 	move.w	#0x9391,d6                      	| [$c98c: ld   hl,$9391]
 	move.b	#0x12,d0                        	| [$c98f: ld   a,$12]
 	exg	d0,d7                              	| [$c991: ex   af,af']
 	jbsr	write_text_55f0                            	| [$c992: call $55F0]
-	lea	game_mem+0x4D1B,a1                      	| [$c995: ld   de,$4D1B]
+	LEA_ROM	       0x4D1B,a1                      	| [$c995: ld   de,$4D1B]
 	move.w	#0x939E,d6                      	| [$c998: ld   hl,$939E]
 	move.b	#0x12,d0                        	| [$c99b: ld   a,$12]
 	exg	d0,d7                              	| [$c99d: ex   af,af']
@@ -5992,31 +6000,31 @@ high_score_entry_c969:
 	move.b	#0x8E,d0                        	| [$c9ad: ld   a,$8E]
 	move.w	#0x9072,d6                      	| [$c9af: ld   hl,$9072]
 	jbsr	write_score_frame_vertical_bar_c8eb                            	| [$c9b2: call $C8EB]
-	lea	game_mem+0x4D36,a1                      	| [$c9b5: ld   de,$4D36]
+	LEA_ROM	       0x4D36,a1                      	| [$c9b5: ld   de,$4D36]
 	move.w	#0x9275,d6                      	| [$c9b8: ld   hl,$9275]
 	jbsr	l_ca49                            	| [$c9bb: call $CA49]
-	lea	game_mem+0x4D4A,a1                      	| [$c9be: ld   de,$4D4A]
+	LEA_ROM	       0x4D4A,a1                      	| [$c9be: ld   de,$4D4A]
 	move.w	#0x91B8,d6                      	| [$c9c1: ld   hl,$91B8]
 	jbsr	l_ca49                            	| [$c9c4: call $CA49]
-	lea	game_mem+0x4D5E,a1                      	| [$c9c7: ld   de,$4D5E]
+	LEA_ROM	       0x4D5E,a1                      	| [$c9c7: ld   de,$4D5E]
 	move.w	#0x929B,d6                      	| [$c9ca: ld   hl,$929B]
 	jbsr	l_ca49                            	| [$c9cd: call $CA49]
-	lea	game_mem+0x4D72,a1                      	| [$c9d0: ld   de,$4D72]
+	LEA_ROM	       0x4D72,a1                      	| [$c9d0: ld   de,$4D72]
 	move.w	#0x92F8,d6                      	| [$c9d3: ld   hl,$92F8]
 	jbsr	l_ca49                            	| [$c9d6: call $CA49]
-	lea	game_mem+0x4D86,a1                      	| [$c9d9: ld   de,$4D86]
+	LEA_ROM	       0x4D86,a1                      	| [$c9d9: ld   de,$4D86]
 	move.w	#0x9258,d6                      	| [$c9dc: ld   hl,$9258]
 	jbsr	write_text_attr_14_ca42                            	| [$c9df: call $CA42]
-	lea	game_mem+0x4D8C,a1                      	| [$c9e2: ld   de,$4D8C]
+	LEA_ROM	       0x4D8C,a1                      	| [$c9e2: ld   de,$4D8C]
 	move.w	#0x9216,d6                      	| [$c9e5: ld   hl,$9216]
 	jbsr	write_text_attr_14_ca42                            	| [$c9e8: call $CA42]
-	lea	game_mem+0x4D8E,a1                      	| [$c9eb: ld   de,$4D8E]
+	LEA_ROM	       0x4D8E,a1                      	| [$c9eb: ld   de,$4D8E]
 	move.w	#0x9217,d6                      	| [$c9ee: ld   hl,$9217]
 	jbsr	write_text_attr_14_ca42                            	| [$c9f1: call $CA42]
-	lea	game_mem+0x4D90,a1                      	| [$c9f4: ld   de,$4D90]
+	LEA_ROM	       0x4D90,a1                      	| [$c9f4: ld   de,$4D90]
 	move.w	#0x9219,d6                      	| [$c9f7: ld   hl,$9219]
 	jbsr	write_text_attr_14_ca42                            	| [$c9fa: call $CA42]
-	lea	game_mem+0x4D92,a1                      	| [$c9fd: ld   de,$4D92]
+	LEA_ROM	       0x4D92,a1                      	| [$c9fd: ld   de,$4D92]
 	move.w	#0x921A,d6                      	| [$ca00: ld   hl,$921A]
 	jbsr	write_text_attr_14_ca42                            	| [$ca03: call $CA42]
 	jbsr	draw_hiscore_frames_c89b                            	| [$ca06: call $C89B]
@@ -6079,11 +6087,11 @@ l_ca79:
 display_player_1_and_2_text_ca7e:
 desplay_player_1_and_2_text_ca7e:
 	* player 1
-	lea	game_mem+0x575A,a1                      	| [$ca7e: ld   de,$575A]
+	LEA_ROM	       0x575A,a1                      	| [$ca7e: ld   de,$575A]
 	move.w	#0x93A0,d6                      	| [$ca81: ld   hl,$93A0]
 	jbsr	display_localized_text_CA67       	| [$ca84: call display_localized_text_CA67]
 	* player 2
-	lea	game_mem+0x5763,a1                      	| [$ca87: ld   de,$5763]
+	LEA_ROM	       0x5763,a1                      	| [$ca87: ld   de,$5763]
 	move.w	#0x9120,d6                      	| [$ca8a: ld   hl,$9120]
 	jbsr	display_localized_text_CA67       	| [$ca8d: call display_localized_text_CA67]
 	rts                                    	| [$ca90: ret]
@@ -6093,10 +6101,10 @@ l_ca91:
 	beq.b	0f                               	| [...]
 	rts                                    	| [$ca96: ret  nz] [...]
 0:
-	lea	game_mem+0x1A58,a1                      	| [$ca97: ld   de,$1A58]
+	LEA_ROM	       0x1A58,a1                      	| [$ca97: ld   de,$1A58]
 	move.w	#0x93A2,d6                      	| [$ca9a: ld   hl,$93A2]
 	jbsr	write_text_55f0                            	| [$ca9d: call $55F0]
-	lea	game_mem+0x1A75,a1                      	| [$caa0: ld   de,$1A75]
+	LEA_ROM	       0x1A75,a1                      	| [$caa0: ld   de,$1A75]
 	move.w	#0x93A3,d6                      	| [$caa3: ld   hl,$93A3]
 	jbsr	write_text_55f0                            	| [$caa6: call $55F0]
 	clr.b	d0                               	| [$caa9: ld   a,$00]
@@ -6448,7 +6456,7 @@ goto_next_left_screen_cc8d:
 l_ccb5:
 	cmp.b	#0x03,d0                         	| [$ccb5: cp   $03]
 	jne	l_ccd7                             	| [$ccb7: jr   nz,$CCD7]
-	lea	game_mem+0x4442,a2                      	| [$ccb9: ld   ix,$4442]
+	LEA_ROM	       0x4442,a2                      	| [$ccb9: ld   ix,$4442]
 	* bogus write, not read anywhere                 	| [$ccbd: ld   (unknown_6281),ix]
 	jbsr	display_screen_2_c272                            	| [$ccc1: call $C272]
 	move.b	#0x02,d0                        	| [$ccc4: ld   a,$02]
@@ -6462,7 +6470,7 @@ l_cccb:
 l_ccd7:
 	cmp.b	#0x04,d0                         	| [$ccd7: cp   $04]
 	jne	l_ccf9                             	| [$ccd9: jr   nz,$CCF9]
-	lea	game_mem+0x4442,a2                      	| [$ccdb: ld   ix,$4442]
+	LEA_ROM	       0x4442,a2                      	| [$ccdb: ld   ix,$4442]
 	* bogus write, not read anywhere                 	| [$ccdf: ld   (unknown_6281),ix]
 	jbsr	display_screen_3_c20e                            	| [$cce3: call $C20E]
 	move.b	#0x03,d0                        	| [$cce6: ld   a,$03]
@@ -6477,7 +6485,7 @@ l_ccf9:
 	beq.b	0f                               	| [...]
 	rts                                    	| [$ccfb: ret  nz] [...]
 0:
-	lea	game_mem+0x4442,a2                      	| [$ccfc: ld   ix,$4442]
+	LEA_ROM	       0x4442,a2                      	| [$ccfc: ld   ix,$4442]
 	* bogus write, not read anywhere                	| [$cd00: ld   (unknown_6281),ix]
 	jbsr	display_screen_4_c1c1                            	| [$cd04: call $C1C1]
 	move.b	#0x04,d0                        	| [$cd07: ld   a,$04]
@@ -6899,12 +6907,12 @@ set_bags_coordinates_hard_level_CFBD:
 	clr.b	d0                               	| [$cfc4: xor  a]
 	move.b	d0,is_key_hunt_phase_6341                 	| [$cfc5: ld   (is_key_hunt_phase_6341),a]
 	lea	bags_coordinates_609C,a1       	| [$cfc8: ld   de,bags_coordinates_609C]
-	lea	game_mem+0x1B15,a0                      	| [$cfcb: ld   hl,$1B15]
+	LEA_ROM	       0x1B15,a0                      	| [$cfcb: ld   hl,$1B15]
 	* that looks suspiciously buggy as d0 is always 0...
 	* maybe this layout (unreachable) is even harder. We'll try it!
 	cmp.b	#0x02,d0                         	| [$cfce: cp   $02]
 	jne	set_bags_coords_cfd5                             	| [$cfd0: jr   nz,$CFD5]
-	lea	game_mem+0x1B4E,a0                      	| [$cfd2: ld   hl,$1B4E]
+	LEA_ROM	       0x1B4E,a0                      	| [$cfd2: ld   hl,$1B4E]
 	
 set_bags_coords_cfd5:
 	move.w	#0x36,d1                        	| [$cfd5: ld   bc,$0036] 54
@@ -6916,12 +6924,12 @@ set_bags_coords_cfd5:
 
 set_bags_coordinates_easy_level_CFDB:
 	lea	bags_coordinates_609C,a1       	| [$cfdb: ld   de,bags_coordinates_609C]
-	lea	game_mem+0x1ADC,a0                      	| [$cfde: ld   hl,$1ADC]
+	LEA_ROM	       0x1ADC,a0                      	| [$cfde: ld   hl,$1ADC]
 	bra.b	set_bags_coords_cfd5
 
 set_bags_coordinates_player_2_CFE7:
 	lea	bags_coordinates_617F,a1       	| [$cfe7: ld   de,bags_coordinates_617F]
-	lea	game_mem+0x1ADC,a0                      	| [$cfea: ld   hl,$1ADC]
+	LEA_ROM	       0x1ADC,a0                      	| [$cfea: ld   hl,$1ADC]
 	                        	| [$cfed: ld   bc,$0036] 54
 	bra.b	set_bags_coords_cfd5
 
@@ -6997,11 +7005,11 @@ current_player_start_screen_d017:
 	move.b	d0,unknown_628C                 	| [$d022: ld   (unknown_628C),a]
 	jbsr	l_c3e3                            	| [$d025: call $C3E3]
 	* write "PLAYER 1"
-	lea	game_mem+0x575A,a1                      	| [$d028: ld   de,$575A]
+	LEA_ROM	       0x575A,a1                      	| [$d028: ld   de,$575A]
 	move.w	#0x9274,d6                      	| [$d02b: ld   hl,$9274]
 	jbsr	display_localized_text_CA67       	| [$d02e: call display_localized_text_CA67]
 	* write "CREDIT"
-	lea	game_mem+0x5689,a1                      	| [$d031: ld   de,$5689]
+	LEA_ROM	       0x5689,a1                      	| [$d031: ld   de,$5689]
 	move.w	#0x919F,d6                      	| [$d034: ld   hl,$919F]
 	jbsr	display_localized_text_CA67       	| [$d037: call display_localized_text_CA67]
 	move.b	current_player_617C,d0          	| [$d03a: ld   a,(current_player_617C)]
@@ -7021,14 +7029,14 @@ current_player_start_screen_d017:
 	move.w	#0x9840,d6                      	| [$d058: ld   hl,$9840]
 	jbsr	write_attribute_on_line_5605      	| [$d05b: call write_attribute_on_line_5605]
 	move.w	#0x9293,d6                      	| [$d05e: ld   hl,$9293]
-	lea	game_mem+0x1A42,a1                      	| [$d061: ld   de,$1A42]
+	LEA_ROM	       0x1A42,a1                      	| [$d061: ld   de,$1A42]
 	move.b	#0x1F,d0                        	| [$d064: ld   a,$1F]
 	exg	d0,d7                              	| [$d066: ex   af,af']
 * write upper part of orange wireframe 
 * that goes around "player" text
 	jbsr	write_text_55f0                            	| [$d067: call $55F0]
 	move.w	#0x9295,d6                      	| [$d06a: ld   hl,$9295]
-	lea	game_mem+0x1A4D,a1                      	| [$d06d: ld   de,$1A4D]
+	LEA_ROM	       0x1A4D,a1                      	| [$d06d: ld   de,$1A4D]
 	move.b	#0x1F,d0                        	| [$d070: ld   a,$1F]
 	exg	d0,d7                              	| [$d072: ex   af,af']
 * write lower part of orange wireframe 
@@ -7097,11 +7105,11 @@ l_d0d4:
 	rts                                    	| [$d0dc: ret]
 	
 draw_credit_and_bonus_d0dd:
-	lea	game_mem+0x5689,a1                      	| [$d0dd: ld   de,$5689]
+	LEA_ROM	       0x5689,a1                      	| [$d0dd: ld   de,$5689]
 	move.w	#0x919F,d6                      	| [$d0e0: ld   hl,$919F]
 	jbsr	display_localized_text_CA67       	| [$d0e3: call display_localized_text_CA67]
 	            	| [$d0e6: ld   a,(io_read_shit_B800)]
-	lea	game_mem+0x5705,a1                      	| [$d0e9: ld   de,$5705]
+	LEA_ROM	       0x5705,a1                      	| [$d0e9: ld   de,$5705]
 	move.w	#0x9240,d6                      	| [$d0ec: ld   hl,$9240]
 	jbsr	display_localized_text_CA67       	| [$d0ef: call display_localized_text_CA67]
 	rts                                    	| [$d0f2: ret]
@@ -7119,14 +7127,14 @@ l_d0f7:
 	clr.b	d0                               	| [$d0ff: xor  a]
 l_d100:
 	move.b	d0,unknown_6353                 	| [$d100: ld   (unknown_6353),a]
-	lea	game_mem+0x3B68,a0                      	| [$d103: ld   hl,$3B68]
+	LEA_ROM	       0x3B68,a0                      	| [$d103: ld   hl,$3B68]
 	cmp.b	#0x01,d0                         	| [$d106: cp   $01]
 	jeq	l_d114                             	| [$d108: jr   z,$D114]
-	lea	game_mem+0x3800,a0                      	| [$d10a: ld   hl,$3800]
+	LEA_ROM	       0x3800,a0                      	| [$d10a: ld   hl,$3800]
 	cmp.b	#0x02,d0                         	| [$d10d: cp   $02]
 	jeq	l_d114                             	| [$d10f: jr   z,$D114]
 	* TODO play music ??
-	lea	game_mem+0x5000,a0                      	| [$d111: ld   hl,$5000]
+	LEA_ROM	       0x5000,a0                      	| [$d111: ld   hl,$5000]
 l_d114:
 	move.l	a0,ay_sound_pointer_6140        	| [$d114: ld   (ay_sound_pointer_6140),hl]
 	clr.b	d0                               	| [$d117: xor  a]
@@ -7177,12 +7185,12 @@ check_if_level_completed_D12F:
 	move.b	#0x01,d0                        	| [$d14b: ld   a,$01]
 	move.b	d0,unknown_6332                 	| [$d14d: ld   (unknown_6332),a]
 	move.b	d0,ignore_if_has_credits_6342                 	| [$d150: ld   (ignore_if_has_credits_6342),a]
-	lea	game_mem+0x1C13,a2                      	| [$d153: ld   ix,$1C13]
+	LEA_ROM	       0x1C13,a2                      	| [$d153: ld   ix,$1C13]
 	jbsr	osd_read_dipswitches                       	| [$d157: ld   a,($B000)]
 	and.b	#0x20,d0                         	| [$d15a: and  $20]
 	cmp.b	#0x20,d0                         	| [$d15c: cp   $20]
 	jne	l_d164                             	| [$d15e: jr   nz,$D164]
-	lea	game_mem+0x1C6A,a2                      	| [$d160: ld   ix,$1C6A]
+	LEA_ROM	       0x1C6A,a2                      	| [$d160: ld   ix,$1C6A]
 l_d164:
 	jbsr	tell_the_story_d82a                            	| [$d164: call $D82A]
 	                               	| [$d167: xor  a]
@@ -7206,7 +7214,7 @@ l_d164:
 	move.w	#0x0020,d3                      	| [$d18c: ld   de,$0020] 32
 	add.w	d3,d6                            	| [$d18f: add  hl,de]
 	jbsr	osd_w_videoram                         	| [$d190: ld   (hl),a]
-	lea	game_mem+0xD1B5,a2                      	| [$d191: ld   ix,$D1B5]
+	LEA_ROM	       0xD1B5,a2                      	| [$d191: ld   ix,$D1B5]
 	move.w	#0x0003,d3                      	| [$d195: ld   de,$0003] 3
 	jbsr  osd_get_random       	| [$d198: ld   a,(interrupt_control_A000)]
 	and.b	#0x07,d0                         	| [$d19b: and  $07]
@@ -7269,13 +7277,13 @@ l_d1f3:
 	jbsr	clear_screen_C3B7                 	| [$d21d: call clear_screen_C3B7]
 	move.b	#0x04,d0                        	| [$d220: ld   a,$04]
 	jbsr	change_attribute_everywhere_C3A3  	| [$d222: call change_attribute_everywhere_C3A3]
-	lea	game_mem+0x1CAE,a2                      	| [$d225: ld   ix,$1CAE]
+	LEA_ROM	       0x1CAE,a2                      	| [$d225: ld   ix,$1CAE]
 	* french/english language setting
 	jbsr	osd_read_dipswitches                       	| [$d229: ld   a,($B000)]
 	and.b	#0x20,d0                         	| [$d22c: and  $20]
 	cmp.b	#0x20,d0                         	| [$d22e: cp   $20]
 	jne	l_d236                             	| [$d230: jr   nz,$D236]
-	lea	game_mem+0x1D25,a2                      	| [$d232: ld   ix,$1D25]
+	LEA_ROM	       0x1D25,a2                      	| [$d232: ld   ix,$1D25]
 l_d236:
 	jbsr	tell_the_story_d82a                            	| [$d236: call $D82A]
 	clr.b	d0                               	| [$d239: xor  a]
@@ -7514,7 +7522,7 @@ l_d464:
 	movem.w	d1/d2,-(sp)                    	| [$d466: push bc]
 	                        	| [$d467: ld   bc,$000A] 10
 	move.w	#0x0a,d1                        	| [$d467: ld   bc,$000A] 10
-	lea	game_mem+0xD477,a0                      	| [$d46a: ld   hl,$D477]
+	LEA_ROM	       0xD477,a0                      	| [$d46a: ld   hl,$D477]
 	jbsr	cpir                              	| [$d46d: cpir]
 
 	movem.w	(sp)+,d1/d2                    	| [$d46f: pop  bc]
@@ -7533,7 +7541,7 @@ l_d481:
 	movem.w	d1/d2,-(sp)                    	| [$d483: push bc]
 	                        	| [$d484: ld   bc,$0014] 20
 	move.w	#0x14,d1                        	| [$d484: ld   bc,$0014] 20
-	lea	game_mem+0xD48F,a0                      	| [$d487: ld   hl,$D48F]
+	LEA_ROM	       0xD48F,a0                      	| [$d487: ld   hl,$D48F]
 	jbsr	cpir                              	| [$d48a: cpir]
  
 	movem.w	(sp)+,d1/d2                    	| [$d48c: pop  bc]
@@ -7572,7 +7580,7 @@ l_d4a9:
 	rts                                    	| [$d4cd: ret  nz] [...]
 0:
 * Sound???? TODO
-**	lea	game_mem+0xD9B1,a0                      	| [$d4ce: ld   hl,$D9B1]
+**	LEA_ROM	       0xD9B1,a0                      	| [$d4ce: ld   hl,$D9B1]
 **	jbsr	play_sample_EC84                  	| [$d4d1: call play_sample_EC84]
 	clr.b	d0                               	| [$d4d4: xor  a]
 	move.b	d0,unknown_6153                 	| [$d4d5: ld   (unknown_6153),a]
@@ -8151,7 +8159,7 @@ play_type_sample_d8c0:
 	movem.w	d1/d2,-(sp)                    	| [$d8c1: push bc]
 	movem.w	d3/d4,-(sp)                    	| [$d8c2: push de]
 	move.l	a1,-(sp)                        	| [$d8c2: push de]
-	lea	game_mem+0xD97B,a0                      	| [$d8c3: ld   hl,$D97B]
+	LEA_ROM	       0xD97B,a0                      	| [$d8c3: ld   hl,$D97B]
 	jbsr	play_sample_EC84                  	| [$d8c6: call play_sample_EC84]
 	move.l	(sp)+,a1                        	| [$d8c9: pop  de]
 	movem.w	(sp)+,d3/d4                    	| [$d8c9: pop  de]
@@ -8212,7 +8220,7 @@ l_d9b7:
 l_d9cc:
 
 	move.l	a3,-(sp)                        	| [$d9cc: push iy]
-	lea	game_mem+0x23A8,a3                      	| [$d9ce: ld   iy,$23A8]
+	LEA_ROM	       0x23A8,a3                      	| [$d9ce: ld   iy,$23A8]
 l_d9d2:
 	LOAD_AX_BE_WORD_DY	a3,d6
 	      	| [$d9d2: ld   a,(iy+$00)]
@@ -8557,7 +8565,7 @@ l_dbe7:
  	move.w	#0x0040,d3                      	| [$dbfd: ld   de,$0040] 64
 	add.w	d3,d6                            	| [$dc00: add  hl,de]
 	move.w	d6,explosion_screen_address_62F8                 	| [$dc01: ld   (explosion_screen_address_62F8),hl]
-	lea	game_mem+0xDEB6,a0                      	| [$dc04: ld   hl,$DEB6]
+	LEA_ROM	       0xDEB6,a0                      	| [$dc04: ld   hl,$DEB6]
 	move.l	a0,bomb_explosion_tiles_pointer_62F6                 	| [$dc07: ld   (bomb_explosion_tiles_pointer_62F6),hl]
 	*move.w	explosion_screen_address_62F8,d6             	| [$dc0a: ld   iy,(explosion_screen_address_62F8)]
  	lea		bomb_explosion_tile_backup_buffer_62FC,a2                	| [$dc0e: ld   ix,bomb_explosion_tile_backup_buffer_62FC]
@@ -8930,10 +8938,10 @@ l_df88:
 	clr.b	d0                               	| [$df88: xor  a]
 	move.b	d0,(A3)                    	| [$df89: ld   (iy+$00),a]
 	rts                                    	| [$df8c: ret]
-l_df8d:
+init_elevator_5_df8d:
 	move.w	#0x90C7,d6                      	| [$df8d: ld   hl,$90C7]
 	move.w	d6,elevator_5_screen_address_62DD                 	| [$df90: ld   (elevator_5_screen_address_62DD),hl]
-	lea	game_mem+0xE004,a0                      	| [$df93: ld   hl,$E004]
+	LEA_ROM	       0xE004,a0                      	| [$df93: ld   hl,$E004]
 	move.l	a0,unknown_pointer_62DB                 	| [$df96: ld   (unknown_pointer_62DB),hl]
 	move.b	#0xBB,d0                        	| [$df99: ld   a,$BB]
 	move.b	d0,unknown_62E0                 	| [$df9b: ld   (unknown_62E0),a]
@@ -8959,9 +8967,9 @@ l_df8d:
 	rts                                    	| [$dfbe: ret]
 	
 init_bombs_locations_and_other_stuff_dfbf:
-	jbsr	l_df8d                            	| [$dfbf: call $DF8D]
+	jbsr	init_elevator_5_df8d                            	| [$dfbf: call $DF8D]
 	move.w	#0xDF2D,d6                      	| [$dfc2: ld   hl,$DF2D]
-	move.w	d6,jail_buddy_aniimation_rom_address_62F1                 	| [$dfc5: ld   (jail_buddy_aniimation_rom_address_62F1),hl]
+	STORE_WORD	d6,jail_buddy_aniimation_rom_address_62F1                 	| [$dfc5: ld   (jail_buddy_aniimation_rom_address_62F1),hl]
 	move.w	#0x9263,d6                      	| [$dfc8: ld   hl,$9263]
 	STORE_WORD	d6,bomb_1_screen_address_630E                 	| [$dfcb: ld   (bomb_1_screen_address_630E),hl]
 	move.b	#0x01,d0                        	| [$dfce: ld   a,$01]
@@ -8986,8 +8994,8 @@ init_bombs_locations_and_other_stuff_dfbf:
 	rts                                    	| [$e002: ret]
 
 l_e039:
-	jbsr	l_df8d                            	| [$e039: call $DF8D]
-l_e03c:
+	jbsr	init_elevator_5_df8d                            	| [$e039: call $DF8D]
+handle_elevator_5_e03c:
 	move.w	elevator_5_screen_address_62DD,d6             	| [$e03c: ld   hl,(elevator_5_screen_address_62DD)]
 	move.b	d6,d0                           	| [$e03f: ld   a,l]
 	cmp.b	#0xC7,d0                         	| [$e040: cp   $C7]
@@ -8998,10 +9006,12 @@ l_e03c:
 	                         	| [$e04b: cp   $00]
 	jeq	l_e054                             	| [$e04d: jr   z,$E054]
 	subq.b	#1,d0                           	| [$e04f: dec  a]
+	* elevator not moving
 	move.b	d0,elevator_5_stop_timer_62E1                 	| [$e050: ld   (elevator_5_stop_timer_62E1),a]
 	rts                                    	| [$e053: ret]
 
 l_e054:
+	* elevator moving (not stopped)
 	move.b	elevator_5_direction_62df,d0                 	| [$e054: ld   a,(elevator_5_direction_62df)]
 	                         	| [$e057: cp   $00]
 	bne.b	0f                               	| [...]
@@ -9011,6 +9021,7 @@ l_e054:
 	move.b	elevator_5_y_62E3,d0                 	| [$e05b: ld   a,(elevator_5_y_62E3)]
 	sub.b	d1,d0                            	| [$e05e: sub  b]
 	move.b	d0,elevator_5_y_62E3                 	| [$e05f: ld   (elevator_5_y_62E3),a]
+	* apply elevator y to all characters on it
 	move.b	d0,d1                           	| [$e062: ld   b,a]
 	tst.b	player_in_elevator_5_62E5                 	| [$e063: ld   a,(player_in_elevator_5_62E5)]
 	                         	| [$e066: cp   $00]
@@ -9018,17 +9029,17 @@ l_e054:
 										| [$e06a: ld   a,b]
 	move.b	d1,player_y_6583                	| [$e06b: ld   (player_y_6583),a]
 l_e06e:
-	move.b	guard_1_in_elevator_5_62E9,d0                 	| [$e06e: ld   a,(guard_1_in_elevator_5_62E9)]
+	tst.b	guard_1_in_elevator_5_62E9                 	| [$e06e: ld   a,(guard_1_in_elevator_5_62E9)]
 	                         	| [$e071: cp   $00]
 	jeq	l_e079                             	| [$e073: jr   z,$E079]
-	move.b	d1,d0                           	| [$e075: ld   a,b]
-	move.b	d0,guard_1_y_6597               	| [$e076: ld   (guard_1_y_6597),a]
+	                           	| [$e075: ld   a,b]
+	move.b	d1,guard_1_y_6597               	| [$e076: ld   (guard_1_y_6597),a]
 l_e079:
-	move.b	guard_2_in_elevator_5_62ED,d0                 	| [$e079: ld   a,(guard_2_in_elevator_5_62ED)]
+	tst.b	guard_2_in_elevator_5_62ED                 	| [$e079: ld   a,(guard_2_in_elevator_5_62ED)]
 	                         	| [$e07c: cp   $00]
 	jeq	l_e084                             	| [$e07e: jr   z,$E084]
-	move.b	d1,d0                           	| [$e080: ld   a,b]
-	move.b	d0,guard_2_y_659B               	| [$e081: ld   (guard_2_y_659B),a]
+	                           	| [$e080: ld   a,b]
+	move.b	d1,guard_2_y_659B               	| [$e081: ld   (guard_2_y_659B),a]
 l_e084:
 	move.b	elevator_5_direction_62df,d0                 	| [$e084: ld   a,(elevator_5_direction_62df)]
 	move.b	d0,d1                           	| [$e087: ld   b,a]
@@ -9051,7 +9062,8 @@ l_e09f:
 	move.w	elevator_5_screen_address_62DD,d6             	| [$e0a8: ld   hl,(elevator_5_screen_address_62DD)]
 	move.b	(A2),d0                    	| [$e0ab: ld   a,(ix+$00)]
 	jbsr	l_e0f7                            	| [$e0ae: call $E0F7]
-	jbsr	write_elevator_tiles_e172                            	| [$e0b1: call $E172]
+	jbsr	write_elevator_5_tiles_e172                            	| [$e0b1: call $E172]
+	* update pointer
 	move.l	unknown_pointer_62DB,a0             	| [$e0b4: ld   hl,(unknown_pointer_62DB)]
  	jbsr	move_elevator_5_e0ec_a0                            	| [$e0b7: call $E0EC]
 	move.l	a0,unknown_pointer_62DB                 	| [$e0ba: ld   (unknown_pointer_62DB),hl]
@@ -9074,11 +9086,11 @@ l_e0c7:
 	move.w	d6,elevator_5_screen_address_62DD                 	| [$e0da: ld   (elevator_5_screen_address_62DD),hl]
 	rts                                    	| [$e0dd: ret]
 l_e0de:
-	lea	game_mem+0xE004,a0                      	| [$e0de: ld   hl,$E004]
+	LEA_ROM	       0xE004,a0                      	| [$e0de: ld   hl,$E004]
 	move.l	a0,unknown_pointer_62DB                 	| [$e0e1: ld   (unknown_pointer_62DB),hl]
 	rts                                    	| [$e0e4: ret]
 l_e0e5:
-	lea	game_mem+0xE013,a0                      	| [$e0e5: ld   hl,$E013]
+	LEA_ROM	       0xE013,a0                      	| [$e0e5: ld   hl,$E013]
 	move.l	a0,unknown_pointer_62DB                 	| [$e0e8: ld   (unknown_pointer_62DB),hl]
 	rts                                    	| [$e0eb: ret]
 move_elevator_5_e0ec:
@@ -9112,24 +9124,24 @@ l_e0f7:
 	jra	l_e135                             	| [$e108: jr   $E135]
 l_e10a:
 	move.b	d6,d0                           	| [$e10a: ld   a,l]
-	move.b	#0x49,d4                        	| [$e10b: ld   e,$49]
-	cmp.b	#0xCB,d0                         	| [$e10d: cp   $CB]
+	cmp.b	#0xCB,d0                         	| [$e10d: cp   $CB]   stop address LSB
 	bne.b	0f                               	| [...]
+	move.b	#0x49,d4                        	| [$e10b: ld   e,$49] Y floor
 	jbsr	elevator_5_reaches_a_floor_e1aa                            	| [$e10f: call z,$E1AA]
 0:
-	move.b	#0x71,d4                        	| [$e112: ld   e,$71]
 	cmp.b	#0xD0,d0                         	| [$e114: cp   $D0]
 	bne.b	0f                               	| [...]
+	move.b	#0x71,d4                        	| [$e112: ld   e,$71]
 	jbsr	elevator_5_reaches_a_floor_e1aa                            	| [$e116: call z,$E1AA]
 0:
-	move.b	#0x99,d4                        	| [$e119: ld   e,$99]
 	cmp.b	#0xD5,d0                         	| [$e11b: cp   $D5]
 	bne.b	0f                               	| [...]
+	move.b	#0x99,d4                        	| [$e119: ld   e,$99]
 	jbsr	elevator_5_reaches_a_floor_e1aa                            	| [$e11d: call z,$E1AA]
 0:
-	move.b	#0x29,d4                        	| [$e120: ld   e,$29]
 	cmp.b	#0xC7,d0                         	| [$e122: cp   $C7]
 	jne	l_e135                             	| [$e124: jr   nz,$E135]
+	move.b	#0x29,d4                        	| [$e120: ld   e,$29]
 	jbsr	elevator_5_reaches_a_floor_e1aa                            	| [$e126: call $E1AA]
 	jra	l_e135                             	| [$e129: jr   $E135]
 l_e12b:
@@ -9160,7 +9172,8 @@ l_e137:
 	move.l	unknown_pointer_62DB,a0             	| [$e147: ld   hl,(unknown_pointer_62DB)]
 	addq.w	#2,a0                           	| [$e14a: inc  hl] * 2
 	move.l	a0,unknown_pointer_62DB                 	| [$e14c: ld   (unknown_pointer_62DB),hl]
-	jra	l_e169                             	| [$e14f: jr   $E169]
+	jra	change_elevator_5_direction_e169                             	| [$e14f: jr   $E169]
+
 l_e151:
 	move.b	elevator_5_direction_62df,d0                 	| [$e151: ld   a,(elevator_5_direction_62df)]
 	cmp.b	#0xFF,d0                         	| [$e154: cp   $FF]
@@ -9181,24 +9194,24 @@ l_e151:
 	move.l	unknown_pointer_62DB,a0             	| [$e161: ld   hl,(unknown_pointer_62DB)]
 	subq.w	#2,a0                           	| [$e164: dec  hl] * 2
 	move.l	a0,unknown_pointer_62DB                 	| [$e166: ld   (unknown_pointer_62DB),hl]
-l_e169:
+change_elevator_5_direction_e169:
 	move.b	elevator_5_direction_62df,d0                 	| [$e169: ld   a,(elevator_5_direction_62df)]
 	not.b	d0                               	| [$e16c: cpl]
 	addq.b	#1,d0                           	| [$e16d: inc  a]
 	move.b	d0,elevator_5_direction_62df                 	| [$e16e: ld   (elevator_5_direction_62df),a]
 	rts                                    	| [$e171: ret]
 
-write_elevator_tiles_e172:
+write_elevator_5_tiles_e172:
 	
-	exg	d0,d7                              	| [$e172: ex   af,af']
+	                              	| [$e172: ex   af,af']
 
-	move.b	player_screen_600D,d0           	| [$e173: ld   a,(player_screen_600D)]
-	cmp.b	#0x05,d0                         	| [$e176: cp   $05]
+	cmp.b	#0x05,player_screen_600D           	| [$e173: ld   a,(player_screen_600D)]
+	                         	| [$e176: cp   $05]
 	beq.b	0f                               	| [...]
 	rts                                    	| [$e178: ret  nz] [...]
 0:
-	exg	d0,d7                              	| [$e179: ex   af,af']
-
+	                              	| [$e179: ex   af,af']
+	WPSET	0x200
 	jbsr	osd_w_videoram                         	| [$e17a: ld   (hl),a]
 	move.w	#0x0020,d3                      	| [$e17b: ld   de,$0020] 32
 	add.w	d3,d6                            	| [$e17e: add  hl,de]
@@ -9449,7 +9462,7 @@ l_e2c5:
 0:
 	rts                                    	| [$e2eb: ret]
 l_e2ec:
-	lea	game_mem+0xE32D,a3                      	| [$e2ec: ld   iy,$E32D]
+	LEA_ROM	       0xE32D,a3                      	| [$e2ec: ld   iy,$E32D]
 	clr.b	d1                               	| [$e2f0: ld   b,$00]
 l_e2f2:
 	move.b	(a1),d0                         	| [$e2f2: ld   a,(de)]
@@ -10123,7 +10136,7 @@ l_e7d3:
 	rts                                    	| [$e811: ret  z] [...]
 0:
 * TODO play sound?
-*	lea	game_mem+0x5428,a0                      	| [$e812: ld   hl,$5428]
+*	LEA_ROM	       0x5428,a0                      	| [$e812: ld   hl,$5428]
 *	move.b	a0,unknown_634E                 	| [$e815: ld   (unknown_634E),hl]
 *	clr.b	d0                               	| [$e818: xor  a]
 *	move.b	d0,ay_sound_start_6142          	| [$e819: ld   (ay_sound_start_6142),a]
@@ -10391,12 +10404,12 @@ l_e9d3:
 	rts                                    	| [$e9e8: ret  z] [...]
 0:
 	* handle mechanical stairs
-	lea	game_mem+0x1B87,a2                      	| [$e9e9: ld   ix,$1B87]
+	LEA_ROM	       0x1B87,a2                      	| [$e9e9: ld   ix,$1B87]
 	move.w	mechanical_stair_frame_62AD,d3             	| [$e9ed: ld   de,(mechanical_stair_frame_62AD)]
 	add.w	d3,a2                            	| [$e9f1: add  ix,de]
 	move.w	#0x92D0,d6                      	| [$e9f3: ld   hl,$92D0]
 	jbsr	draw_mechanical_stair_ea3c                            	| [$e9f6: call $EA3C]
-	lea	game_mem+0x1B87,a2                      	| [$e9f9: ld   ix,$1B87]
+	LEA_ROM	       0x1B87,a2                      	| [$e9f9: ld   ix,$1B87]
 	add.w	d3,a2                            	| [$e9fd: add  ix,de]
 	move.w	#0x928F,d6                      	| [$e9ff: ld   hl,$928F]
 	jbsr	draw_mechanical_stair_ea3c                            	| [$ea02: call $EA3C]
@@ -10826,7 +10839,7 @@ l_ec5e:
 	rts                                    	| [$ec6b: ret]
 l_ec6c:
 	move.w	#0x926E,d6                      	| [$ec6c: ld   hl,$926E]
-	lea	game_mem+0x56A1,a1                      	| [$ec6f: ld   de,$56A1]
+	LEA_ROM	       0x56A1,a1                      	| [$ec6f: ld   de,$56A1]
 	jbsr	display_localized_text_CA67       	| [$ec72: call display_localized_text_CA67]
 	rts                                    	| [$ec75: ret]
 l_ec76:
@@ -10879,7 +10892,7 @@ l_ecc1:
 	jbsr	set_bags_coordinates_easy_level_CFDB	| [$ecc4: call set_bags_coordinates_easy_level_CFDB]
 	jbsr	set_bags_coordinates_player_2_CFE7         	| [$ecc7: call set_bags_coordinates_player_2_CFE7]
 	* TODO sound
-*	lea	game_mem+0x513C,a0                      	| [$ecca: ld   hl,$513C]
+*	LEA_ROM	       0x513C,a0                      	| [$ecca: ld   hl,$513C]
 *	move.b	a0,ay_sound_pointer_6140        	| [$eccd: ld   (ay_sound_pointer_6140),hl]
 *	move.b	a0,unknown_634E                 	| [$ecd0: ld   (unknown_634E),hl]
 	move.b	#0x38,d0                        	| [$ecd3: ld   a,$38]
@@ -10964,7 +10977,7 @@ l_ed5a:
 	jbsr	display_player_ids_and_credit_F8A4	| [$ed82: call display_player_ids_and_credit_F8A4]
 	jbsr	write_credits_and_lives_162e                            	| [$ed85: call $162E]
 	* TODO sound!
-	*lea	game_mem+0x5B68,a0                      	| [$ed88: ld   hl,$5B68]
+	*LEA_ROM	       0x5B68,a0                      	| [$ed88: ld   hl,$5B68]
 	*move.b	a0,ay_sound_pointer_6140        	| [$ed8b: ld   (ay_sound_pointer_6140),hl]
 	*clr.b	d0                               	| [$ed8e: xor  a]
 	*move.b	d0,ay_sound_start_6142          	| [$ed8f: ld   (ay_sound_start_6142),a]
@@ -10980,12 +10993,12 @@ l_ed9f:
 	move.b	number_of_credits_6000,d0       	| [$eda6: ld   a,(number_of_credits_6000)]
 	cmp.b	#0x01,d0                         	| [$eda9: cp   $01]
 	jne	l_edb9                             	| [$edab: jr   nz,$EDB9]
-	lea	game_mem+0x56DF,a1                      	| [$edad: ld   de,$56DF]
+	LEA_ROM	       0x56DF,a1                      	| [$edad: ld   de,$56DF]
 	move.w	#0x9311,d6                      	| [$edb0: ld   hl,$9311]
 	jbsr	display_localized_text_CA67       	| [$edb3: call display_localized_text_CA67]
 	jra	mainloop_ecf9                             	| [$edb6: jp   $ECF9]
 l_edb9:
-	lea	game_mem+0x56F2,a1                      	| [$edb9: ld   de,$56F2]
+	LEA_ROM	       0x56F2,a1                      	| [$edb9: ld   de,$56F2]
 	move.w	#0x9311,d6                      	| [$edbc: ld   hl,$9311]
 	jbsr	display_localized_text_CA67       	| [$edbf: call display_localized_text_CA67]
 	jra	mainloop_ecf9                             	| [$edc2: jp   $ECF9]
@@ -11417,7 +11430,7 @@ l_f18a:
 	jra	mainloop_ecf9                             	| [$f18b: jp   $ECF9]
 l_f18e:
 	bsr		read_rom                         	| [$f18e: ld   a,(hl)]
-	lea	game_mem+0x239E,a0                      	| [$f18f: ld   hl,$239E]
+	LEA_ROM	       0x239E,a0                      	| [$f18f: ld   hl,$239E]
 	addq.w	#1,a0                           	| [$f192: inc  hl]
 	move.w	#0x09,d1                        	| [$f193: ld   bc,$0009] 9
 	jbsr	cpir                              	| [$f196: cpir]
@@ -11443,7 +11456,7 @@ l_f1a6:
 	bsr		read_rom                         	| [$f1c1: ld   a,(hl)]
 
 	movem.l	a0,-(sp)                        	| [$f1c2: push hl]
-	lea	game_mem+0x5B24,a0                      	| [$f1c3: ld   hl,$5B24]
+	LEA_ROM	       0x5B24,a0                      	| [$f1c3: ld   hl,$5B24]
 	move.w	#0x07,d1                        	| [$f1c6: ld   bc,$0007] 7
 	jbsr	cpdr                              	| [$f1c9: cpdr]
 	movem.l	(sp)+,a0                        	| [$f1cb: pop  hl]
@@ -11467,7 +11480,7 @@ l_f1d9:
 	bsr		read_rom                         	| [$f1f2: ld   a,(hl)]
 
 	move.l	a0,-(sp)                        	| [$f1f3: push hl]
-	lea	game_mem+0x21E3,a0                      	| [$f1f4: ld   hl,$21E3]
+	LEA_ROM	       0x21E3,a0                      	| [$f1f4: ld   hl,$21E3]
 	move.w	#0x17,d1                        	| [$f1f7: ld   bc,$0017] 23
 	jbsr	cpdr                              	| [$f1fa: cpdr]
 	movem.l	(sp)+,a0                        	| [$f1fc: pop  hl]
@@ -11482,7 +11495,7 @@ l_f1d9:
 	jbsr	convert_logical_to_screen_address_f2b2                            	| [$f20f: call $F2B2]
 	bsr		osd_r_videoram                         	| [$f212: ld   a,(hl)]
 	                              	| [$f213: ex   de,hl]
-	lea	game_mem+0x21E3,a0                      	| [$f214: ld   hl,$21E3]
+	LEA_ROM	       0x21E3,a0                      	| [$f214: ld   hl,$21E3]
 	move.w	#0x17,d1                        	| [$f217: ld   bc,$0017] 23
 	jbsr	cpdr                              	| [$f21a: cpdr]
 	                             	| [$f21c: ex   de,hl]
@@ -11502,7 +11515,7 @@ l_f225:
 	cmp.b	#0xEE,d0                         	| [$f230: cp   $EE]
 	jeq	l_f246                             	| [$f232: jr   z,$F246]
                               	| [$f234: ex   de,hl]
-	lea	game_mem+0x21E3,a0                      	| [$f235: ld   hl,$21E3]
+	LEA_ROM	       0x21E3,a0                      	| [$f235: ld   hl,$21E3]
 	move.w	#0x17,d1                        	| [$f238: ld   bc,$0017] 23
 	jbsr	cpdr                              	| [$f23b: cpdr]
 	                              	| [$f23d: ex   de,hl]
@@ -11974,7 +11987,7 @@ test_pickup_flag_F4E3:
 l_f4f2:
 	CLEAR_XC_FLAG
 	move.w	d3,d4
-	lea	game_mem+0x2384,a0                      	| [$f4f2: ld   hl,$2384]
+	LEA_ROM	       0x2384,a0                      	| [$f4f2: ld   hl,$2384]
 	                        	| [$f4f5: ld   bc,$0013] 19
 	move.w	#0x13,d1                        	| [$f4f5: ld   bc,$0013] 19
 	move.w	d0,-(sp)                        	| [$f4f8: push af]
@@ -12080,7 +12093,7 @@ l_f595:
 	jbsr  osd_get_random       	| [$f595: ld   a,(interrupt_control_A000)]
 
 	move.l	a0,-(sp)                        	| [$f598: push hl]
-	lea	game_mem+0x2385,a0  	| [$f599: ld   hl,direction_index_table_2385]
+	LEA_ROM	       0x2385,a0  	| [$f599: ld   hl,direction_index_table_2385]
 	and.b	#0x03,d0                         	| [$f59c: and  $03] random 0 1 2 3
                            	| [$f59e: add  a,l]
                           	| [$f59f: ld   l,a]
@@ -12440,7 +12453,7 @@ l_f7f7:
 	movem.w	d1/d2,-(sp)                    	| [$f7fe: push bc]
 	move.b	#0x15,d1                        	| [$f7ff: ld   b,$15]
  * 15 tests
-	lea	game_mem+0x2389,a3                      	| [$f801: ld   iy,$2389]
+	LEA_ROM	       0x2389,a3                      	| [$f801: ld   iy,$2389]
 l_f805:
 	cmp.b	(A3)+,d0                     	| [$f805: cp   (iy+$00)]
 	jeq	l_f810                             	| [$f808: jr   z,$F810]
@@ -12558,21 +12571,21 @@ l_f8a2:
 
 * display PLAYER 1
 display_player_ids_and_credit_F8A4:
-	lea	game_mem+0x5680,a1                      	| [$f8a4: ld   de,$5680]
+	LEA_ROM	       0x5680,a1                      	| [$f8a4: ld   de,$5680]
 	move.w	#0x93A0,d6                      	| [$f8a7: ld   hl,$93A0]
 	jbsr	display_localized_text_CA67       	| [$f8aa: call display_localized_text_CA67]
 * display PLAYER 1 again
-	lea	game_mem+0x5680,a1                      	| [$f8ad: ld   de,$5680]
+	LEA_ROM	       0x5680,a1                      	| [$f8ad: ld   de,$5680]
 	move.w	#0x9120,d6                      	| [$f8b0: ld   hl,$9120]
 * display BONUS
 	jbsr	display_localized_text_CA67       	| [$f8b3: call display_localized_text_CA67]
-	lea	game_mem+0x5705,a1                      	| [$f8b6: ld   de,$5705]
+	LEA_ROM	       0x5705,a1                      	| [$f8b6: ld   de,$5705]
 	move.w	#0x9240,d6                      	| [$f8b9: ld   hl,$9240]
 	jbsr	display_localized_text_CA67       	| [$f8bc: call display_localized_text_CA67]
 	move.b	#0x02,d0                        	| [$f8bf: ld   a,$02]
 	move.w	#0x9040,d6                      	| [$f8c1: ld   hl,$9040]
 	move.b	d0,(a0)                         	| [$f8c4: ld   (hl),a]
-	lea	game_mem+0x5689,a1                      	| [$f8c5: ld   de,$5689]
+	LEA_ROM	       0x5689,a1                      	| [$f8c5: ld   de,$5689]
 	move.w	#0x919F,d6                      	| [$f8c8: ld   hl,$919F]
 	jbsr	display_localized_text_CA67       	| [$f8cb: call display_localized_text_CA67]
 * credit digits seems useless: wrong and overwritten
@@ -12611,7 +12624,7 @@ l_f8f7:
 	cmp.b	#0xF8,d0                         	| [$f907: cp   $F8]
 
 	move.l	a0,-(sp)                        	| [$f909: push hl]
-	lea	game_mem+0x23A7,a0                      	| [$f90a: ld   hl,$23A7]
+	LEA_ROM	       0x23A7,a0                      	| [$f90a: ld   hl,$23A7]
 	move.w	#0x02,d1                        	| [$f90d: ld   bc,$000A] 10
 	jbsr	cpdr                              	| [$f910: cpdr]
 	movem.l	(sp)+,a0                        	| [$f912: pop  hl]
@@ -12653,13 +12666,13 @@ l_f94b:
 
 init_new_game_F951:
 
-*	lea	game_mem+0x5B60,a0                      	| [$f951: ld   hl,$5B60]
+*	LEA_ROM	       0x5B60,a0                      	| [$f951: ld   hl,$5B60]
 *	move.b	a0,ay_sound_pointer_6140        	| [$f954: ld   (ay_sound_pointer_6140),hl]
 *	clr.b	d0                               	| [$f957: xor  a]
 *	move.b	d0,ay_sound_start_6142          	| [$f958: ld   (ay_sound_start_6142),a]
 *	jbsr	l_d4e7                            	| [$f95b: call $D4E7]
 	jne	l_f96d                             	| [$f95e: jr   nz,$F96D]
-	lea	game_mem+0x3B68,a0                      	| [$f960: ld   hl,$3B68]
+	LEA_ROM	       0x3B68,a0                      	| [$f960: ld   hl,$3B68]
 	* play first tune
 	jbsr	play_first_tune
 	*move.b	a0,ay_sound_pointer_6140        	| [$f963: ld   (ay_sound_pointer_6140),hl]
@@ -12750,7 +12763,7 @@ player_dies_F9E1:
 	      	| [$fa0b: ld   (interrupt_control_A000),a]
 	                      	| [$fa0e: ld   hl,$2779]
 	move.w	#0x2779,unknown_6154                 	| [$fa11: ld   (unknown_6154),hl]
-	lea	game_mem+0xD95D,a0                      	| [$fa14: ld   hl,$D95D]
+	LEA_ROM	       0xD95D,a0                      	| [$fa14: ld   hl,$D95D]
 	clr.b	d0                               	| [$fa17: xor  a]
 	move.b	d0,wait_flag_6152               	| [$fa18: ld   (wait_flag_6152),a]
     jbsr   osd_enable_vblank_interrupt  | ei
@@ -12770,7 +12783,7 @@ l_fa35:
 *	jbsr	l_d4e7                            	| [$fa35: call $D4E7]
 	*jne	l_fa4b                             	| [$fa38: jr   nz,$FA4B]
     	jbsr   osd_disable_vblank_interrupt  | di
-	*lea	game_mem+0x3F60,a0                      	| [$fa3b: ld   hl,$3F60]
+	*LEA_ROM	       0x3F60,a0                      	| [$fa3b: ld   hl,$3F60]
 	*move.b	a0,ay_sound_pointer_6140        	| [$fa3e: ld   (ay_sound_pointer_6140),hl]
 	*clr.b	d0                               	| [$fa41: xor  a]
 	*move.b	d0,ay_sound_start_6142          	| [$fa42: ld   (ay_sound_start_6142),a]
@@ -12907,11 +12920,11 @@ l_fb18:
 	jne	l_fb7b                             	| [$fb44: jr   nz,$FB7B]
 	jbsr	prepare_cleared_screen_FB98       	| [$fb46: call prepare_cleared_screen_FB98]
 	* "INSERT COIN"
-	lea	game_mem+0x56AC,a1                      	| [$fb49: ld   de,$56AC]
+	LEA_ROM	       0x56AC,a1                      	| [$fb49: ld   de,$56AC]
 	move.w	#0x935A,d6                      	| [$fb4c: ld   hl,$935A]
 	jbsr	display_localized_text_CA67       	| [$fb4f: call display_localized_text_CA67]
 	* "BY VALADON AUTOMATION 1982"
-	lea	game_mem+0x2353,a1                      	| [$fb52: ld   de,$2353]
+	LEA_ROM	       0x2353,a1                      	| [$fb52: ld   de,$2353]
 	move.w	#0x93B5,d6                      	| [$fb55: ld   hl,$93B5]
 	jbsr	display_text_55d9                            	| [$fb58: call $55D9]
 	move.b	#0x0E,d0                        	| [$fb5b: ld   a,$0E]
@@ -13223,7 +13236,7 @@ l_fcf4:
 	move.l	a2,-(sp)                        	| [$fd04: push ix]
 	move.w	#0x500,d6                      	| [$fd06: ld   hl,$0500]
 	jbsr	add_to_score_5C90                 	| [$fd09: call add_to_score_5C90]
-	lea	game_mem+0xD96F,a0                      	| [$fd0c: ld   hl,$D96F]
+	LEA_ROM	       0xD96F,a0                      	| [$fd0c: ld   hl,$D96F]
 	jbsr	play_sample_EC84                  	| [$fd0f: call play_sample_EC84]
 	move.l	(sp)+,a2                        	| [$fd12: pop  ix]
 	lea	unknown_604F,a2                	| [$fd14: ld   ix,unknown_604F]
@@ -13250,7 +13263,7 @@ l_fd33:
 	move.l	a2,-(sp)                        	| [$fd43: push ix]
 	move.w	#0x500,d6                      	| [$fd45: ld   hl,$0500]
 	jbsr	add_to_score_5C90                 	| [$fd48: call add_to_score_5C90]
-	lea	game_mem+0xD96F,a0                      	| [$fd4b: ld   hl,$D96F]
+	LEA_ROM	       0xD96F,a0                      	| [$fd4b: ld   hl,$D96F]
 	jbsr	play_sample_EC84                  	| [$fd4e: call play_sample_EC84]
 	move.l	(sp)+,a2                        	| [$fd51: pop  ix]
 	lea	unknown_608F,a2                	| [$fd53: ld   ix,unknown_608F]
@@ -13501,7 +13514,7 @@ l_feae:
 	jbsr		read_rom                         	| [$fec5: ld   a,(hl)]
 
 	move.w	d6,-(sp)                        	| [$fec6: push hl]
-	lea	game_mem+0x21E3,a0                      	| [$fec7: ld   hl,$21E3]
+	LEA_ROM	       0x21E3,a0                      	| [$fec7: ld   hl,$21E3]
 	move.w	#0x17,d1                        	| [$feca: ld   bc,$0017] 23
 	jbsr	cpdr                              	| [$fecd: cpdr]
 	movem.w	(sp)+,d6                        	| [$fecf: pop  hl]

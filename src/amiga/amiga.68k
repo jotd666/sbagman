@@ -2115,7 +2115,7 @@ handle_keyboard:
 	bne.b	0f
 	* high X
 	move.b	#0xD8,player_struct_6580+2
-	clr.b	lives_6056
+0:
 	cmp.b	#0x56,d0	| F7 key
 	bne.b	0f
 	* low Y
