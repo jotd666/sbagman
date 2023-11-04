@@ -18,6 +18,7 @@
 	.global	sound_timer
 	.global guard_1_inactive
 	.global guard_2_inactive
+	.global	vblank_ack
 	.ifdef	__amiga__
 	
 	.ascii	"RAM_STRT"
@@ -81,7 +82,8 @@ vb_ticks_count:
 	.byte	0
 current_ticks_count:
 	.byte	0
-
+vblank_ack:
+	.byte	0
 	.align	2
 regscopy:
 	ds.b	64

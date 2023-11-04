@@ -302,6 +302,7 @@ sbagman_irq:
 	rts
 	
 game_tick_0038:
+	clr.b	vblank_ack
 	addq.w	#1,sound_timer
 	bne.b	0f
 	* don't stay at 0 ever
@@ -4993,20 +4994,19 @@ change_attribute_everywhere_C3A3:
 	* 8 is too much as it writes beyond $9C00
 	* changing to 4
 	* set all attributes to passed d0
-	move.b	#0x04,d1                        	| [$c3a3: ld   b,$08]
-	move.w	#0x9800,d6                      	| [$c3a5: ld   hl,$9800]
+	move.w	#0x03FF,d1                        	| [$29ec: ld   b,$08]
+	move.w	#0x9800,d6                      	| [$29ee: ld   hl,$9800]
 0:
-	clr.b	d2                               	| [$c3a8: ld   c,$00]
-1:
-	jbsr	osd_w_colorram                         	| [$c3aa: ld   (hl),a]
-	addq.w	#1,d6                           	| [$c3ab: inc  hl]
+	jbsr	osd_w_colorram                         	| [$29f3: ld   (hl),a]
+	addq.w	#1,d6                           	| [$29f4: inc  hl]
 	* kick watchdog
-	                        	| [$c3ac: push af]
-	            	| [$c3ad: ld   a,(io_read_shit_B800)]
-	subq.b	#1,d2                           	| [$29fa: dec  c]
-	jne	1b                             	| [$29fb: jr   nz,$29F3]
-	subq.b	#1,d1                           	| [...]
-	jne	0b                             	| [$29fd: djnz $29F1]
+												| [$29f5: push af]
+												| [$29f6: ld   a,(watchdog_reset_B800)]
+												| [$29f9: pop  af]
+	                        	| [$29fa: dec  c]
+	                   	| [$29fb: jr   nz,$29F3]
+	                           	| [...]
+	dbf		d1,0b                             	| [$29fd: djnz $29F1]
 	rts                                    	| [$29ff: ret]
 	* had to separate both routines
 	* as one writes to color ram and the other one
@@ -6797,8 +6797,13 @@ l_cf06:
 
 	
 wait_for_vblank_cf34:
-	moveq	#1,d0
-	jra		osd_wait
+	st.b	vblank_ack
+0:
+	* wait for flag to be reset by irq
+	tst.b	vblank_ack
+	bne.b	0b
+	rts
+	
 	
 * delay loop on vertical position????
 *	move.b	vertical_beam_pos_A000,d0       	| [$34cf: ld   a,(vertical_beam_pos_A000)]

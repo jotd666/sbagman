@@ -239,7 +239,7 @@ add_sprites(0x7A,0x7B,0x8,"barrow",False)
 # barrow on slope
 add_sprite(0x73,0x8,"barrow",False)
 # wagon
-add_sprite(0x35,4,"wagon",False)
+add_sprite(0x35,4,"wagon",mirror=False)
 # elevators!!
 add_sprite(0x10,0xC,"shot",False)
 add_sprite(0x33,4,"elevator",False)

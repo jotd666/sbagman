@@ -1,4 +1,5 @@
-- objects background doesn't restore properly!
+- bagman can't "climb down the stairs" at level 1!!!!
+- objects background doesn't restore properly! test again???
 - draw_explosion_frame_dd2b doesn't work
 - guard doesn't seem killed by bomb
 - guard monitoring doesn't work?? when waiting for elevator 5, guard
@@ -19,7 +20,6 @@ l_0a93:
 * real machine: player Y = e0, elevator = e1
 
 - guard sometimes stuck climbing down stairs (until sees player)
-- sync in mainloop makes 50Hz not 60: use a simple flag instead of osd_wait
 - armurerie in english at screen 3: doesn't work despite tiles defined!
 - write a script to detect move.w to/from ram
 - highscore when not reached a highscore: check time
