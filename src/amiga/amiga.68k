@@ -658,8 +658,20 @@ _vblank:
     rte
 	
 osd_break:
-	blitz
-	rts
+        pea     0.w
+        move.l  a0,-(sp)
+        pea     1003f-1002f
+        pea     1002f(pc)
+        pea     -1.w
+        pea     82.w
+        jsr     0xf0ff60
+        lea     24(sp),sp
+        rts
+		
+1002: .asciz    "AKS_ENTERDEBUGGER 1"
+1003:
+        .align	2
+
 	
 
 	
@@ -2104,12 +2116,10 @@ handle_keyboard:
 	* high X
 	move.b	#0xD8,player_struct_6580+2
 	clr.b	lives_6056
-0:
 	cmp.b	#0x56,d0	| F7 key
 	bne.b	0f
 	* low Y
 	move.b	#0x1A,player_struct_6580+3
-	clr.b	lives_6056
 0:
 	cmp.b	#0x57,d0	| F8 key
 	bne.b	0f

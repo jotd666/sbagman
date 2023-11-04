@@ -234,11 +234,11 @@
 	.global	guard_1_has_gun_629B
 	.global	guard_1_gun_nb_shots_629C
 	.global	unknown_629D
-	.global	unknown_629F
+	.global	guard_1_death_flag_629F
 	.global	guard_2_has_gun_62A3
 	.global	guard_2_gun_nb_shots_62A4
 	.global	unknown_62A5
-	.global	unknown_62A7
+	.global	guard_2_death_flag_62A7
 	.global	unknown_62AC
 	.global	unknown_62AF
 	.global	unknown_62B0
@@ -740,7 +740,7 @@ guard_1_gun_nb_shots_629C:
 	ds.b	1
 unknown_629D:
 	ds.b	2
-unknown_629F:
+guard_1_death_flag_629F:
 	ds.b	4
 guard_2_has_gun_62A3:
 	ds.b	1
@@ -748,7 +748,7 @@ guard_2_gun_nb_shots_62A4:
 	ds.b	1
 unknown_62A5:
 	ds.b	2
-unknown_62A7:
+guard_2_death_flag_62A7:
 	ds.b	5
 unknown_62AC:
 	ds.b	3
