@@ -1540,7 +1540,7 @@ l_08c2:
 	beq.b	0f                               	| [...]
 	rts                                    	| [$08c7: ret  nz] [...]
 0:
-	lea	  game_mem+0x08E3,a1                      	| [$08c8: ld   de,l_08E3]
+	LEA_ROM	       0x08E3,a1                      	| [$08c8: ld   de,l_08E3]
 	moveq	#0,d0
 	move.b	unknown_602B,d0                 	| [$08cb: ld   a,(unknown_602B)]
 	cmp.b	#0x05,d0                         	| [$08ce: cp   $05]
@@ -11865,9 +11865,10 @@ restore_background_tile_F465:
 	jbsr	compute_backbuffer_tile_address_F47B                          	| [$1933: call $1945]
 
 	* D3 points to ROM now, copy tile data back to screen
-	and.l	#0xFFFF,d3
-	lea		game_mem,a1
-	move.b	(a1,d3.l),d0                         	| [$1936: ld   a,(de)]
+	exg		d3,d6
+	bsr		read_rom			| [$1936: ld   a,(de)]
+	exg		d3,d6
+	                         	
 	jbsr	osd_w_videoram                         	| [$1937: ld   (hl),a]
 	* loop until write succeeds... no need for this!
 												| [$1938: ld   a,(de)]

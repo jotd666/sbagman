@@ -1,14 +1,15 @@
-- guard doesn't seem killed by bomb
 - guard monitoring doesn't work?? when waiting for elevator 5, guard
   disappears (unknown_6156??: move.b	d6,d0                           	| [$da3e: ld   a,l])
   debug MAME da3e
-  
+
+- dropping object save/restore background doesn't work every time properly
 - record bomb sound, insert at dccd
 - gun cheat doesn't work properly. act 2 gun set must happen too soon
   vs start of the game
 - optimize elevator X test
 - test elevator level 4 doesn't carry player at ground level! lifts player
-  slightly then drops him!!!! works at other levels!!!
+  slightly then drops him!!!! works at other stops!!!
+  also works with other configuration
   
   	cmp.b	(0x03,a2),d0                     	| [$0a8e: cp   (ix+$03)]
 	jne	player_not_in_elevator_0a6d                             	| [$0a91: jr   nz,$0A6D]
@@ -18,10 +19,10 @@ l_0a93:
 	jne	player_not_in_elevator_0a6d                             	| [$0a98: jr   nz,$0A6D]
 	tst.b	fatal_fall_height_reached_604E	| [$0a9a: ld   a,(fatal_fall_height_reached_604E)]
 
-- draw_explosion_frame_dd2b seems incorrect
+- draw_explosion_frame_dd2b seems incorrect in the end / background not restored
 
 * real machine/68k port: player Y = e0, elevator = e1
-  Y alignment occurs when player is in being lifted by elevator
+  Y alignment occurs when player is being lifted by elevator
   in l_c15f. Investigate value unknown_600C:  computed by 
   l_c16d which requires debugging in the elevator where it's not zero
   Y=0x70 => D1=0
@@ -29,7 +30,8 @@ l_0a93:
   Y=0x52 => D1=2
   optimize l_c16d with AND?
 
-- guard sometimes stuck climbing down stairs (until sees player)
+- guard sometimes stuck climbing down stairs (until sees player), 
+  random bug stuck at the bottom of ladder for player too
 - armurerie in english at screen 3: doesn't work despite tiles defined!
 - write a script to detect move.w to/from ram
 - highscore when not reached a highscore: check time
