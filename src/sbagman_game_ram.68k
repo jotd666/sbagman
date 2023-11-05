@@ -288,9 +288,9 @@
 	.global	unknown_screen_address_632F
 	.global	unknown_6332
 	.global	bomb_just_dropped_6334
-	.global	unknown_6336
-	.global	unknown_6337
-	.global	unknown_6338
+	.global	player_killed_by_bomb_6336
+	.global	guard_1_killed_by_bomb_6337
+	.global	guard_2_killed_by_bomb_6338
 	.global	unknown_633A
 	.global	unknown_6340
 	.global	is_key_hunt_phase_6341
@@ -830,7 +830,7 @@ unknown_62FB:
 bomb_explosion_tile_backup_buffer_62FC:
 	ds.b	8
 bomb_explosion_attr_backup_buffer_6304:
-	ds.b	10
+	ds.b	8
 	
 
 * bomb stuff (we can't align, leave mapping as is!)
@@ -880,11 +880,11 @@ unknown_6332:
 	ds.b	2
 bomb_just_dropped_6334:
 	ds.b	2
-unknown_6336:
+player_killed_by_bomb_6336:
 	ds.b	1
-unknown_6337:
+guard_1_killed_by_bomb_6337:
 	ds.b	1
-unknown_6338:
+guard_2_killed_by_bomb_6338:
 	ds.b	2
 unknown_633A:
 	ds.b	3

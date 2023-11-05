@@ -92,6 +92,12 @@ used_cluts.update({k:[0xF] for k in range(0x334,0x33A)})
 
 # gun
 used_cluts[0x3BD] = [0x5,0x6]
+
+# extra beams, maybe not needed after all
+used_cluts[0x24A] = [0xF]
+used_cluts[0x24B] = [0xF]
+used_cluts[0x24C] = [0xF]
+
 # highscore arrows
 
 used_cluts.update({k:[0x4] for k in range(0x255,0x25D)})
@@ -100,7 +106,6 @@ used_cluts.update({k:[0x4] for k in range(0x255,0x25D)})
 used_cluts.update({k:[8] for k in range(0x367,0x37E)})
 
 # bagman title/character tile anims
-
 
 used_cluts.update({k:[0xC] for k in range(0x100,0x146)})
 used_cluts.update({k:[0xC] for k in range(0x200,0x231)})

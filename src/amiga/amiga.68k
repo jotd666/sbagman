@@ -1672,7 +1672,12 @@ update_bg_tile:
 
 	* optimization when a well-known
 	* empty character is passed (standard charset)
+	* doesn't seem to depend on the attribute
 	cmp.w	#0xE0,d0	| empty character
+	jeq	11f
+	cmp.w	#0x1E0,d0	| empty character
+	jeq	11f
+	cmp.w	#0x3E0,d0	| empty character
 	jeq	11f
 	cmp.w	#0x10,d0	| empty character
 	jeq	11f

@@ -3,10 +3,9 @@
   debug MAME da3e
 
 - dropping object save/restore background doesn't work every time properly
+  try blasting a ladder & debug (1FF / F => FF 1F)
+  
 - record bomb sound, insert at dccd
-- gun cheat doesn't work properly. act 2 gun set must happen too soon
-  vs start of the game
-- optimize elevator X test
 - test elevator level 4 doesn't carry player at ground level! lifts player
   slightly then drops him!!!! works at other stops!!!
   also works with other configuration
@@ -20,6 +19,7 @@ l_0a93:
 	tst.b	fatal_fall_height_reached_604E	| [$0a9a: ld   a,(fatal_fall_height_reached_604E)]
 
 - draw_explosion_frame_dd2b seems incorrect in the end / background not restored
+  explosion frames remain like if tiles weren't recognized anymore
 
 * real machine/68k port: player Y = e0, elevator = e1
   Y alignment occurs when player is being lifted by elevator
@@ -30,6 +30,9 @@ l_0a93:
   Y=0x52 => D1=2
   optimize l_c16d with AND?
 
+- gun cheat doesn't work properly. act 2 gun set must happen too soon
+  vs start of the game
+- optimize elevator X test
 - guard sometimes stuck climbing down stairs (until sees player), 
   random bug stuck at the bottom of ladder for player too
 - armurerie in english at screen 3: doesn't work despite tiles defined!

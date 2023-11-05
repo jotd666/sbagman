@@ -295,8 +295,6 @@ sbagman_reset:
 	* we need 60 updates / second so on amiga PAL
 	* we need to set this variable to 2 once out of 5 calls
 	move.b	#1,vb_ticks_count
-
-	move.l	#lives_6056,0x200
 	
 	jra	game_startup_eca8                             	| [$0000: jp   $1200]
 
@@ -409,7 +407,7 @@ l_00cf:
 	move.b	unknown_6351,d0                 	| [$00d2: ld   a,(unknown_6351)]
 	cmp.b	#0x01,d0                         	| [$00d5: cp   $01]
 	bne.b	0f                               	| [...]
-	jbsr	l_dbe7                            	| [$00d7: call z,$DBE7]
+	jbsr	backup_bomb_tiles_background_dbe7                            	| [$00d7: call z,$DBE7]
 0:
 	addq.b	#1,unknown_6143                 	| [$00da: ld   a,(unknown_6143)]
 	                           	| [$00dd: inc  a]
@@ -1815,7 +1813,6 @@ l_0a61:
 	subq.b	#1,d1                           	| [...]
 	jne	l_0a61                             	| [$0a6b: djnz $0A61]
 player_not_in_elevator_0a6d:
-	WPSET	0x201
 	clr.b	d0                               	| [$0a6d: xor  a]
 	move.b	d0,(a0)                         	| [$0a6e: ld   (hl),a]
 	                          	| [$0a6f: dec  hl]
@@ -1831,11 +1828,11 @@ handle_player_in_elevator_0a7b:
 	move.b	elevator_y_screen_4_6587,d0	| [$0a7b: ld   a,(elevator_y_screen_4_6587)]
 	* no effect : removed								| [$09f4: sub  $00]	
 	* elevator same Y as character?
-	cmp.b	#0xE0,d0
-	bne.b	0f
-	move.b	d0,0x200
-	move.b	(0x03,a2),0x201
-0:
+*	cmp.b	#0xE0,d0
+*	bne.b	0f
+*	move.b	d0,0x200
+*	move.b	(0x03,a2),0x201
+*0:
 	
 	cmp.b	(0x03,a2),d0                     	| [$0a80: cp   (ix+$03)]
 	jeq	l_0a93                             	| [$0a83: jr   z,$0A93]
@@ -8547,8 +8544,9 @@ l_dbcd:
 	movem.w	(sp)+,d1/d2                    	| [$dbe5: pop  bc]
 	rts                                    	| [$dbe6: ret]
 
-* draw bomb exploding
-l_dbe7:
+* bomb about to explode, better save the tiles behind it to restore them later
+
+backup_bomb_tiles_background_dbe7:
 	move.b	bomb_must_detonate_62F5,d0                 	| [$dbe7: ld   a,(bomb_must_detonate_62F5)]
 	cmp.b	#0x01,d0                         	| [$dbea: cp   $01]
 	beq.b	0f                               	| [...]
@@ -8569,22 +8567,23 @@ l_dbe7:
 	move.l	a0,bomb_explosion_tiles_pointer_62F6                 	| [$dc07: ld   (bomb_explosion_tiles_pointer_62F6),hl]
 	*move.w	explosion_screen_address_62F8,d6             	| [$dc0a: ld   iy,(explosion_screen_address_62F8)]
  	lea		bomb_explosion_tile_backup_buffer_62FC,a2                	| [$dc0e: ld   ix,bomb_explosion_tile_backup_buffer_62FC]
+
 	jbsr	osd_r_videoram                    	| [$dc12: ld   a,(iy+$00)]
-	move.b	d0,(A2)                    	| [$dc15: ld   (ix+$00),a]
+	move.b	d0,(A2)+                    	| [$dc15: ld   (ix+$00),a]
 	READ_VIDEORAM	1                    	| [$dc18: ld   a,(iy+$01)]
-	move.b	d0,(0x01,a2)                    	| [$dc1b: ld   (ix+$01),a]
+	move.b	d0,(A2)+                    	| [$dc1b: ld   (ix+$01),a]
 	READ_VIDEORAM	-0x20                   	| [$dc1e: ld   a,(iy-$20)]
-	move.b	d0,(0x02,a2)                    	| [$dc21: ld   (ix+$02),a]
+	move.b	d0,(A2)+                    	| [$dc21: ld   (ix+$02),a]
 	READ_VIDEORAM	-0x1f                   	| [$dc24: ld   a,(iy-$1f)]
-	move.b	d0,(0x03,a2)                    	| [$dc27: ld   (ix+$03),a]
+	move.b	d0,(A2)+                    	| [$dc27: ld   (ix+$03),a]
 	READ_VIDEORAM	-0x40                   	| [$dc2a: ld   a,(iy-$40)]
-	move.b	d0,(0x04,a2)                    	| [$dc2d: ld   (ix+$04),a]
+	move.b	d0,(A2)+                    	| [$dc2d: ld   (ix+$04),a]
 	READ_VIDEORAM	-0x3f                   	| [$dc30: ld   a,(iy-$3f)]
-	move.b	d0,(0x05,a2)                    	| [$dc33: ld   (ix+$05),a]
+	move.b	d0,(A2)+                    	| [$dc33: ld   (ix+$05),a]
 	READ_VIDEORAM	-0x60                   	| [$dc36: ld   a,(iy-$60)]
-	move.b	d0,(0x06,a2)                    	| [$dc39: ld   (ix+$06),a]
+	move.b	d0,(A2)+                   	| [$dc39: ld   (ix+$06),a]
 	READ_VIDEORAM	-0x5f                   	| [$dc3c: ld   a,(iy-$5f)]
-	move.b	d0,(0x07,a2)                    	| [$dc3f: ld   (ix+$07),a]
+	move.b	d0,(A2)                    	| [$dc3f: ld   (ix+$07),a]
 
 	move.l	a0,-(sp)                        	| [$dc42: push hl]
 	movem.w	d1/d2,-(sp)                    	| [$dc43: push bc]
@@ -8597,7 +8596,7 @@ l_dc4e:
 	move.b	(A3),d0                    	| [$dc4e: ld   a,(iy+$00)]
 	cmp.b	d3,d0                            	| [$dc51: cp   d]
 	bcc.b	0f                               	| [...]
-	jbsr	l_dcf3                            	| [$dc52: call c,$DCF3]
+	jbsr	set_blank_backup_tile_dcf3                            	| [$dc52: call c,$DCF3]
 0:
 	addq.w	#1,a3                           	| [$dc55: inc  iy]
 	subq.b	#1,d1                           	| [...]
@@ -8614,21 +8613,21 @@ l_dc4e:
  
 	lea	bomb_explosion_attr_backup_buffer_6304,a2                	| [$dc68: ld   ix,bomb_explosion_attr_backup_buffer_6304]
 	jbsr	osd_r_colorram                    	| [$dc6c: ld   a,(iy+$00)]
-	move.b	d0,(A2)                    	| [$dc6f: ld   (ix+$00),a]
+	move.b	d0,(A2)+                    	| [$dc6f: ld   (ix+$00),a]
 	move.b	(0x01,a3),d0                    	| [$dc72: ld   a,(iy+$01)]
-	move.b	d0,(0x01,a2)                    	| [$dc75: ld   (ix+$01),a]
+	move.b	d0,(A2)+                   	| [$dc75: ld   (ix+$01),a]
 	READ_COLORRAM	-0x20                   	| [$dc78: ld   a,(iy-$20)]
-	move.b	d0,(0x02,a2)                    	| [$dc7b: ld   (ix+$02),a]
+	move.b	d0,(A2)+                   	| [$dc7b: ld   (ix+$02),a]
 	READ_COLORRAM	-0x1f                   	| [$dc7e: ld   a,(iy-$1f)]
-	move.b	d0,(0x03,a2)                    	| [$dc81: ld   (ix+$03),a]
+	move.b	d0,(A2)+                   	| [$dc81: ld   (ix+$03),a]
 	READ_COLORRAM	-0x40                   	| [$dc84: ld   a,(iy-$40)]
-	move.b	d0,(0x04,a2)                    	| [$dc87: ld   (ix+$04),a]
+	move.b	d0,(A2)+                   	| [$dc87: ld   (ix+$04),a]
 	READ_COLORRAM	-0x3f                   	| [$dc8a: ld   a,(iy-$3f)]
-	move.b	d0,(0x05,a2)                    	| [$dc8d: ld   (ix+$05),a]
+	move.b	d0,(A2)+                    	| [$dc8d: ld   (ix+$05),a]
 	READ_COLORRAM	-0x60                   	| [$dc90: ld   a,(iy-$60)]
-	move.b	d0,(0x06,a2)                    	| [$dc93: ld   (ix+$06),a]
+	move.b	d0,(A2)+                    	| [$dc93: ld   (ix+$06),a]
 	READ_COLORRAM	-0x5f                   	| [$dc96: ld   a,(iy-$5f)]
-	move.b	d0,(0x07,a2)                    	| [$dc99: ld   (ix+$07),a]
+	move.b	d0,(A2)                  	| [$dc99: ld   (ix+$07),a]
 	jbsr	l_de3b                            	| [$dc9c: call $DE3B]
 	move.b	#0x08,d1                        	| [$dc9f: ld   b,$08]
 	lea	bomb_explosion_tile_backup_buffer_62FC,a2                	| [$dca1: ld   ix,bomb_explosion_tile_backup_buffer_62FC]
@@ -8676,7 +8675,9 @@ l_dced:
 	move.b	#0x1F,d0                        	| [$dced: ld   a,$1F]
 	move.b	d0,(A3)                    	| [$dcef: ld   (iy+$00),a]
 	rts                                    	| [$dcf2: ret]
-l_dcf3:
+	
+set_blank_backup_tile_dcf3:
+	* set tile as blank + 0x3F attribute
 	move.b	#0xE0,d0                        	| [$dcf3: ld   a,$E0]
 	move.b	d0,(A3)                    	| [$dcf5: ld   (iy+$00),a]
 	move.b	#0x3F,d0                        	| [$dcf8: ld   a,$3F]
@@ -8711,6 +8712,7 @@ update_bomb_explosion_frame_timer_dd13:
 	subq.b	#1,d0                           	| [$dd26: dec  a]
 	move.b	d0,bomb_explosion_frame_timer_62FA                 	| [$dd27: ld   (bomb_explosion_frame_timer_62FA),a]
 	rts                                    	| [$dd2a: ret]
+
 draw_explosion_frame_dd2b:
 	move.l	bomb_explosion_tiles_pointer_62F6,a3             	| [$dd2b: ld   iy,(bomb_explosion_tiles_pointer_62F6)]
 	move.w	explosion_screen_address_62F8,d6             	| [$dd2f: ld   hl,(explosion_screen_address_62F8)]
@@ -8734,6 +8736,7 @@ draw_explosion_frame_dd2b:
 	jbsr	osd_w_videoram                         	| [$dd56: ld   (hl),a]
 	jbsr	set_attribute_38_deac                            	| [$dd57: call $DEAC]
 	                           	| [$dd5a: inc  iy]
+	* second row
 	move.w	#0x0061,d3                      	| [$dd5c: ld   de,$0061] 97
 	add.w	d3,d6                            	| [$dd5f: add  hl,de]
 	move.b	(A3)+,d0                    	| [$dd60: ld   a,(iy+$00)]
@@ -8756,6 +8759,8 @@ draw_explosion_frame_dd2b:
  	jbsr	osd_w_videoram                         	| [$dd84: ld   (hl),a]
 	jbsr	set_attribute_38_deac                            	| [$dd85: call $DEAC]
 	                           	| [$dd88: inc  iy]
+	
+	
  	move.l	a3,bomb_explosion_tiles_pointer_62F6                 	| [$dd8a: ld   (bomb_explosion_tiles_pointer_62F6),iy]
 	move.b	#0x03,d0                        	| [$dd8e: ld   a,$03]
 	move.b	d0,bomb_explosion_frame_timer_62FA                 	| [$dd90: ld   (bomb_explosion_frame_timer_62FA),a]
@@ -8764,74 +8769,77 @@ draw_explosion_frame_dd2b:
 	beq.b	0f                               	| [...]
 	rts                                    	| [$dd98: ret  nz] [...]
 0:
-	clr.b	d0                               	| [$dd99: xor  a]
-	move.b	d0,bomb_must_detonate_62F5                 	| [$dd9a: ld   (bomb_must_detonate_62F5),a]
+	* end of explosion animation: restore background
+	clr.b	bomb_must_detonate_62F5                               	| [$dd99: xor  a]
+	                 	| [$dd9a: ld   (bomb_must_detonate_62F5),a]
 	move.w	explosion_screen_address_62F8,d6             	| [$dd9d: ld   iy,(explosion_screen_address_62F8)]
 	lea	bomb_explosion_tile_backup_buffer_62FC,a2                	| [$dda1: ld   ix,bomb_explosion_tile_backup_buffer_62FC]
-	move.b	(A2),d0                    	| [$dda5: ld   a,(ix+$00)]
+	move.b	(A2)+,d0                    	| [$dda5: ld   a,(ix+$00)]
 	jbsr	osd_w_videoram                    	| [$dda8: ld   (iy+$00),a]
-	move.b	(0x01,a2),d0                    	| [$ddab: ld   a,(ix+$01)]
+	move.b	(A2)+,d0                    	| [$ddab: ld   a,(ix+$01)]
   	WRITE_VIDEORAM	1                    	| [$ddae: ld   (iy+$01),a]
-	move.b	(0x02,a2),d0                    	| [$ddb1: ld   a,(ix+$02)]
+	move.b	(A2)+,d0                    	| [$ddb1: ld   a,(ix+$02)]
 	WRITE_VIDEORAM	-0x20                   	| [$ddb4: ld   (iy-$20),a]
-	move.b	(0x03,a2),d0                    	| [$ddb7: ld   a,(ix+$03)]
+	move.b	(A2)+,d0                    	| [$ddb7: ld   a,(ix+$03)]
 	WRITE_VIDEORAM	-0x1f                   	| [$ddba: ld   (iy-$1f),a]
-	move.b	(0x04,a2),d0                    	| [$ddbd: ld   a,(ix+$04)]
+	move.b	(A2)+,d0                    	| [$ddbd: ld   a,(ix+$04)]
 	WRITE_VIDEORAM	-0x40                   	| [$ddc0: ld   (iy-$40),a]
-	move.b	(0x05,a2),d0                    	| [$ddc3: ld   a,(ix+$05)]
+	move.b	(A2)+,d0                    	| [$ddc3: ld   a,(ix+$05)]
 	WRITE_VIDEORAM	-0x3f                   	| [$ddc6: ld   (iy-$3f),a]
-	move.b	(0x06,a2),d0                    	| [$ddc9: ld   a,(ix+$06)]
+	move.b	(A2)+,d0                    	| [$ddc9: ld   a,(ix+$06)]
 	WRITE_VIDEORAM	-0x60                   	| [$ddcc: ld   (iy-$60),a]
-	move.b	(0x07,a2),d0                    	| [$ddcf: ld   a,(ix+$07)]
+	move.b	(A2)+,d0                    	| [$ddcf: ld   a,(ix+$07)]
 	WRITE_VIDEORAM	-0x5f                   	| [$ddd2: ld   (iy-$5f),a]
 	move.w	explosion_screen_address_62F8,d6             	| [$ddd5: ld   iy,(explosion_screen_address_62F8)]
 	                     	| [$ddd9: ld   de,$0800]
 	add.w	#0x800,d6                            	| [$dddc: add  iy,de]
 
+	WPSET	0X200
+	
  	lea	bomb_explosion_attr_backup_buffer_6304,a2                	| [$ddde: ld   ix,bomb_explosion_attr_backup_buffer_6304]
-	move.b	(A2),d0                    	| [$dde2: ld   a,(ix+$00)]
+	move.b	(A2)+,d0                    	| [$dde2: ld   a,(ix+$00)]
 	jbsr	osd_w_colorram                    	| [$dde5: ld   (iy+$00),a]
-	move.b	(0x01,a2),d0                    	| [$dde8: ld   a,(ix+$01)]
+	move.b	(A2)+,d0                    	| [$dde8: ld   a,(ix+$01)]
   	WRITE_COLORRAM	1                       	| [$ddeb: ld   (iy+$01),a]
-	move.b	(0x02,a2),d0                    	| [$ddee: ld   a,(ix+$02)]
+	move.b	(A2)+,d0                    	| [$ddee: ld   a,(ix+$02)]
 	WRITE_COLORRAM	-0x20                   	| [$ddf1: ld   (iy-$20),a]
-	move.b	(0x03,a2),d0                    	| [$ddf4: ld   a,(ix+$03)]
+	move.b	(A2)+,d0                    	| [$ddf4: ld   a,(ix+$03)]
 	WRITE_COLORRAM	-0x1f                   	| [$ddf7: ld   (iy-$1f),a]
-	move.b	(0x04,a2),d0                    	| [$ddfa: ld   a,(ix+$04)]
+	move.b	(A2)+,d0                    	| [$ddfa: ld   a,(ix+$04)]
 	WRITE_COLORRAM	-0x40                   	| [$ddfd: ld   (iy-$40),a]
-	move.b	(0x05,a2),d0                    	| [$de00: ld   a,(ix+$05)]
+	move.b	(A2)+,d0                    	| [$de00: ld   a,(ix+$05)]
 	WRITE_COLORRAM	-0x3f                   	| [$de03: ld   (iy-$3f),a]
-	move.b	(0x06,a2),d0                    	| [$de06: ld   a,(ix+$06)]
+	move.b	(A2)+,d0                    	| [$de06: ld   a,(ix+$06)]
 	WRITE_COLORRAM	-0x60                   	| [$de09: ld   (iy-$60),a]
-	move.b	(0x07,a2),d0                    	| [$de0c: ld   a,(ix+$07)]
+	move.b	(A2),d0                    	| [$de0c: ld   a,(ix+$07)]
 	WRITE_COLORRAM	-0x5f                   	| [$de0f: ld   (iy-$5f),a]
-	move.b	unknown_6336,d0                 	| [$de12: ld   a,(unknown_6336)]
+	move.b	player_killed_by_bomb_6336,d0                 	| [$de12: ld   a,(player_killed_by_bomb_6336)]
 	cmp.b	#0x01,d0                         	| [$de15: cp   $01]
 	jne	l_de1c                             	| [$de17: jr   nz,$DE1C]
 	jbsr  is_invincible
 	bne.b	l_de1c
 	move.b	#1,player_death_flag_6025       	| [$de19: ld   (player_death_flag_6025),a]
 l_de1c:
-	move.b	unknown_6337,d0                 	| [$de1c: ld   a,(unknown_6337)]
+	move.b	guard_1_killed_by_bomb_6337,d0                 	| [$de1c: ld   a,(guard_1_killed_by_bomb_6337)]
 	cmp.b	#0x01,d0                         	| [$de1f: cp   $01]
 	jne	l_de26                             	| [$de21: jr   nz,$DE26]
 	move.b	d0,guard_1_death_flag_629F                 	| [$de23: ld   (guard_1_death_flag_629F),a]
 l_de26:
-	move.b	unknown_6338,d0                 	| [$de26: ld   a,(unknown_6338)]
+	move.b	guard_2_killed_by_bomb_6338,d0                 	| [$de26: ld   a,(guard_2_killed_by_bomb_6338)]
 	cmp.b	#0x01,d0                         	| [$de29: cp   $01]
 	jne	l_de30                             	| [$de2b: jr   nz,$DE30]
 	move.b	d0,guard_2_death_flag_62A7                 	| [$de2d: ld   (guard_2_death_flag_62A7),a]
 l_de30:
-	clr.b	unknown_6336                 	| [$de31: ld   (unknown_6336),a]
-	clr.b	unknown_6337                 	| [$de34: ld   (unknown_6337),a]
-	clr.b	unknown_6338                 	| [$de37: ld   (unknown_6338),a]
+	clr.b	player_killed_by_bomb_6336                 	| [$de31: ld   (player_killed_by_bomb_6336),a]
+	clr.b	guard_1_killed_by_bomb_6337                 	| [$de34: ld   (guard_1_killed_by_bomb_6337),a]
+	clr.b	guard_2_killed_by_bomb_6338                 	| [$de37: ld   (guard_2_killed_by_bomb_6338),a]
 	rts                                    	| [$de3a: ret]
 l_de3b:
 	move.w	explosion_screen_address_62F8,d6             	| [$de3b: ld   hl,(explosion_screen_address_62F8)]
 	jbsr	l_eb64                            	| [$de3e: call $EB64]
-	lea	unknown_6336,a3                	| [$de41: ld   iy,unknown_6336]
+	lea	player_killed_by_bomb_6336,a3                	| [$de41: ld   iy,player_killed_by_bomb_6336]
 	lea	player_struct_6580,a2          	| [$de45: ld   ix,player_struct_6580]
-	jbsr	l_eb4e                            	| [$de49: call $EB4E]
+	jbsr	check_if_bomb_kills_character_eb4e                            	| [$de49: call $EB4E]
 	move.b	(A3),d0                    	| [$de4c: ld   a,(iy+$00)]
 	cmp.b	#0x01,d0                         	| [$de4f: cp   $01]
 	jne	l_de5b                             	| [$de51: jr   nz,$DE5B]
@@ -8839,17 +8847,17 @@ l_de3b:
 	move.b	d0,pickup_flag_6160             	| [$de55: ld   (pickup_flag_6160),a]
 	jbsr	l_e399                            	| [$de58: call $E399]
 l_de5b:
-	lea	unknown_6337,a3                	| [$de5b: ld   iy,unknown_6337]
+	lea	guard_1_killed_by_bomb_6337,a3                	| [$de5b: ld   iy,guard_1_killed_by_bomb_6337]
 	lea	guard_1_struct_6594,a2         	| [$de5f: ld   ix,guard_1_struct_6594]
-	jbsr	l_eb4e                            	| [$de63: call $EB4E]
+	jbsr	check_if_bomb_kills_character_eb4e                            	| [$de63: call $EB4E]
 	move.b	(A3),d0                    	| [$de66: ld   a,(iy+$00)]
 	cmp.b	#0x01,d0                         	| [$de69: cp   $01]
 	bne.b	0f                               	| [...]
 	jbsr	l_e321                            	| [$de6b: call z,$E321]
 0:
-	lea	unknown_6338,a3                	| [$de6e: ld   iy,unknown_6338]
+	lea	guard_2_killed_by_bomb_6338,a3                	| [$de6e: ld   iy,guard_2_killed_by_bomb_6338]
 	lea	guard_2_struct_6598,a2         	| [$de72: ld   ix,guard_2_struct_6598]
-	jbsr	l_eb4e                            	| [$de76: call $EB4E]
+	jbsr	check_if_bomb_kills_character_eb4e                            	| [$de76: call $EB4E]
 	move.b	(A3),d0                    	| [$de79: ld   a,(iy+$00)]
 	cmp.b	#0x01,d0                         	| [$de7c: cp   $01]
 	bne.b	0f                               	| [...]
@@ -9211,7 +9219,6 @@ write_elevator_5_tiles_e172:
 	rts                                    	| [$e178: ret  nz] [...]
 0:
 	                              	| [$e179: ex   af,af']
-	WPSET	0x200
 	jbsr	osd_w_videoram                         	| [$e17a: ld   (hl),a]
 	move.w	#0x0020,d3                      	| [$e17b: ld   de,$0020] 32
 	add.w	d3,d6                            	| [$e17e: add  hl,de]
@@ -10632,7 +10639,7 @@ l_eb46:
 	                           	| [$eb4c: ld   h,a]
 	rts                                    	| [$eb4d: ret]
 	
-l_eb4e:
+check_if_bomb_kills_character_eb4e:
 	move.b	(0x02,a2),d0                    	| [$eb4e: ld   a,(ix+$02)]
 	cmp.b	d1,d0                            	| [$eb51: cp   b]
 	bcc.b	0f                               	| [...]
@@ -10656,6 +10663,7 @@ l_eb4e:
 	move.b	#0x01,d0                        	| [$eb5e: ld   a,$01]
 	move.b	d0,(A3)                    	| [$eb60: ld   (iy+$00),a]
 	rts                                    	| [$eb63: ret]
+	
 l_eb64:
 	move.b	d6,d0                           	| [$eb64: ld   a,l]
 	asl.b	#3,d0                            	| [$eb65: sla  a] * 3
