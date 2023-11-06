@@ -613,7 +613,7 @@ l_029e:
 	move.b	d0,current_character_screen_index_6098	| [$02ac: ld   (current_character_screen_index_6098),a]
 	lea	player_in_elevator_4_6014,a0                	| [$02af: ld   hl,player_in_elevator_4_6014]
 	lea	player_struct_6580,a2          	| [$02b2: ld   ix,player_struct_6580]
-	jbsr	l_0ab1                            	| [$02b6: call $0AB1]
+	jbsr	is_character_sufficiently_aligned_with_elevator_0ab1                            	| [$02b6: call $0AB1]
                        	| [$02b9: ld   a,($B800)]
        
 	move.b	player_controls_blocked_61F2,d0 	| [$02bc: ld   a,(player_controls_blocked_61F2)]
@@ -640,7 +640,7 @@ l_029e:
 	move.b	player_screen_600D,d0           	| [$02ed: ld   a,(player_screen_600D)]
 	cmp.b	#0x04,d0                         	| [$02f0: cp   $04]
 	jne	l_030c                             	| [$02f2: jr   nz,$030C]
-	move.b	player_in_elevator_4_6013,d0                 	| [$02f4: ld   a,(player_in_elevator_4_6013)]
+	move.b	player_almost_in_elevator_4_6013,d0                 	| [$02f4: ld   a,(player_almost_in_elevator_4_6013)]
 	cmp.b	#0x01,d0                         	| [$02f7: cp   $01]
 	jeq	l_030c                             	| [$02f9: jr   z,$030C]
 	move.b	player_in_elevator_4_6014,d0                 	| [$02fb: ld   a,(player_in_elevator_4_6014)]
@@ -659,7 +659,7 @@ l_030c:
 	lea	player_struct_6580,a2          	| [$0310: ld   ix,player_struct_6580]
 	move.b	player_in_elevator_4_6014,d0                 	| [$0314: ld   a,(player_in_elevator_4_6014)]
 	move.b	d0,d2                           	| [$0317: ld   c,a]
-	move.b	player_in_elevator_4_6013,d0                 	| [$0318: ld   a,(player_in_elevator_4_6013)]
+	move.b	player_almost_in_elevator_4_6013,d0                 	| [$0318: ld   a,(player_almost_in_elevator_4_6013)]
 	move.b	#0x19,d1                        	| [$031b: ld   b,$19]
 	jbsr	l_0b82                            	| [$031d: call $0B82]
                        	| [$0320: ld   a,($B800)]
@@ -780,7 +780,7 @@ l_0418:
 		| [$041b: ld   (current_character_screen_index_6098),a]
 	lea	guard_2_in_elevator_607B,a0    	| [$041e: ld   hl,guard_2_in_elevator_607B]
 	lea	guard_2_struct_6598,a2         	| [$0421: ld   ix,guard_2_struct_6598]
-	jbsr	l_0ab1                            	| [$0425: call $0AB1]
+	jbsr	is_character_sufficiently_aligned_with_elevator_0ab1                            	| [$0425: call $0AB1]
                        	| [$0428: ld   a,($B800)]
 
 	addq.b	#1,guard_2_not_moving_timeout_counter_6097	| [$042b: ld   a,(guard_2_not_moving_timeout_counter_6097)]
@@ -813,7 +813,7 @@ l_046b:
 	move.b	d0,current_character_screen_index_6098	| [$046e: ld   (current_character_screen_index_6098),a]
 	lea	guard_1_in_elevator_603B,a0    	| [$0471: ld   hl,guard_1_in_elevator_603B]
 	lea	guard_1_struct_6594,a2         	| [$0474: ld   ix,guard_1_struct_6594]
-	jbsr	l_0ab1                            	| [$0478: call $0AB1]
+	jbsr	is_character_sufficiently_aligned_with_elevator_0ab1                            	| [$0478: call $0AB1]
 	move.b	guard_1_not_moving_timeout_counter_6057,d0	| [$047b: ld   a,(guard_1_not_moving_timeout_counter_6057)]
 	addq.b	#1,d0                           	| [$047e: inc  a]
 	move.b	d0,guard_1_not_moving_timeout_counter_6057	| [$047f: ld   (guard_1_not_moving_timeout_counter_6057),a]
@@ -1804,19 +1804,21 @@ handle_elevator_stops_0A40:
 	move.b	#0x09,d1                        	| [$0a5f: ld   b,$09]
 	* test player X against elevator X (0xC4 <= PX <= 0xCC)
 	* (would have been faster with 2 cmps...)
-l_0a61:
+* < A3: range of X values to test, larger when character is on a floor
+* (which will kill the character if not inside enough)
+test_against_x_range_0a61:
 	move.b	(0x02,a2),d0                    	| [$0a61: ld   a,(ix+$02)]
 	cmp.b	(A3)+,d0                     	| [$0a64: cp   (iy+$00)]
 	jeq	handle_player_in_elevator_0a7b                             	| [$0a67: jr   z,$0A7B]
 	                           	| [$0a69: inc  iy]
  
 	subq.b	#1,d1                           	| [...]
-	jne	l_0a61                             	| [$0a6b: djnz $0A61]
+	jne	test_against_x_range_0a61                             	| [$0a6b: djnz $0A61]
 player_not_in_elevator_0a6d:
 	clr.b	d0                               	| [$0a6d: xor  a]
 	move.b	d0,(a0)                         	| [$0a6e: ld   (hl),a]
 	                          	| [$0a6f: dec  hl]
-	* clears player_in_elevator_4_6013 too (why 2 flags? not sure)
+	* clears player_almost_in_elevator_4_6013 too
 	move.b	d0,-(a0)                         	| [$0a70: ld   (hl),a]
 	rts                                    	| [$0a71: ret]
 
@@ -1869,15 +1871,19 @@ l_0aab:
 	move.b	d0,-(a0)                         	| [$0aaf: ld   (hl),a]
 	rts                                    	| [$0ab0: ret]
 
-l_0ab1:
+* < A0: character in elevator flag
+is_character_sufficiently_aligned_with_elevator_0ab1:
 	move.b	current_character_screen_index_6098,d0	| [$0ab1: ld   a,(current_character_screen_index_6098)]
 	cmp.b	#0x04,d0                         	| [$0ab4: cp   $04]
 	jne	l_0ac6                             	| [$0ab6: jr   nz,$0AC6]
+	* wide range of X values to compare to
 	LEA_ROM	       0x0AC9,a3                      	| [$0ab8: ld   iy,$0AC9]
 	move.b	#0x12,d1                        	| [$0abc: ld   b,$12]
+	* save/restore "character in elevator" flag so test_against_x_range_0a61
+	* has no effect on it
 	move.b	(a0),d0                         	| [$0abe: ld   a,(hl)]
 	move.w	d0,-(sp)                        	| [$0abf: push af]
-	jbsr	l_0a61                            	| [$0ac0: call $0A61]
+	jbsr	test_against_x_range_0a61                            	| [$0ac0: call $0A61]
 	move.w	(sp)+,d0                        	| [$0ac3: pop  af]
 	move.b	d0,(a0)                         	| [$0ac4: ld   (hl),a]
 	rts                                    	| [$0ac5: ret]
@@ -2347,7 +2353,7 @@ check_edge_tiles_0DAB:
 l_0db5:
 
 	                        	| [$0db5: push ix]
-	jbsr	l_c16d                            	| [$0db7: call $C16D]
+	jbsr	get_y_8_modulus_c16d                            	| [$0db7: call $C16D]
 	                        	| [$0dba: pop  ix]
 	move.b	d1,d0                           	| [$0dbc: ld   a,b]
 	cmp.b	#0x05,d0                         	| [$0dbd: cp   $05]
@@ -4621,15 +4627,16 @@ l_c11b:
 	clr.b	(1,a4)                         	| [$c127: ld   (bc),a]
 	                           	| [$c128: dec  bc]
 	rts                                    	| [$c129: ret]
-l_c12a:
-	move.b	(a0),d0                         	| [$c12a: ld   a,(hl)]
+
+maybe_align_character_y_on_8_c12a:
+	jbsr	read_rom                         	| [$c12a: ld   a,(hl)]
 	cmp.b	#0xFF,d0                         	| [$c12b: cp   $FF]
 	bne.b	0f                               	| [...]
 	rts                                    	| [$c12d: ret  z] [...]
 0:
-	jbsr	l_c16d                            	| [$c12e: call $C16D]
+	jbsr	get_y_8_modulus_c16d                            	| [$c12e: call $C16D]
 	move.b	d1,d0                           	| [$c131: ld   a,b]
-	move.b	d0,unknown_600C                 	| [$c132: ld   (unknown_600C),a]
+	move.b	d0,player_y_modulus_8_600C                 	| [$c132: ld   (player_y_modulus_8_600C),a]
 	                         	| [$c135: cp   $00]
 	bne.b	0f                               	| [...]
 	rts                                    	| [$c137: ret  z] [...]
@@ -4655,8 +4662,20 @@ l_c149:
 	subq.b	#1,d1                           	| [...]
 	jne	l_c149                             	| [$c14d: djnz $C149]
 l_c14f:
-	move.b	unknown_600C,d0                 	| [$c14f: ld   a,(unknown_600C)]
+	move.b	player_y_modulus_8_600C,d0                 	| [$c14f: ld   a,(player_y_modulus_8_600C)]
 	cmp.b	#0x05,d0                         	| [$c152: cp   $05]
+	* too much difference: align on Y%8 = 0
+	* problem is if aligns DF to E0 multiple times, depending on
+	* interrupts & mainloop (I'm assuming this as sometimes it works depending
+	* on the Winuae CPU/speed configuration), and
+	* it also NEVER happens on MAME!)
+	* it can make player miss the elevator at bottom of screen 4.
+	*
+	* it never happens in bagman probably because the floor y isn't 
+	* a multiple of 16, or we're just lucky. Anyway, in Bagman it is
+	* so dangerous to take the elevator at the bottom on screen 3 that
+	* noone tries that :)
+	
 	jcc	l_c15f                             	| [$c154: jr   nc,$C15F]
 	move.b	d0,d1                           	| [$c156: ld   b,a]
 	move.b	(0x03,a2),d0                    	| [$c157: ld   a,(ix+$03)]
@@ -4664,7 +4683,14 @@ l_c14f:
 	move.b	d0,(0x03,a2)                    	| [$c15b: ld   (ix+$03),a]
 	rts                                    	| [$c15e: ret]
 l_c15f:
-	* align character in Y on multiples of 8
+	* align character in Y on multiples of 8 when elevator picks up the player
+	* jotd: add special case to avoid issues
+	* (I could also completely skip this, as it only leads to problems, but
+	* lets fix it with a kludge just in case...)
+	cmp.b	#0xDF,(0x03,a2)	| coord of player just after elevator lifts him at ground level
+	bne.b	0f
+	rts
+0:
 	not.b	d0                               	| [$c15f: cpl]
 	and.b	#0x07,d0                         	| [$c160: and  $07]
 	addq.b	#0x01,d0                        	| [$c162: add  a,$01]
@@ -4677,8 +4703,13 @@ l_c15f:
 * bagman: same routine in l_2640
 * seems like a good old mask to extract bits
 * and #7,d0 would do the same thing it seems
+*  Y=0x70 => D1=0
+*  Y=0x55 => D1=5
+*  Y=0x52 => D1=2
 
-l_c16d:
+* < A2: player structure (to read player Y)
+* > D1: modulus
+get_y_8_modulus_c16d:
 	move.b	(0x03,a2),d0                    	| [$c16d: ld   a,(ix+$03)]
 *	and.b	#7,d0
 *	move.b	d0,d1
@@ -7931,7 +7962,7 @@ l_d756:
 	clr.b	guard_2_not_moving_timeout_counter_6097	| [$d757: ld   (guard_2_not_moving_timeout_counter_6097),a]
 	clr.b	unknown_6288                 	| [$d75a: ld   (unknown_6288),a]
 	clr.b	unknown_6008                 	| [$d75d: ld   (unknown_6008),a]
-	clr.b	player_in_elevator_4_6013                 	| [$d760: ld   (player_in_elevator_4_6013),a]
+	clr.b	player_almost_in_elevator_4_6013                 	| [$d760: ld   (player_almost_in_elevator_4_6013),a]
 	clr.b	player_in_wagon_flag_6029    	| [$d763: ld   (player_in_wagon_flag_6029),a]
 	clr.b	player_gripping_handle_602A  	| [$d766: ld   (player_gripping_handle_602A),a]
 	clr.b	fatal_fall_height_reached_604E	| [$d769: ld   (fatal_fall_height_reached_604E),a]
@@ -7940,7 +7971,7 @@ l_d756:
 	clr.w	pickaxe_timer_duration_61E0  	| [$d772: ld   (pickaxe_timer_duration_61E0),a]
 											| [$d775: ld   (unknown_61E1),a]
 	clr.b	player_in_elevator_4_6014                 	| [$d778: ld   (player_in_elevator_4_6014),a]
-	clr.b	player_in_elevator_4_6013                 	| [$d77b: ld   (player_in_elevator_4_6013),a]
+	clr.b	player_almost_in_elevator_4_6013                 	| [$d77b: ld   (player_almost_in_elevator_4_6013),a]
 	clr.b	unknown_62B5                 	| [$d77e: ld   (unknown_62B5),a]
 	clr.b	unknown_62B6                 	| [$d781: ld   (unknown_62B6),a]
 	clr.b	unknown_62B9                 	| [$d784: ld   (unknown_62B9),a]
@@ -8793,8 +8824,6 @@ draw_explosion_frame_dd2b:
 	move.w	explosion_screen_address_62F8,d6             	| [$ddd5: ld   iy,(explosion_screen_address_62F8)]
 	                     	| [$ddd9: ld   de,$0800]
 	add.w	#0x800,d6                            	| [$dddc: add  iy,de]
-
-	WPSET	0X200
 	
  	lea	bomb_explosion_attr_backup_buffer_6304,a2                	| [$ddde: ld   ix,bomb_explosion_attr_backup_buffer_6304]
 	move.b	(A2)+,d0                    	| [$dde2: ld   a,(ix+$00)]
@@ -11153,7 +11182,7 @@ l_ef26:
 	move.w	guard_1_logical_address_6038,d6	| [$ef26: ld   hl,(guard_1_logical_address_6038)]
 	lea	guard_1_in_elevator_6037,a3    	| [$ef29: ld   iy,guard_1_in_elevator_6037]
 	lea	guard_1_struct_6594,a2         	| [$ef2d: ld   ix,guard_1_struct_6594]
-	jbsr	l_c12a                            	| [$ef31: call $C12A]
+	jbsr	maybe_align_character_y_on_8_c12a                            	| [$ef31: call $C12A]
 	move.w	#-0x20,d1                        	| [$ef34: ld   bc,$FFE0] 65504
 	move.w	guard_1_logical_address_6038,d6	| [$ef37: ld   hl,(guard_1_logical_address_6038)]
 	lea	guard_1_struct_6594,a2         	| [$ef3a: ld   ix,guard_1_struct_6594]
@@ -11162,14 +11191,14 @@ l_ef26:
 	* by luck because BC is often $FFxx it points on ROM and
 	* the values are 1) non writable 2) compatible)
 	* if A4 is set to whatever the value, first it corrupts the memory
-	* it points to and second it can be > 3 which makes game release teh*
+	* it points to and second it can be > 3 which makes game release the
 	* pickaxe / bomb / barrow immediately (or rather lose it)
 	sub.l	a4,a4
 	jbsr	l_c098                            	| [$ef3e: call $C098]
 	move.w	guard_2_logical_address_6078,d6	| [$ef41: ld   hl,(guard_2_logical_address_6078)]
 	lea	guard_2_in_elevator_6077,a3    	| [$ef44: ld   iy,guard_2_in_elevator_6077]
 	lea	guard_2_struct_6598,a2         	| [$ef48: ld   ix,guard_2_struct_6598]
-	jbsr	l_c12a                            	| [$ef4c: call $C12A]
+	jbsr	maybe_align_character_y_on_8_c12a                            	| [$ef4c: call $C12A]
 	move.w	#-0x20,d1                        	| [$ef4f: ld   bc,$FFE0] 65504
 	move.w	guard_2_logical_address_6078,d6	| [$ef52: ld   hl,(guard_2_logical_address_6078)]
 	lea	guard_2_struct_6598,a2         	| [$ef55: ld   ix,guard_2_struct_6598]
@@ -11194,7 +11223,7 @@ l_ef7b:
 	move.w	player_logical_address_6009,d6	| [$ef7b: ld   hl,(player_logical_address_6009)]
 	lea	unknown_6008,a3                	| [$ef7e: ld   iy,unknown_6008]
 	lea	player_struct_6580,a2          	| [$ef82: ld   ix,player_struct_6580]
-	jbsr	l_c12a                            	| [$ef86: call $C12A]
+	jbsr	maybe_align_character_y_on_8_c12a                            	| [$ef86: call $C12A]
 	move.w	player_logical_address_6009,d6	| [$ef89: ld   hl,(player_logical_address_6009)]
 	lea	player_struct_6580,a2          	| [$ef8c: ld   ix,player_struct_6580]
 	lea	unknown_633A,a4            	| [$ef90: ld   bc,unknown_633A] None
@@ -12765,7 +12794,7 @@ player_dies_F9E1:
 	move.w	player_logical_address_6009,d6	| [$f9f8: ld   hl,(player_logical_address_6009)]
  	lea	unknown_6008,a3                	| [$f9fb: ld   iy,unknown_6008]
 	lea	player_struct_6580,a2          	| [$f9ff: ld   ix,player_struct_6580]
-	jbsr	l_c12a                            	| [$fa03: call $C12A]
+	jbsr	maybe_align_character_y_on_8_c12a                            	| [$fa03: call $C12A]
 	move.b	#0x01,d0                        	| [$fa06: ld   a,$01]
 	move.b	d0,game_locked_6151             	| [$fa08: ld   (game_locked_6151),a]
 	      	| [$fa0b: ld   (interrupt_control_A000),a]
@@ -12893,7 +12922,7 @@ start_new_life_FAEA:
 	clr.b	player_controls_frozen_6028  	| [$faff: ld   (player_controls_frozen_6028),a]
 	clr.b	fatal_fall_height_reached_604E	| [$fb02: ld   (fatal_fall_height_reached_604E),a]
 	clr.b	player_in_wagon_flag_6029    	| [$fb05: ld   (player_in_wagon_flag_6029),a]
-	clr.b	player_in_elevator_4_6013                 	| [$fb08: ld   (player_in_elevator_4_6013),a]
+	clr.b	player_almost_in_elevator_4_6013                 	| [$fb08: ld   (player_almost_in_elevator_4_6013),a]
 	clr.b	fall_height_604D             	| [$fb0b: ld   (fall_height_604D),a]
 	clr.b	bag_falling_6159             	| [$fb0e: ld   (bag_falling_6159),a]
 	clr.b	bag_sliding_615E             	| [$fb11: ld   (bag_sliding_615E),a]
@@ -13256,7 +13285,7 @@ l_fcf4:
 	move.w	guard_1_logical_address_6038,d6	| [$fd24: ld   hl,(guard_1_logical_address_6038)]
 	lea	guard_1_in_elevator_6037,a3    	| [$fd27: ld   iy,guard_1_in_elevator_6037]
 	lea	guard_1_struct_6594,a2         	| [$fd2b: ld   ix,guard_1_struct_6594]
-	jbsr	l_c12a                            	| [$fd2f: call $C12A]
+	jbsr	maybe_align_character_y_on_8_c12a                            	| [$fd2f: call $C12A]
 	rts                                    	| [$fd32: ret]
 l_fd33:
 	lea	unknown_6157,a3                	| [$fd33: ld   iy,unknown_6157]
@@ -13283,7 +13312,7 @@ l_fd33:
 	move.w	guard_2_logical_address_6078,d6	| [$fd63: ld   hl,(guard_2_logical_address_6078)]
 	lea	guard_2_in_elevator_6077,a3    	| [$fd66: ld   iy,guard_2_in_elevator_6077]
 	lea	guard_2_struct_6598,a2         	| [$fd6a: ld   ix,guard_2_struct_6598]
-	jbsr	l_c12a                            	| [$fd6e: call $C12A]
+	jbsr	maybe_align_character_y_on_8_c12a                            	| [$fd6e: call $C12A]
 	rts                                    	| [$fd71: ret]
 draw_object_tiles_FD72:
 	lea	bags_coordinates_609C,a2       	| [$fd72: ld   ix,bags_coordinates_609C]

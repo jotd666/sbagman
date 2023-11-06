@@ -83,7 +83,7 @@ start:
     
     IFD CHIP_ONLY
     lea  _expmem(pc),a0
-    move.l  #$80000,(a0)
+    move.l  #$78000,(a0)
     ENDC
     lea progstart(pc),a0
     move.l  _expmem(pc),(a0)

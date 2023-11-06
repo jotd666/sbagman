@@ -216,7 +216,8 @@ tiles_palette = [tuple(map(int,line.split())) for line in """0 0 0
 original_palette = palette
 
 # "VALADON" title uses other colors, we just replace them, we'll change them dynamically in the title screen
-palette_replacement_dict = {(255,151,0):tiles_palette[1],(0,222,247):tiles_palette[2]}
+# also 0,222,247 must be replaced by something approaching as it's used by the gun tile in game
+palette_replacement_dict = {(255,151,0):tiles_palette[1],(0,222,247):tiles_palette[5]}
 
 
 with open(os.path.join(src_dir,"palette.68k"),"w") as f:

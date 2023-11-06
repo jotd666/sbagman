@@ -60,8 +60,8 @@
 	.global	player_climb_frame_counter_6007
 	.global	unknown_6008
 	.global	way_clear_flag_600B
-	.global	unknown_600C
-	.global	player_in_elevator_4_6013
+	.global	player_y_modulus_8_600C
+	.global	player_almost_in_elevator_4_6013
 	.global	player_in_elevator_4_6014
 	.global	elevator_4_going_down_6015
 	.global	wagon_direction_array_6016
@@ -338,7 +338,7 @@ player_logical_address_6009:
 	ds.l	1
 way_clear_flag_600B:
 	ds.b	1
-unknown_600C:
+player_y_modulus_8_600C:
 	ds.b	1
 player_screen_600D:
 	ds.b	3
@@ -348,7 +348,7 @@ elevator_timer_screen_4_6011:
 	ds.b	1
 elevator_not_moving_screen_4_6012:
 	ds.b	1
-player_in_elevator_4_6013:
+player_almost_in_elevator_4_6013:
 	ds.b	1
 player_in_elevator_4_6014:
 	ds.b	1

@@ -1,19 +1,20 @@
-# Bagman (68K)
+# Super Bagman (68K)
 
-Bagman remake by JOTD in 2010-2023
+Super Bagman remake by JOTD in 2023
 
 Original game by Valadon Automation
 ROM strings show that it has been coded by Jacques Brisse (still head of Valadon in 2015 at least)
 
-Game has been resourced (Z80) and A.I & speeds extracted from the first versions. Now the Amiga version
-uses 100% of the transcoded original code for better accuracy.
+Game uses 99% of the transcoded original code for better accuracy.
+
+Some memory read bugs & text typos have been fixed. 
+Music never loses the tempo.
+Sound use samples.
 
 History: 
 
-2010: first SDL version (Windows, Amiga - super slow)
-2015: fixed a lot of bugs on SDL version
-2019: Amiga version (needs 68020+ and fastmem, still slow)
 2023: Amiga version using real game code transcoded to 68000 (should run on A500)
+2010-2023: Bagman
 
 
 ### PROGRESS:
@@ -26,7 +27,6 @@ History:
 - fully playable with sound
 - still bugs
 - missing features
-- stuck on highscore screen
 
 #### NEO GEO
 
@@ -37,7 +37,7 @@ History:
 #### CREDITS:
 
 - Jean-Francois Fabre (aka jotd): Z80 reverse engineering, Z80 to 68k transcode, Amiga code and assets
-- J.M.D: remade amiga tunes
+- no9: remade amiga tunes
 - phx: ptplayer sound/music replay Amiga code
 - Valadon Automation: original game :)
 
@@ -88,10 +88,10 @@ History:
 
 - make -f makefile.ng OUTPUT={cart|cd} MAMEDIR={mamedir} install
   - (mamedir defaults to '.')
-- paste bagman.xml into MAME's hash/neogeo.xml file
+- paste sbagman.xml into MAME's hash/neogeo.xml file
 
 #### To run in MAME:
 
-- cart : 'mame neogeo bagman'
-- cd : 'mame neocdz -cdrom roms/neocdz/bagman.iso'
+- cart : 'mame neogeo sbagman'
+- cd : 'mame neocdz -cdrom roms/neocdz/sbagman.iso'
   
