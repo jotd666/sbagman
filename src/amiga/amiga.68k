@@ -2320,14 +2320,14 @@ bg_displayed_screen_ptr:
 
 guard_climb_sound:
     .long    player_climb_raw
-    .word   5136    | copied from player climb
+    .word   4566    | copied from player climb
     .word   FXFREQBASE/HQ_SOUNDFREQ,8
     .byte    2
     .byte    2		| priority
 
 guard_walk_sound:
     .long    player_walk_raw
-    .word   4467   | copied from player walk
+    .word   3970   | copied from player walk
     .word   FXFREQBASE/HQ_SOUNDFREQ,8
     .byte    2
     .byte    2		| priority

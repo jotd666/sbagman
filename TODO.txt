@@ -6,6 +6,7 @@
   try blasting a ladder & debug (1FF / F => FF 1F)
   
 - record bomb sound, insert at dccd
+- record gun sound
 - test elevator level 4 doesn't carry player at ground level! lifts player
   slightly then drops him!!!! works at other stops!!!
   also works with other configuration

@@ -18,7 +18,7 @@ src_dir = os.path.join(this_dir,"../../src/amiga")
 outfile = os.path.join(src_dir,"sounds.68k")
 sndfile = os.path.join(src_dir,"sound_entries.68k")
 
-hq_sample_rate = 18000
+hq_sample_rate = 16000
 
 
 
@@ -37,14 +37,18 @@ sound_dict = {
 "REWARD_TALK_SND"              :{"index":5,"channel":talk,"sample_rate":hq_sample_rate,"priority":10},
 "FALL_IN_WAGON_SND"            :{"index":6,"channel":talk,"sample_rate":hq_sample_rate,"priority":10},
 "PLAYER_GRABS_HANDLE_SND"      :{"index":7,"channel":talk,"sample_rate":hq_sample_rate,"priority":10},
+# AY noises (interrupt the music)
+"BOMB_SND"                   :{"index":8,"channel":talk,"sample_rate":hq_sample_rate,"priority":15},
+"SHOT_SND"                   :{"index":9,"channel":talk,"sample_rate":hq_sample_rate,"priority":15},
+
 # AY sounds & music
-"CREDIT_SND"                   :{"index":8,"channel":ay,"sample_rate":hq_sample_rate,"priority":10},
-"TIME_WARN_SND"                :{"index":9,"channel":ay,"sample_rate":hq_sample_rate,"priority":20},
-"TAKE_BAG_SND"                 :{"index":10,"channel":ay,"sample_rate":hq_sample_rate,"priority":10},
-"REWARD_TUNE_SND"              :{"index":11,"channel":ay,"sample_rate":hq_sample_rate,"priority":10},
-"PLAYER_KILLED_TUNE_SND"       :{"index":12,"channel":ay,"sample_rate":hq_sample_rate,"priority":10},
-"TUNE1_SND"              :{"index":13,"pattern":1,"loops":False,"volume":32,"ticks":766},
-"TUNE2_SND"              :{"index":14,"pattern":3,"loops":False,"volume":32,"ticks":1048},
+"CREDIT_SND"                   :{"index":10,"channel":ay,"sample_rate":hq_sample_rate,"priority":10},
+"TIME_WARN_SND"                :{"index":11,"channel":ay,"sample_rate":hq_sample_rate,"priority":20},
+"TAKE_BAG_SND"                 :{"index":12,"channel":ay,"sample_rate":hq_sample_rate,"priority":10},
+"REWARD_TUNE_SND"              :{"index":13,"channel":ay,"sample_rate":hq_sample_rate,"priority":10},
+"PLAYER_KILLED_TUNE_SND"       :{"index":14,"channel":ay,"sample_rate":hq_sample_rate,"priority":10},
+"TUNE1_SND"              :{"index":15,"pattern":1,"loops":False,"volume":32,"ticks":766},
+"TUNE2_SND"              :{"index":16,"pattern":3,"loops":False,"volume":32,"ticks":1048},
 }
 
 max_sound = max(x["index"] for x in sound_dict.values())+1

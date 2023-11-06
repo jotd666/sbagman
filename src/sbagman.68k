@@ -8655,8 +8655,8 @@ l_dca9:
 	rts                                    	| [$dccc: ret  z] [...]
 0:
 	* play bomb sound							
-												| [$dccd: ld   hl,$3FDC]
-											| [$dcd0: ld   (unknown_634E),hl]
+	move.w	#BOMB_SND,d0					| [$dccd: ld   hl,$3FDC]
+	jbsr	start_a_sound					| [$dcd0: ld   (unknown_634E),hl]
 											| [$dcd3: xor  a]
 											| [$dcd4: ld   (ay_sound_start_6142),a]
 	move.b	#0x03,d0                        	| [$dcd7: ld   a,$03]
@@ -10142,11 +10142,10 @@ l_e7d3:
 	bne.b	0f                               	| [...]
 	rts                                    	| [$e811: ret  z] [...]
 0:
-* TODO play sound?
-*	LEA_ROM	       0x5428,a0                      	| [$e812: ld   hl,$5428]
-*	move.b	a0,unknown_634E                 	| [$e815: ld   (unknown_634E),hl]
-*	clr.b	d0                               	| [$e818: xor  a]
-*	move.b	d0,ay_sound_start_6142          	| [$e819: ld   (ay_sound_start_6142),a]
+    move.w	#SHOT_SND,d0         	| [$e812: ld   hl,$5428]
+    jbsr	start_a_sound   	| [$e815: ld   (unknown_634E),hl]
+        	| [$e818: xor  a]
+       	| [$e819: ld   (ay_sound_start_6142),a]
 	move.b	#0x02,d0                        	| [$e81c: ld   a,$02]
 	move.b	d0,unknown_6348                 	| [$e81e: ld   (unknown_6348),a]
 	move.b	#0x0F,d0                        	| [$e821: ld   a,$0F]
