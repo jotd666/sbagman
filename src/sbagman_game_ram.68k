@@ -107,8 +107,8 @@
 	.global	unknown_6144
 	.global	unknown_6145
 	.global	unknown_pointer_6146
-	.global	unknown_6148
-	.global	unknown_6149
+	.global	guard_1_not_moving_flag_6148
+	.global	guard_2_not_moving_flag_6149
 	.global	unknown_6151
 	.global	wait_flag_6152
 	.global	unknown_6153
@@ -514,9 +514,9 @@ unknown_6145:
 	ds.b	1
 unknown_pointer_6146:
 	ds.l	1
-unknown_6148:
+guard_1_not_moving_flag_6148:
 	ds.b	1
-unknown_6149:
+guard_2_not_moving_flag_6149:
 	ds.b	8
 unknown_6151:
 	ds.b	1
@@ -831,7 +831,7 @@ bomb_explosion_tile_backup_buffer_62FC:
 	ds.b	8
 bomb_explosion_attr_backup_buffer_6304:
 	ds.b	8
-	
+	ds.b	2		| seems to be used (else 630E is corrupt when bomb explodes)
 
 * bomb stuff (we can't align, leave mapping as is!)
 

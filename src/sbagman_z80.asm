@@ -131,11 +131,11 @@
 0172: 32 71 62    ld   (unknown_6271),a
 0175: FD 21 56 61 ld   iy,unknown_6156
 0179: DD 21 94 65 ld   ix,guard_1_struct_6594
-017D: 11 48 61    ld   de,unknown_6148
+017D: 11 48 61    ld   de,guard_1_not_moving_flag_6148
 0180: CD 4C 05    call $054C
 0183: FD 21 57 61 ld   iy,unknown_6157
 0187: DD 21 98 65 ld   ix,guard_2_struct_6598
-018B: 11 49 61    ld   de,unknown_6149
+018B: 11 49 61    ld   de,guard_2_not_moving_flag_6149
 018E: CD 4C 05    call $054C
 0191: 2A 38 60    ld   hl,(guard_1_logical_address_6038)
 0194: DD 21 EB 61 ld   ix,unknown_61EB
@@ -323,7 +323,7 @@
 0368: 3A B5 62    ld   a,(unknown_62B5)
 036B: FE 01       cp   $01
 036D: 28 18       jr   z,$0387
-036F: 3A 48 61    ld   a,(unknown_6148)
+036F: 3A 48 61    ld   a,(guard_1_not_moving_flag_6148)
 0372: FE 01       cp   $01
 0374: 28 11       jr   z,$0387
 0376: 3A 3B 60    ld   a,(guard_1_in_elevator_603B)
@@ -364,7 +364,7 @@
 03D2: 3A B9 62    ld   a,(unknown_62B9)
 03D5: FE 01       cp   $01
 03D7: 28 18       jr   z,$03F1
-03D9: 3A 49 61    ld   a,(unknown_6149)
+03D9: 3A 49 61    ld   a,(guard_2_not_moving_flag_6149)
 03DC: FE 01       cp   $01
 03DE: 28 11       jr   z,$03F1
 03E0: 3A 7B 60    ld   a,(guard_2_in_elevator_607B)
@@ -8665,9 +8665,9 @@ EE3E: 3A 00 B8    ld   a,(io_read_shit_B800)
 EE41: CD 0B F5    call analyse_guard_direction_change_F50B
 EE44: DD 21 3B 60 ld   ix,guard_1_in_elevator_603B
 EE48: 21 57 60    ld   hl,guard_1_not_moving_timeout_counter_6057
-EE4B: 11 48 61    ld   de,unknown_6148
+EE4B: 11 48 61    ld   de,guard_1_not_moving_flag_6148
 EE4E: CD 2E F4    call check_for_not_moving_timeout_F42E
-EE51: 3A 48 61    ld   a,(unknown_6148)
+EE51: 3A 48 61    ld   a,(guard_1_not_moving_flag_6148)
 EE54: FE 00       cp   $00
 EE56: 20 2D       jr   nz,$EE85
 EE58: 3A 57 60    ld   a,(guard_1_not_moving_timeout_counter_6057)
@@ -8699,9 +8699,9 @@ EEB1: 32 71 62    ld   (unknown_6271),a
 EEB4: CD 0B F5    call analyse_guard_direction_change_F50B
 EEB7: DD 21 7B 60 ld   ix,guard_2_in_elevator_607B
 EEBB: 21 97 60    ld   hl,guard_2_not_moving_timeout_counter_6097
-EEBE: 11 49 61    ld   de,unknown_6149
+EEBE: 11 49 61    ld   de,guard_2_not_moving_flag_6149
 EEC1: CD 2E F4    call check_for_not_moving_timeout_F42E
-EEC4: 3A 49 61    ld   a,(unknown_6149)
+EEC4: 3A 49 61    ld   a,(guard_2_not_moving_flag_6149)
 EEC7: FE 00       cp   $00
 EEC9: 20 2D       jr   nz,$EEF8
 EECB: 3A 97 60    ld   a,(guard_2_not_moving_timeout_counter_6097)
@@ -8806,7 +8806,7 @@ EFE9: 18 04       jr   $EFEF
 
 guard_2_sees_player_EFEB:
 EFEB: AF          xor  a
-EFEC: 32 48 61    ld   (unknown_6148),a
+EFEC: 32 48 61    ld   (guard_1_not_moving_flag_6148),a
 EFEF: DD 21 7C 60 ld   ix,guard_2_sees_player_right_607C
 EFF3: 06 04       ld   b,$04
 EFF5: DD 7E 00    ld   a,(ix+$00)
@@ -8831,7 +8831,7 @@ F02A: 18 04       jr   $F030
 
 guard_1_sees_player_F02C:
 F02C: AF          xor  a
-F02D: 32 49 61    ld   (unknown_6149),a
+F02D: 32 49 61    ld   (guard_2_not_moving_flag_6149),a
 F030: 3A 60 61    ld   a,(pickup_flag_6160)
 F033: 32 2A 63    ld   (unknown_632A),a
 F036: 2A 09 60    ld   hl,(player_logical_address_6009)

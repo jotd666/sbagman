@@ -478,11 +478,11 @@ l_0139:
  	move.b	d0,unknown_6271                 	| [$0172: ld   (unknown_6271),a]
 	lea	unknown_6156,a3                	| [$0175: ld   iy,unknown_6156]
 	lea	guard_1_struct_6594,a2         	| [$0179: ld   ix,guard_1_struct_6594]
-	lea	unknown_6148,a1                	| [$017d: ld   de,unknown_6148]
+	lea	guard_1_not_moving_flag_6148,a1                	| [$017d: ld   de,guard_1_not_moving_flag_6148]
 	jbsr	l_054c                            	| [$0180: call $054C]
 	lea	unknown_6157,a3                	| [$0183: ld   iy,unknown_6157]
 	lea	guard_2_struct_6598,a2         	| [$0187: ld   ix,guard_2_struct_6598]
-	lea	unknown_6149,a1                	| [$018b: ld   de,unknown_6149]
+	lea	guard_2_not_moving_flag_6149,a1                	| [$018b: ld   de,guard_2_not_moving_flag_6149]
 	jbsr	l_054c                            	| [$018e: call $054C]
 	move.w	guard_1_logical_address_6038,d6	| [$0191: ld   hl,(guard_1_logical_address_6038)]
 	lea	unknown_61EB,a2                	| [$0194: ld   ix,unknown_61EB]
@@ -694,7 +694,7 @@ l_0323:
 	move.b	unknown_62B5,d0                 	| [$0368: ld   a,(unknown_62B5)]
 	cmp.b	#0x01,d0                         	| [$036b: cp   $01]
 	jeq	l_0387                             	| [$036d: jr   z,$0387]
-	move.b	unknown_6148,d0                 	| [$036f: ld   a,(unknown_6148)]
+	move.b	guard_1_not_moving_flag_6148,d0                 	| [$036f: ld   a,(guard_1_not_moving_flag_6148)]
 	cmp.b	#0x01,d0                         	| [$0372: cp   $01]
 	jeq	l_0387                             	| [$0374: jr   z,$0387]
 l_0376:
@@ -746,7 +746,7 @@ l_03a8:
 	move.b	unknown_62B9,d0                 	| [$03d2: ld   a,(unknown_62B9)]
 	cmp.b	#0x01,d0                         	| [$03d5: cp   $01]
 	jeq	l_03f1                             	| [$03d7: jr   z,$03F1]
-	move.b	unknown_6149,d0                 	| [$03d9: ld   a,(unknown_6149)]
+	move.b	guard_2_not_moving_flag_6149,d0                 	| [$03d9: ld   a,(guard_2_not_moving_flag_6149)]
 	cmp.b	#0x01,d0                         	| [$03dc: cp   $01]
 	jeq	l_03f1                             	| [$03de: jr   z,$03F1]
 l_03e0:
@@ -4683,6 +4683,7 @@ l_c14f:
 	move.b	d0,(0x03,a2)                    	| [$c15b: ld   (ix+$03),a]
 	rts                                    	| [$c15e: ret]
 l_c15f:
+
 	* align character in Y on multiples of 8 when elevator picks up the player
 	* jotd: add special case to avoid issues
 	* (I could also completely skip this, as it only leads to problems, but
@@ -5345,7 +5346,7 @@ l_c55a:
 	move.l	unknown_pointer_6146,a0     	| [$c55f: ld   hl,(unknown_pointer_6146)]
 	* was +4, but pointer is now 32 bits and points on                           	| [$2b8c: inc  hl] * 4
 	* unknown_6144 so it would write in wrong location instead of
-	* unknown_6148...
+	* guard_1_not_moving_flag_6148...
 	move.b	d0,(6,a0)                         	| [$2b90: ld   (hl),a]
 	rts                                    	| [$c567: ret]
 l_c568:
@@ -5374,7 +5375,7 @@ l_c58d:
 	move.l	unknown_pointer_6146,a0     	| [$c58d: ld   hl,(unknown_pointer_6146)]
  	* was +4, but pointer is now 32 bits and points on                           	| [$2b8c: inc  hl] * 4
 	* unknown_6144 so it would write in wrong location instead of
-	* unknown_6148...
+	* guard_1_not_moving_flag_6148...
 	                           	| [$c590: inc  hl] * 4
 	                               	| [$c594: xor  a]
 	clr.b	(6,a0)                          	| [$c595: ld   (hl),a]
@@ -6279,7 +6280,20 @@ l_cb4d:
 	move.b	#0x24,d0                        	| [$cb54: ld   a,$24]
 	jbsr	osd_w_colorram                         	| [$cb56: ld   (hl),a]
 	rts                                    	| [$cb57: ret]
-l_cb58:
+
+* called when guard_x_not_moving_timeout_counter_xxxx reaches >= 0xF0
+* it's a safeguard to ensure that no guard can be stuck for the rest of the
+* round in a place, which would make the game much easier to complete.
+*
+* something Jacques forgot is that if you threaten a guard with pick if
+* he has gun and is in "fire on sight" mode, you can make him immobile
+* (because of the shooting stance), and make him
+* reset/warp (checked on MAME). Since the guard still is afraid of your pick
+* even with the gun (WTF??) guard shoots 6 times in the opposite direction
+* so misses every time and doesn't move for a time long enough for the timeout
+* system. "Don't bring a pickaxe to a gunfight" doesn't seem to apply here :)
+
+maybe_reset_guard_position_cb58:
 	lea	guard_1_struct_6594,a2         	| [$cb58: ld   ix,guard_1_struct_6594]
 	move.b	guard_1_in_elevator_603B,d0     	| [$cb5c: ld   a,(guard_1_in_elevator_603B)]
 	cmp.b	#0x01,d0                         	| [$cb5f: cp   $01]
@@ -8301,7 +8315,9 @@ l_da22:
 	cmp.b	#0x05,d0                         	| [$da25: cp   $05]
 	jne	l_da08                             	| [$da27: jr   nz,$DA08]
 	move.b	(0x03,a3),d0                    	| [$da29: ld   a,(iy+$03)]
-	* was 4 but now 6 because of 32 bit pointer
+	* was 4 but now 6 because of 32 bit pointer in 6146 that I'm starting
+	* to regret now... I should have kept 16 bit and add absolute address
+	* to keep size the same
 	addq.w	#6,a0                           	| [$da2c: inc  hl] * 4
 	move.b	d0,d1                           	| [$da30: ld   b,a]
 	move.b	elevator_5_y_62E3,d0                 	| [$da31: ld   a,(elevator_5_y_62E3)]
@@ -8312,12 +8328,18 @@ l_da22:
 	jeq	l_da4c                             	| [$da39: jr   z,$DA4C]
 	move.b	#0x01,d0                        	| [$da3b: ld   a,$01]
 	move.b	d0,(a0)                         	| [$da3d: ld   (hl),a]
-	move.b	d6,d0                           	| [$da3e: ld   a,l]
+	* compute the offset between start of memory address 6144 and current
+	* but we added 6 not 4 because of pointer in 6146 which is now 32 bit	
+	move.l	a0,d0                           	| [$da3e: ld   a,l]
 	lea	guard_1_not_moving_timeout_counter_6057,a0	| [$da3f: ld   hl,guard_1_not_moving_timeout_counter_6057]
-	cmp.b	#0x48,d0                         	| [$da42: cp   $48]
+	* 48 is LSB of 6148, better compare address directly to avoid issues
+	* (if wrong guard select, guard can disappear while waiting for the elevator)
+	cmp.l	#guard_1_not_moving_flag_6148,d0                         	| [$da42: cp   $48]
 	jeq	l_da49                             	| [$da44: jr   z,$DA49]
+	* d0=guard_2_not_moving_flag_6149 (what else?) so we're processing guard 2
 	lea	guard_2_not_moving_timeout_counter_6097,a0	| [$da46: ld   hl,guard_2_not_moving_timeout_counter_6097]
 l_da49:
+	* we're processing guard 1
 	clr.b	d0                               	| [$da49: xor  a]
 	move.b	d0,(a0)                         	| [$da4a: ld   (hl),a]
 	rts                                    	| [$da4b: ret]
@@ -11093,15 +11115,15 @@ l_eddc:
 	jbsr	analyse_guard_direction_change_F50B	| [$ee41: call analyse_guard_direction_change_F50B]
 	lea	guard_1_in_elevator_603B,a2    	| [$ee44: ld   ix,guard_1_in_elevator_603B]
 	lea	guard_1_not_moving_timeout_counter_6057,a0	| [$ee48: ld   hl,guard_1_not_moving_timeout_counter_6057]
-	lea	unknown_6148,a1                	| [$ee4b: ld   de,unknown_6148]
+	lea	guard_1_not_moving_flag_6148,a1                	| [$ee4b: ld   de,guard_1_not_moving_flag_6148]
 	jbsr	check_for_not_moving_timeout_F42E 	| [$ee4e: call check_for_not_moving_timeout_F42E]
-	move.b	unknown_6148,d0                 	| [$ee51: ld   a,(unknown_6148)]
+	move.b	guard_1_not_moving_flag_6148,d0                 	| [$ee51: ld   a,(guard_1_not_moving_flag_6148)]
 	                         	| [$ee54: cp   $00]
 	jne	l_ee85                             	| [$ee56: jr   nz,$EE85]
 	move.b	guard_1_not_moving_timeout_counter_6057,d0	| [$ee58: ld   a,(guard_1_not_moving_timeout_counter_6057)]
 	cmp.b	#0xF0,d0                         	| [$ee5b: cp   $F0]
 	bcs.b	0f                               	| [...]
-	jbsr	l_cb58                            	| [$ee5d: call nc,$CB58]
+	jbsr	maybe_reset_guard_position_cb58                            	| [$ee5d: call nc,$CB58]
 0:
 	lea	guard_1_struct_6594,a3         	| [$ee62: ld   iy,guard_1_struct_6594]
 	move.l	a3,guard_struct_pointer_6093    	| [$ee66: ld   (guard_struct_pointer_6093),iy]
@@ -11133,9 +11155,9 @@ l_ee85:
 	jbsr	analyse_guard_direction_change_F50B	| [$eeb4: call analyse_guard_direction_change_F50B]
 	lea	guard_2_in_elevator_607B,a2    	| [$eeb7: ld   ix,guard_2_in_elevator_607B]
 	lea	guard_2_not_moving_timeout_counter_6097,a0	| [$eebb: ld   hl,guard_2_not_moving_timeout_counter_6097]
-	lea	unknown_6149,a1                	| [$eebe: ld   de,unknown_6149]
+	lea	guard_2_not_moving_flag_6149,a1                	| [$eebe: ld   de,guard_2_not_moving_flag_6149]
 	jbsr	check_for_not_moving_timeout_F42E 	| [$eec1: call check_for_not_moving_timeout_F42E]
-	move.b	unknown_6149,d0                 	| [$eec4: ld   a,(unknown_6149)]
+	move.b	guard_2_not_moving_flag_6149,d0                 	| [$eec4: ld   a,(guard_2_not_moving_flag_6149)]
 	                         	| [$eec7: cp   $00]
 	jne	l_eef8                             	| [$eec9: jr   nz,$EEF8]
 	move.b	guard_2_not_moving_timeout_counter_6097,d0	| [$eecb: ld   a,(guard_2_not_moving_timeout_counter_6097)]
@@ -11263,7 +11285,7 @@ l_efb4:
 
 guard_2_sees_player_EFEB:
 	clr.b	d0                               	| [$efeb: xor  a]
-	move.b	d0,unknown_6148                 	| [$efec: ld   (unknown_6148),a]
+	move.b	d0,guard_1_not_moving_flag_6148                 	| [$efec: ld   (guard_1_not_moving_flag_6148),a]
 l_efef:
 	lea	guard_2_sees_player_right_607C,a2	| [$efef: ld   ix,guard_2_sees_player_right_607C]
 	move.b	#0x04,d1                        	| [$eff3: ld   b,$04]
@@ -11291,7 +11313,7 @@ l_eff5:
 
 guard_1_sees_player_F02C:
 	clr.b	d0                               	| [$f02c: xor  a]
-	move.b	d0,unknown_6149                 	| [$f02d: ld   (unknown_6149),a]
+	move.b	d0,guard_2_not_moving_flag_6149                 	| [$f02d: ld   (guard_2_not_moving_flag_6149),a]
 l_f030:
 	move.b	pickup_flag_6160,d0             	| [$f030: ld   a,(pickup_flag_6160)]
 	move.b	d0,unknown_632A                 	| [$f033: ld   (unknown_632A),a]
@@ -11848,20 +11870,28 @@ restore_object_background_f3f3:
 	jbsr	switch_to_screen_5_CE4D           	| [$f42a: call z,switch_to_screen_5_CE4D]
 0:
 	rts                                    	| [$f42d: ret]
+	
+* < A0 points on guard_x_not_moving_timeout_counter_xxxx
+* < A1 points on guard_x_not_moving_flag_xxxx
+* < A2 points on guard_x_in_elevator_xxxx
+
 check_for_not_moving_timeout_F42E:
 	move.b	(A2),d0                    	| [$f42e: ld   a,(ix+$00)]
 	cmp.b	#0x01,d0                         	| [$f431: cp   $01]
 	bne.b	0f                               	| [...]
 	rts                                    	| [$f433: ret  z] [...]
 0:
+	* guard not in elevator, check if not moving for a looong time
 	move.b	(a0),d0                         	| [$f434: ld   a,(hl)]
 	cmp.b	#0xF0,d0                         	| [$f435: cp   $F0]
 	bcc.b	0f                               	| [...]
 	rts                                    	| [$f437: ret  c] [...]
 0:
+	* ok, not moving but short time, reset not moving flag
 	clr.b	d0                               	| [$f438: xor  a]
 	move.b	d0,(a1)                         	| [$f439: ld   (de),a]
 	rts                                    	| [$f43a: ret]
+	
 color_background_tile_F43B:
 	move.b	#0x1F,d1                        	| [$f43b: ld   b,$1F]
 	jbsr	osd_r_videoram                         	| [$f43d: ld   a,(hl)]

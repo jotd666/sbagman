@@ -658,15 +658,18 @@ _vblank:
     rte
 	
 osd_break:
-        pea     0.w
-        move.l  a0,-(sp)
-        pea     1003f-1002f
-        pea     1002f(pc)
-        pea     -1.w
-        pea     82.w
-        jsr     0xf0ff60
-        lea     24(sp),sp
-        rts
+	* sends a WinUAE command to enter WinUAE debugger
+	.ifndef	RELEASE
+	pea     0.w
+	move.l  a0,-(sp)
+	pea     1003f-1002f
+	pea     1002f(pc)
+	pea     -1.w
+	pea     82.w
+	jsr     0xf0ff60
+	lea     24(sp),sp
+	.endif
+    rts
 		
 1002: .asciz    "AKS_ENTERDEBUGGER 1"
 1003:
@@ -824,8 +827,11 @@ osd_update_sprites:
 	move.l	(a4,d4.w),d4	| get pointer
 	.ifndef	RELEASE
 	bne.b	25f
-	* sprite doesn't exist: blitz and bail out
-	**blitz
+	* sprite doesn't exist: bail out
+	
+	lea		sprite_doesnt_exist_error(pc),a0
+	jbsr	osd_break
+	
 	move.b	d1,d1
 	move.b	d2,d2
 	jra		30f
@@ -845,7 +851,8 @@ osd_update_sprites:
 	move.l	(a5),d4
 	.ifndef	RELEASE
 	bne.b	22f
-	blitz		| should not happen
+	lea		sprite_buffer_doesnt_exist_error(pc),a0
+	jbsr	osd_break
 	jra		30f
 22:
 	.endif
@@ -1032,10 +1039,14 @@ alloc_sprite:
 	bne.b	21b
 	* just cannot happen
 	* if we reach that point there's a big problem
-	blitz
+	.ifndef	RELEASE
+	lea	sprite_allocation_error(pc),a0
+	jbsr	osd_break
 	illegal
 	illegal
 	illegal
+	.endif
+	
 	rts
 	
 
@@ -1489,10 +1500,11 @@ osd_w_videoram:
 	bcs.b	1f
 0:
 	* should not happen
-	blitz
-	nop
-	move.b	d0,d0
-	nop	
+	.ifndef	RELEASE
+	lea		write_videoram_out_of_range_error(pc),a0
+	jbsr	osd_break
+	.endif
+	
 	bra.b	0f
 	
 1:
@@ -1547,11 +1559,11 @@ osd_w_colorram:
 	bcs.b	1f
 0:
 	* should not happen
-	blitz
-	nop
-	move.b	d1,d1
-	nop
-	nop
+	.ifndef	RELEASE
+	lea		write_colorram_out_of_range_error(pc),a0
+	jbsr	osd_break
+	.endif
+
 	bra.b	0f
 1:
 	lea		bg_colorram,a1
@@ -1834,10 +1846,10 @@ osd_r_colorram:
 	bcs.b	1f
 0:
 	* should not happen
-	blitz
-	clr.b	d0
-	move.b	D2,d2
-	nop
+	.ifndef	RELEASE
+	lea		read_colorram_out_of_range_error(pc),a0
+	jbsr	osd_break
+	.endif
 	bra.b	2f
 1:
 	lea		bg_colorram,a0
@@ -1855,10 +1867,10 @@ osd_r_videoram:
 	bcs.b	1f
 0:
 	* should not happen
-	blitz
-	clr.b	d0
-	move.b	D1,d1
-	nop
+	.ifndef	RELEASE
+	lea		read_videoram_out_of_range_error(pc),a0
+	jbsr	osd_break
+	.endif
 	bra.b	2f
 1:
 	lea		bg_videoram,a0
@@ -2195,6 +2207,24 @@ read_args_string:
 	.ascii	"INVINCIBLE/S,INFLIVES/S,INFTIME/S,INFPICK/S,"
 	.ascii	"CHEATKEYS/S,HARDBAGS/S,FRENCH/S,GUNSATSTART/S,SKILL/K/N,STARTLIVES/K/N"
 read_args_string_end:
+
+	.ifndef	RELEASE
+sprite_allocation_error:
+	.asciz	"sprite allocation error"
+sprite_doesnt_exist_error:
+	.asciz	"sprite doesn't exist"
+sprite_buffer_doesnt_exist_error:
+	.asciz	"sprite buffer doesn't exist"
+read_videoram_out_of_range_error:
+	.asciz	"read videoram out of range"
+write_videoram_out_of_range_error:
+	.asciz	"write videoram out of range"
+read_colorram_out_of_range_error:
+	.asciz	"read colorram out of range"
+write_colorram_out_of_range_error:
+	.asciz	"write colorram out of range"
+	
+	.endif
 	.align	2
 
 

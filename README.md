@@ -7,9 +7,10 @@ ROM strings show that it has been coded by Jacques Brisse (still head of Valadon
 
 Game uses 99% of the transcoded original code for better accuracy.
 
-Some memory read bugs & text typos have been fixed. 
+Some memory read bugs & text typos have been fixed, some not. 
 Music never loses the tempo.
 Sound use samples.
+Game still has original bugs left
 
 History: 
 
