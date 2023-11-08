@@ -93,10 +93,13 @@ used_cluts.update({k:[0xF] for k in range(0x334,0x33A)})
 # gun
 used_cluts[0x3BD] = [0x5,0x6]
 
-# extra beams, maybe not needed after all
+# extra beams, exactly like the ones in 0x349-0x34B
+# but with a different attribute, probably to
+# workaround a problem when restoring tiles
+# (tested with MAME, tile 0x34B is restored into 0x24B)
 used_cluts[0x24A] = [0xF]
 used_cluts[0x24B] = [0xF]
-used_cluts[0x24C] = [0xF]
+used_cluts[0x249] = [0xF]
 
 # highscore arrows
 

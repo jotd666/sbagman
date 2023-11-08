@@ -180,6 +180,7 @@ is_invincible:
 	rts
 
 * < D6: ROM offset
+* A0 is preserved as else it can conflict with program
 read_rom:
 	move.w	d6,-(sp)
 	swap	d6
@@ -197,8 +198,10 @@ read_rom:
 1:
 	.endif
 
+	move.l	a0,-(sp)
 	lea		game_mem,a0
 	move.b	(a0,d6.l),d0
+	move.l	(sp)+,a0
 	move.w	(sp)+,d6
 	rts
 	
@@ -3804,8 +3807,11 @@ l_17f1:
 	move.b	d0,unknown_627D                 	| [$181c: ld   (unknown_627D),a]
 	rts                                    	| [$181f: ret]
 
-l_1918:
-	move.b	d3,d0				| [$1918] ld   a,d
+* < D3: guard logical address
+* > A3: relevant table
+choose_screen_intersections_table_1918:
+	move.w	d3,d0				| [$1918] ld   a,d
+	lsr.w	#8,d0				| get MSB
 	LEA_ROM	       0x224E,a3                      	| [$1919: ld   iy,$224E]
 	cmp.b	#0x34,d0                         	| [$191d: cp   $34]
 	bcc.b	0f                               	| [...]
@@ -11109,7 +11115,9 @@ l_eddc:
 	move.l	a2,guard_direction_pointer_6095 	| [$ee2a: ld   (guard_direction_pointer_6095),ix]
 	lea	guard_1_ladder_frame_6035,a2   	| [$ee2e: ld   ix,guard_1_ladder_frame_6035]
 	lea	guard_1_struct_6594,a3         	| [$ee32: ld   iy,guard_1_struct_6594]
-	move.w	guard_1_logical_address_6038,guard_logical_address_6091	| [$ee36: ld   de,(guard_1_logical_address_6038)]
+	* leave the load in d3 as it's needed by analyse_guard_direction_change_F50B
+	move.w	guard_1_logical_address_6038,d3
+	move.w	d3,guard_logical_address_6091	| [$ee36: ld   de,(guard_1_logical_address_6038)]
 	  	| [$ee3a: ld   (guard_logical_address_6091),de]
 	            	| [$ee3e: ld   a,(io_read_shit_B800)]
 	jbsr	analyse_guard_direction_change_F50B	| [$ee41: call analyse_guard_direction_change_F50B]
@@ -11146,8 +11154,9 @@ l_ee85:
 	move.l	a2,guard_direction_pointer_6095 	| [$ee97: ld   (guard_direction_pointer_6095),ix]
 	lea	guard_2_ladder_frame_6075,a2   	| [$ee9b: ld   ix,guard_2_ladder_frame_6075]
 	lea	guard_2_struct_6598,a3         	| [$ee9f: ld   iy,guard_2_struct_6598]
-	move.w	guard_2_logical_address_6078,guard_logical_address_6091	| [$eea3: ld   de,(guard_2_logical_address_6078)]
- 	   	| [$eea7: ld   (guard_logical_address_6091),de]
+	* load d3, don't copy right away as analyse_guard_direction_change_F50B needs it
+	move.w	guard_2_logical_address_6078,d3	| [$eea3: ld   de,(guard_2_logical_address_6078)]
+	move.w	d3,guard_logical_address_6091		| [$eea7: ld   (guard_logical_address_6091),de]
 	            	| [$eeab: ld   a,(io_read_shit_B800)]
 	* copyright tampering protection
 	move.b	#0x41,d0                       	| [$eeae: ld   a,($570C)]
@@ -12071,13 +12080,13 @@ l_f508:
 	jbsr	cpdr                              	| [$f508: cpdr]
 	rts                                    	| [$f50a: ret]
  * < $6095:	pointer on direction ($6027/$6067)
- * < de:	guard screen address
+ * < d3:	guard screen address
  * < $6098:	guard screen index
- * < ix:	6035 or 6057 guard ????? what????
- * < iy:	guard struct
+ * < a2:	6035 or 6057 guard ladder frame pointer
+ * < a3:	guard struct
 analyse_guard_direction_change_F50B:
 	move.l	a3,-(sp)                        	| [$f50b: push iy]
-	jbsr	l_1918                            	| [$f50d: call $1918]
+	jbsr	choose_screen_intersections_table_1918                            	| [$f50d: call $1918]
  * loop to look for branches (ladders, etc)
 l_f510:
 	LOAD_AX_BE_WORD_DY	a3,d6                    	| [$f510: ld   a,(iy+$00)]
@@ -12085,7 +12094,7 @@ l_f510:
 	        	| [$f514: ld   a,(iy+$01)]
 	        	| [$f517: ld   l,a]
 	         	| [$f518: xor  a]
-	cmp.w	d3,d6                            	| [$f519: sbc  hl,de] get address distance between guard and
+	cmp.w	d3,d6                            	| [$f519: sbc  hl,de] compare guard & intersection position
 	jeq	l_f534                             	| [$f51b: jr   z,$F534]
 	addq.w	#3,a3                           	| [$f51d: inc  iy] * 3
 	            	| [$f523: ld   a,(io_read_shit_B800)]
@@ -12100,7 +12109,6 @@ l_f510:
 	
  * branch found:	what do we decide??
 l_f534:
-
 	move.l	a2,-(sp)                        	| [$f534: push ix]
 	move.l	a3,unknown_pointer_604B         	| [$f536: ld   (unknown_pointer_604B),iy]
 	move.b	current_character_screen_index_6098,d0	| [$f53a: ld   a,(current_character_screen_index_6098)]
@@ -12129,10 +12137,10 @@ l_f551:
 	jeq	l_f595                             	| [$f568: jp   z,$F595]
 	move.b	player_x_6582,d0                	| [$f56b: ld   a,(player_x_6582)]
 	move.b	d0,d1                           	| [$f56e: ld   b,a]
-	move.l	(sp)+,a3                        	| [$f56f: pop  iy]
+	move.l	(sp),a3                        	| [$f56f: pop  iy]
 	move.b	(0x02,a3),d0                    	| [$f571: ld   a,(iy+$02)]
 
-	move.l	a3,-(sp)                        	| [$f574: push iy]
+	                        	| [$f574: push iy]
 	cmp.b	d1,d0                            	| [$f576: cp   b]
 	                        	| [$f577: push af]
 	bcs.b	0f                               	| [...]
@@ -12173,13 +12181,15 @@ l_f595:
 
 	move.l	a2,-(sp)                        	| [$f5a9: push ix]
 	move.l	guard_direction_pointer_6095,a2	| [$f5ab: ld   ix,(guard_direction_pointer_6095)]
+	* save random chosen direction in d1
 	move.b	d0,d1                           	| [$f5af: ld   b,a]  set 8 4 2 1 value to b
-	move.b	(A2),d0                    	| [$f5b0: ld   a,(ix+$00)] guard direction
- * divide by 16
-	ror.b	#4,d0                            	| [$f5b3: rrc  a] * 4
+	move.b	(A2),d0                    	| [$f5b0: ld   a,(ix+$00)] guard current direction
+ * divide by 16 (ror+and => lsr, faster & clearer)
+	lsr.b	#4,d0                            	| [$f5b3: rrc  a] * 4
  * shift so guard current direction flag matches the 8 4 2 1 values computed by random
  * now compute the opposite of current direction, check against that
-	and.b	#0x0F,d0                         	| [$f5bb: and  $0F]
+ * because we don't want the guard to reverse direction
+												| [$f5bb: and  $0F]
 	cmp.b	#0x01,d0                         	| [$f5bd: cp   $01]
 	jne	l_f5c5                             	| [$f5bf: jr   nz,$F5C5]
  * direction is "up" (1) => opposite is "down" (2)
@@ -12198,18 +12208,23 @@ l_f5cd:
 	move.b	#0x08,d0                        	| [$f5d1: ld   a,$08]
 	jra	l_f5db                             	| [$f5d3: jr   $F5DB]
 l_f5d5:
+	* direction is "right", opposite is "left"
 	cmp.b	#0x08,d0                         	| [$f5d5: cp   $08]
 	jne	l_f5db                             	| [$f5d7: jr   nz,$F5DB]
 	move.b	#0x04,d0                        	| [$f5d9: ld   a,$04]
 l_f5db:
+	* check if chosen direction is the opposite of the current one
 	cmp.b	d1,d0                            	| [$f5db: cp   b]
 	jne	l_f5e5                             	| [$f5dc: jr   nz,$F5E5] ok:	 random did not give the opposite
+	* opposite direction chosen: invalid: retry
 	move.l	(sp)+,a2                        	| [$f5de: pop  ix]
 
 	movem.w	(sp)+,d1/d2                    	| [$f5e0: pop  bc]
 	move.l	(sp)+,a0                        	| [$f5e1: pop  hl]
 	jra	l_f595                             	| [$f5e2: jp   $F595] retry until random gives something else than the opposite
 l_f5e5:
+	* chosen direction at random is not the opposite of the current direction
+	* but we don't know if this direction is possible
 	move.l	(sp)+,a2                        	| [$f5e5: pop  ix]
 	move.b	d1,d0                           	| [$f5e7: ld   a,b]
 
@@ -12223,6 +12238,8 @@ l_f5ed:
 	ror.b	#4,d0                            	| [$f5f5: rrc  a] * 4
 	move.b	d0,d1                           	| [$f5fd: ld   b,a]
 	move.b	(0x15,a2),d0                    	| [$f5fe: ld   a,(ix+$15)]  restore a
+	* check if possible directions are compatible with chosen direction:
+	* mask out the incompatible direction
 	and.b	d1,d0                            	| [$f601: and  b]
 	move.w	guard_logical_address_6091,d6	| [$f604: ld   hl,(guard_logical_address_6091)]
 	move.b	d0,stored_logical_address_6044  	| [$f607: ld   (stored_logical_address_6044),a]
@@ -12353,6 +12370,8 @@ set_guard_direction_down_F6DE:
 	clr.b	d0                               	| [$f6de: xor  a]
 
 	move.l	a0,-(sp)                        	| [$f6df: push hl]
+	* can be 6067 or 6027
+	
 	move.l	guard_direction_pointer_6095,a0	| [$f6e0: ld   hl,(guard_direction_pointer_6095)]
 	bset.b	#5,d0                           	| [$f6e3: set  5,a] set direction to down
 	move.b	d0,(a0)                         	| [$f6e5: ld   (hl),a]
