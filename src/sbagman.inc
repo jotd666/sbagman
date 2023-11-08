@@ -64,6 +64,8 @@
 	* same as player climb/walk only less loud
 	.equ	GUARD_CLIMB_SND,                      17
 	.equ	GUARD_WALK_SND,                       18
+	* same as player climb sound
+	.equ	TYPING_SND,                      19
 
 
 

@@ -220,8 +220,8 @@
 	.global	bomb_5_screen_address_631E
 
 	.global	screen_base_screen_address_6326
-	.global	unknown_address_609F
-	.global	unknown_60A1
+	.global	key_screen_address_609F
+	.global	key_screen_60A1
 	.global	act_number_60D3
 	.global	unknown_61B6
 	.global	unknown_61F7
@@ -492,9 +492,9 @@ unknown_609B:
 bags_coordinates_609C:
 	ds.b	3
 	.align	2
-unknown_address_609F:
+key_screen_address_609F:
 	ds.b	2
-unknown_60A1:
+key_screen_60A1:
 	ds.b	50
 act_number_60D3:
 	ds.b	200

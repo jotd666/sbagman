@@ -1,37 +1,21 @@
-- guard monitoring doesn't work?? when waiting for elevator 5, guard
-  disappears (unknown_6156??: move.b	d6,d0  	| [$da3e: ld   a,l]): test again!!
-  debug MAME da3e
-
-- test search key phase!
-
+- test search key phase (make trainer key to skip to it directly)
 - bomb blasts wall OK, but switch screens and wall is back again (can be crossed, though)
-
 - if lose with the gun gun not drawn at screen 3
 - armurerie in english at screen 3: doesn't work despite tiles defined!
-
 - dropping object save/restore background doesn't work for bottom left
   tile.
-  
-- optimize l_c16d with AND?
+- bomb fuse not animated missing tiles
+- big bagman fingers animation is wrong
 
-
-- typing sound missing
-- guard killed sound missing
 
 - maybe fix original bug: threaten guard with pickaxe so it doesn't move and disappears???
 - gun cheat doesn't work properly. act 2 gun set must happen too soon
   vs start of the game
 
 - maybe omit tiles 0x249-24B and handle this with update_bg_tile
-- highscore screen missing frames: save screen
-- guard sometimes stuck climbing down stairs (until sees player), 
-  random bug stuck at the bottom of ladder for player too
-- write a script to detect move.w to/from ram
-- highscore when not reached a highscore: check time
-- big bagman fingers animation is wrong
-- sometimes mechanical stairs appear in the bagman title!!
-- new code unknown_address_609F D1AE
-- debug: l_f4f2
+- write a script to detect move.w to/from ram: in progress
+- sometimes mechanical stairs appear in the bagman title!! (maybe ok now)
+- optimize l_c16d with AND?
 
 - original bug (can't reproduce)? high fall into a wagon: makes "et hopla" wagon drop sound
   then dies instead of playing dying sound

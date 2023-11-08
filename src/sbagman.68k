@@ -120,9 +120,12 @@ zero_sprites:
 * if a sound is played too close to the same one,
 * don't play it
 start_a_sound:
+	cmp.w	#TYPING_SND,d0
+	beq.b	1f
 	cmp.w	#CREDIT_SND,d0
 	bne.b	0f
-	* credit sound can be interrupted all right and played anytime
+1:
+	* credit/typing sound can be interrupted all right and played anytime
 	jbra		osd_sound_start
 0:
 	tst.b	check_scenery_disabled_61ED
@@ -7262,7 +7265,8 @@ l_d164:
 	move.w	#0x0020,d3                      	| [$d18c: ld   de,$0020] 32
 	add.w	d3,d6                            	| [$d18f: add  hl,de]
 	jbsr	osd_w_videoram                         	| [$d190: ld   (hl),a]
-	LEA_ROM	       0xD1B5,a2                      	| [$d191: ld   ix,$D1B5]
+	* pick a key location at random (8 possible locations)
+	lea	       possible_key_locations_D1B5,a2                      	| [$d191: ld   ix,$D1B5]
 	move.w	#0x0003,d3                      	| [$d195: ld   de,$0003] 3
 	jbsr  osd_get_random       	| [$d198: ld   a,(interrupt_control_A000)]
 	and.b	#0x07,d0                         	| [$d19b: and  $07]
@@ -7278,9 +7282,10 @@ l_d19f:
 	                    	| [$d1a7: ld   a,(ix+$01)]
 	                           	| [$d1aa: ld   h,a]
 	move.b	(0x02,a2),d0                    	| [$d1ab: ld   a,(ix+$02)]
-	move.w	d6,unknown_address_609F                 	| [$d1ae: ld   (unknown_address_609F),hl]
-	move.b	d0,unknown_60A1                 	| [$d1b1: ld   (unknown_60A1),a]
+	move.w	d6,key_screen_address_609F                 	| [$d1ae: ld   (key_screen_address_609F),hl]
+	move.b	d0,key_screen_60A1                 	| [$d1b1: ld   (key_screen_60A1),a]
 	rts                                    	| [$d1b4: ret]
+
 
 l_d1d0:
 	move.b	jail_buddy_free_6343,d0                 	| [$d1d0: ld   a,(jail_buddy_free_6343)]
@@ -8207,8 +8212,8 @@ play_type_sample_d8c0:
 	movem.w	d1/d2,-(sp)                    	| [$d8c1: push bc]
 	movem.w	d3/d4,-(sp)                    	| [$d8c2: push de]
 	move.l	a1,-(sp)                        	| [$d8c2: push de]
-	LEA_ROM	       0xD97B,a0                      	| [$d8c3: ld   hl,$D97B]
-	jbsr	play_sample_EC84                  	| [$d8c6: call play_sample_EC84]
+	move.w	#TYPING_SND,d0                      	| [$d8c3: ld   hl,$D97B]
+	jbsr	start_a_sound                  	| [$d8c6: call play_sample_EC84]
 	move.l	(sp)+,a1                        	| [$d8c9: pop  de]
 	movem.w	(sp)+,d3/d4                    	| [$d8c9: pop  de]
 
@@ -13301,7 +13306,7 @@ l_fce7:
 
 	move.l	a0,-(sp)                        	| [$fcea: push hl]
 	jbsr	l_f4f2                            	| [$fceb: call $F4F2]
-	move.l	(sp)+,a0                        	| [$fcee: pop  hl]
+	movem.l	(sp)+,a0                        	| [$fcee: pop  hl]
 
 	movem.w	(sp)+,d1/d2                    	| [$fcef: pop  bc]
 	beq.b	0f                               	| [...]
@@ -13322,8 +13327,10 @@ l_fcf4:
 	move.l	a2,-(sp)                        	| [$fd04: push ix]
 	move.w	#0x500,d6                      	| [$fd06: ld   hl,$0500]
 	jbsr	add_to_score_5C90                 	| [$fd09: call add_to_score_5C90]
-	LEA_ROM	       0xD96F,a0                      	| [$fd0c: ld   hl,$D96F]
-	jbsr	play_sample_EC84                  	| [$fd0f: call play_sample_EC84]
+	move.w	#GUARD_KILLED_SND,d0            | [$fd0c: ld   hl,$D96F]
+	jbsr	start_a_sound                       | [$fd0f: call play_sample_EC84]
+                     	
+	                 	
 	move.l	(sp)+,a2                        	| [$fd12: pop  ix]
 	lea	unknown_604F,a2                	| [$fd14: ld   ix,unknown_604F]
 	jbsr	l_d4a9                            	| [$fd18: call $D4A9]
@@ -13349,8 +13356,8 @@ l_fd33:
 	move.l	a2,-(sp)                        	| [$fd43: push ix]
 	move.w	#0x500,d6                      	| [$fd45: ld   hl,$0500]
 	jbsr	add_to_score_5C90                 	| [$fd48: call add_to_score_5C90]
-	LEA_ROM	       0xD96F,a0                      	| [$fd4b: ld   hl,$D96F]
-	jbsr	play_sample_EC84                  	| [$fd4e: call play_sample_EC84]
+	move.w	#GUARD_KILLED_SND,d0                      	| [$fd4b: ld   hl,$D96F]
+	jbsr	start_a_sound                  	| [$fd4e: call play_sample_EC84]
 	move.l	(sp)+,a2                        	| [$fd51: pop  ix]
 	lea	unknown_608F,a2                	| [$fd53: ld   ix,unknown_608F]
 	jbsr	l_d4a9                            	| [$fd57: call $D4A9]
@@ -13675,3 +13682,12 @@ table_1BFB:
 *	.byte 	0x00,0x00,0x00,0x00,0x00,0x2e,0x92,0x4
 *	.byte	0x00,0x00,0x00,0x00,0x1b,0x92,0x1,0xa
 *	.byte	0x92,0x3,0x7,0x93,0x5,0xa3,0x91,0x2
+
+possible_key_locations_D1B5:
+     .byte	0x00,0x00,0x00,0x91,0x23,0x01
+	 .byte	0x92,0x03,0x02,0x92,0xA3,0x03
+	 .byte	0x92,0x7C,0x03,0x91,0x03,0x03
+	 .byte	0x90,0xF0,0x03,0x92,0xD3,0x01,0x92,0x3C,0x02 
+* original table contains little endian screen addresses	
+*     .byte	0x00,0x00,0x00,0x23,0x91,0x01,0x03,0x92,0x02,0xA3,0x92,0x03,0x7C
+*	 .byte	0x92,0x03,0x03,0x91,0x03,0xF0,0x90,0x03,0xD3,0x92,0x01,0x3C,0x92,0x02 
