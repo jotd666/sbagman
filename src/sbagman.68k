@@ -3344,11 +3344,9 @@ l_14fd:
  	and.b	#0x20,d0                         	| [$1530: and  $20]
 	cmp.b	#0x20,d0                         	| [$1532: cp   $20]
 	jne	l_153a                             	| [$1534: jr   nz,$153A]
+	* "ALCATRAZ PRISON ..."
 	LEA_ROM	       0x1DA5,a2                      	| [$1536: ld   ix,$1DA5]
 l_153a:
-	* jotd: added this else guard sprite remains
-	jbsr	zero_sprites
-	
 	jbsr	tell_the_story_d82a                            	| [$153a: call $D82A]
 	clr.b	d0                               	| [$153d: xor  a]
 	move.b	d0,unknown_6332                 	| [$153e: ld   (unknown_6332),a]
@@ -6170,7 +6168,7 @@ draw_bag_cac1:
 0:
 	move.b	is_key_hunt_phase_6341,d0                 	| [$cad2: ld   a,(is_key_hunt_phase_6341)]
 	cmp.b	#0x01,d0                         	| [$cad5: cp   $01]
-	jeq	l_cb20                             	| [$cad7: jr   z,$CB20]
+	jeq	draw_key_tiles_cb20                             	| [$cad7: jr   z,$CB20]
 	move.b	#0xD0,d0                        	| [$cad9: ld   a,$D0]
 	jbsr	osd_w_videoram                        	| [$cadb: ld   (hl),a]
 
@@ -6237,7 +6235,8 @@ set_bag_color_attribute_cb14:
 	move.b	bag_color_color_attribute_627A,d0	| [$cb1b: ld   a,(bag_color_color_attribute_627A)]
 	jbsr	osd_w_colorram                         	| [$cb1e: ld   (hl),a]
 	rts                                    	| [$cb1f: ret]
-l_cb20:
+	
+draw_key_tiles_cb20:
 	addq.w	#1,d6                           	| [$cb20: inc  hl]
 	jbsr	osd_r_videoram                         	| [$cb21: ld   a,(hl)]
 	cmp.b	#0xED,d0                         	| [$cb22: cp   $ED]
@@ -7217,9 +7216,20 @@ check_if_level_completed_D12F:
 	jbsr	check_remaining_bags_D269         	| [$d12f: call check_remaining_bags_D269]
 	move.b	d2,d0                           	| [$d132: ld   a,c]
 	                         	| [$d133: cp   $00]
-	bne.b	0f                               	| [...]
+	bne.b	1f                               	| [...]
 	rts                                    	| [$d135: ret  z] [...]
 0:
+	* cheat: if we don't do this, all remaining bags are turned into keys
+	lea	bags_coordinates_609C,a3
+	move.b	#0x36,d1
+clr_bags:
+	clr.b	(A3)+
+	clr.b	(A3)+
+	clr.b	(A3)+
+	subq.b	#1,d1
+	jne	clr_bags
+	
+1:
 	clr.b	next_bag_completes_level_flag
 * level completed
 	* stop music if any
@@ -7236,11 +7246,18 @@ check_if_level_completed_D12F:
 	move.b	#0x01,d0                        	| [$d14b: ld   a,$01]
 	move.b	d0,unknown_6332                 	| [$d14d: ld   (unknown_6332),a]
 	move.b	d0,ignore_if_has_credits_6342                 	| [$d150: ld   (ignore_if_has_credits_6342),a]
+	
+	* we have to re-enable interrupts on status register as this is 
+	* called from an interrupt (very bad practice)
+	
+	move.w	#0x2000,SR
+	
 	LEA_ROM	       0x1C13,a2                      	| [$d153: ld   ix,$1C13]
 	jbsr	osd_read_dipswitches                       	| [$d157: ld   a,($B000)]
 	and.b	#0x20,d0                         	| [$d15a: and  $20]
 	cmp.b	#0x20,d0                         	| [$d15c: cp   $20]
 	jne	l_d164                             	| [$d15e: jr   nz,$D164]
+	* "FOUND THE KEY (sic) ..." (now changed to "FIND THE KEY")
 	LEA_ROM	       0x1C6A,a2                      	| [$d160: ld   ix,$1C6A]
 l_d164:
 	jbsr	tell_the_story_d82a                            	| [$d164: call $D82A]
@@ -8099,6 +8116,10 @@ l_d801:
 * < A2 text to write with type/scroll effect
 
 tell_the_story_d82a:
+	* jotd: added this else guard/whatever sprite remains
+
+	jbsr	zero_sprites
+
 	clr.b	d0                               	| [$d82a: xor  a]
 	move.b	#0x20,d1                        	| [$d82b: ld   b,$20]
 	move.w	#0x9800,d6                      	| [$d82d: ld   hl,$9800]

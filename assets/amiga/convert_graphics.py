@@ -107,6 +107,10 @@ used_cluts.update({k:[0x4] for k in range(0x255,0x25D)})
 
 # bomb exploding
 used_cluts.update({k:[8] for k in range(0x367,0x37E)})
+#bomb fuse animation
+used_cluts.update({k:[4] for k in [0x1D0,0x1D4,0x1D6]})
+#key
+used_cluts.update({k:[4] for k in [0x1C5,0x1C7]})
 
 # bagman title/character tile anims
 
