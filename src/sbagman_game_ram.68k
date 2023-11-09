@@ -183,7 +183,7 @@
 	.global	unknown_6279
 	.global	bag_color_color_attribute_627A
 	.global	unknown_627B
-	.global	unknown_627D
+	.global	tile_at_the_destroyable_wall_location_627D
 	.global	unknown_627E
 	.global	unknown_627F
 	.global	unknown_6280
@@ -696,7 +696,7 @@ unknown_627B:
 	ds.b	1
 player_has_blue_bag_flag_627C:
 	ds.b	1
-unknown_627D:
+tile_at_the_destroyable_wall_location_627D:
 	ds.b	1
 unknown_627E:
 	ds.b	1

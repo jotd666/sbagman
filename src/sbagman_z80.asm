@@ -1819,7 +1819,7 @@ start_a_game_0F15:
 0F61: 27          daa
 0F62: 32 00 60    ld   (number_of_credits_6000),a
 0F65: 3E 0A       ld   a,$0A
-0F67: 32 7D 62    ld   (unknown_627D),a
+0F67: 32 7D 62    ld   (tile_at_the_destroyable_wall_location_627D),a
 0F6A: 32 90 62    ld   (unknown_6290),a
 0F6D: CD 17 D0    call $D017
 0F70: 3E 01       ld   a,$01
@@ -2824,7 +2824,7 @@ read_player_controls_1689:
 1814: 32 97 65    ld   (guard_1_y_6597),a
 1817: 32 9B 65    ld   (guard_2_y_659B),a
 181A: 3E 0C       ld   a,$0C
-181C: 32 7D 62    ld   (unknown_627D),a
+181C: 32 7D 62    ld   (tile_at_the_destroyable_wall_location_627D),a
 181F: C9          ret
  
 1918: 7A          ld   a,d                                            
@@ -3913,10 +3913,10 @@ C45D: F1          pop  af
 C45E: 32 7E 61    ld   (unknown_617E),a
 C461: 3A 90 62    ld   a,(unknown_6290)
 C464: F5          push af
-C465: 3A 7D 62    ld   a,(unknown_627D)
+C465: 3A 7D 62    ld   a,(tile_at_the_destroyable_wall_location_627D)
 C468: 32 90 62    ld   (unknown_6290),a
 C46B: F1          pop  af
-C46C: 32 7D 62    ld   (unknown_627D),a
+C46C: 32 7D 62    ld   (tile_at_the_destroyable_wall_location_627D),a
 C46F: 3A 41 63    ld   a,(is_key_hunt_phase_6341)
 C472: F5          push af
 C473: 3A 40 63    ld   a,(unknown_6340)
@@ -5126,7 +5126,7 @@ CE49: DD 77 00    ld   (ix+$00),a
 CE4C: C9          ret
 
 switch_to_screen_5_CE4D:
-CE4D: 3A 7D 62    ld   a,(unknown_627D)
+CE4D: 3A 7D 62    ld   a,(tile_at_the_destroyable_wall_location_627D)
 CE50: 32 F3 91    ld   ($91F3),a
 CE53: FE E0       cp   $E0
 CE55: 28 01       jr   z,$CE58
@@ -8225,7 +8225,7 @@ EA98: 3E E0       ld   a,$E0
 EA9A: 32 F3 91    ld   ($91F3),a
 EA9D: 32 F4 91    ld   ($91F4),a
 EAA0: 3A F3 91    ld   a,($91F3)
-EAA3: 32 7D 62    ld   (unknown_627D),a
+EAA3: 32 7D 62    ld   (tile_at_the_destroyable_wall_location_627D),a
 EAA6: C9          ret
 
 update_player_screen_address_from_xy_EAA7:

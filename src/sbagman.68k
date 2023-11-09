@@ -302,6 +302,7 @@ sbagman_reset:
 	* we need to set this variable to 2 once out of 5 calls
 	move.b	#1,vb_ticks_count
 	
+	
 	jra	game_startup_eca8                             	| [$0000: jp   $1200]
 
 sbagman_irq:
@@ -849,7 +850,7 @@ l_04bb:
 	jbsr	l_e3e0                            	| [$04bb: call $E3E0]
 	jbsr	l_e36d                            	| [$04be: call $E36D]
 	jbsr	l_e389                            	| [$04c1: call $E389]
-	jbsr	l_e630                            	| [$04c4: call $E630]
+	jbsr	check_if_gun_is_picked_e630                            	| [$04c4: call $E630]
 	jbsr	l_e1b4                            	| [$04c7: call $E1B4]
 	jbsr	l_e1c0                            	| [$04ca: call $E1C0]
 	jbsr	l_e1cc                            	| [$04cd: call $E1CC]
@@ -1836,11 +1837,6 @@ handle_player_in_elevator_0a7b:
 	move.b	elevator_y_screen_4_6587,d0	| [$0a7b: ld   a,(elevator_y_screen_4_6587)]
 	* no effect : removed								| [$09f4: sub  $00]	
 	* elevator same Y as character?
-*	cmp.b	#0xE0,d0
-*	bne.b	0f
-*	move.b	d0,0x200
-*	move.b	(0x03,a2),0x201
-*0:
 	
 	cmp.b	(0x03,a2),d0                     	| [$0a80: cp   (ix+$03)]
 	jeq	l_0a93                             	| [$0a83: jr   z,$0A93]
@@ -2652,7 +2648,7 @@ l_0f59:
 
 	move.b	d0,number_of_credits_6000       	| [$0f62: ld   (number_of_credits_6000),a]
 	move.b	#0x0A,d0                        	| [$0f65: ld   a,$0A]
-	move.b	d0,unknown_627D                 	| [$0f67: ld   (unknown_627D),a]
+	move.b	d0,tile_at_the_destroyable_wall_location_627D                 	| [$0f67: ld   (tile_at_the_destroyable_wall_location_627D),a]
 	move.b	d0,unknown_6290                 	| [$0f6a: ld   (unknown_6290),a]
 	jbsr	current_player_start_screen_d017                            	| [$0f6d: call $D017]
 	move.b	#0x01,d0                        	| [$0f70: ld   a,$01]
@@ -2697,7 +2693,7 @@ l_0f91:
 	move.b	#0x01,d0                        	| [$0fac: ld   a,$01]
 	move.b	d0,barrow_screen_61C6           	| [$0fae: ld   (barrow_screen_61C6),a]
 	move.b	d0,unknown_61FC                 	| [$0fb1: ld   (unknown_61FC),a]
-	jbsr	l_d7c9                            	| [$0fb4: call $D7C9]
+	jbsr	clear_misc_variables_d7c9                            	| [$0fb4: call $D7C9]
 	jbsr	set_bags_coordinates_easy_level_CFDB	| [$0fb7: call set_bags_coordinates_easy_level_CFDB]
 	jbsr	set_bags_coordinates_player_2_CFE7         	| [$0fba: call set_bags_coordinates_player_2_CFE7]
 	clr.b	d0                               	| [$0fbd: xor  a]
@@ -3805,7 +3801,7 @@ l_17f1:
 	move.b	d0,guard_1_y_6597               	| [$1814: ld   (guard_1_y_6597),a]
 	move.b	d0,guard_2_y_659B               	| [$1817: ld   (guard_2_y_659B),a]
 	move.b	#0x0C,d0                        	| [$181a: ld   a,$0C]
-	move.b	d0,unknown_627D                 	| [$181c: ld   (unknown_627D),a]
+	move.b	d0,tile_at_the_destroyable_wall_location_627D                 	| [$181c: ld   (tile_at_the_destroyable_wall_location_627D),a]
 	rts                                    	| [$181f: ret]
 
 * < D3: guard logical address
@@ -4753,7 +4749,7 @@ display_screen_5_c189:
 	jbsr	set_attribute_row_c361                            	| [$c1a4: call $C361]
 	jbsr	switch_to_screen_5_CE4D           	| [$c1a7: call switch_to_screen_5_CE4D]
 	jbsr	draw_credit_and_bonus_d0dd                            	| [$c1aa: call $D0DD]
-	jbsr	l_c30e                            	| [$c1ad: call $C30E]
+	jbsr	zero_elevator_4_x_c30e                            	| [$c1ad: call $C30E]
 	            	| [$c1b0: ld   a,(io_read_shit_B800)]
 	jbsr	put_score_lives_attributes_f8de                            	| [$c1b3: call $F8DE]
 	jbsr	display_player_1_and_2_text_ca7e                            	| [$c1b6: call $CA7E]
@@ -4844,12 +4840,13 @@ display_screen_3_c20e:
 	move.b	#0x06,d1                        	| [$c25b: ld   b,$06]
 	move.w	#0x0020,d3                      	| [$c25e: ld   de,$0020] 32
 l_c25d:
+	jbsr	osd_w_videoram                      | [$c25d: ld   (hl),a]
 	add.w	d3,d6                            	| [$c261: add  hl,de]
 	addq.b	#1,d0                           	| [$c262: inc  a]
 	subq.b	#1,d1                           	| [...]
 	jne	l_c25d                             	| [$c263: djnz $C25D]
 l_c265:
-	jbsr	l_c30e                            	| [$c265: call $C30E]
+	jbsr	zero_elevator_4_x_c30e                            	| [$c265: call $C30E]
 	jbsr	put_score_lives_attributes_f8de                            	| [$c268: call $F8DE]
 	jbsr	display_player_1_and_2_text_ca7e                            	| [$c26b: call $CA7E]
 	jbsr	start_level_music_d0f3                            	| [$c26e: call $D0F3]
@@ -4899,7 +4896,7 @@ l_c2b1:
 	jne	l_c2b1                             	| [$c2b7: djnz $C2B1]
 	jbsr	draw_credit_and_bonus_d0dd                            	| [$c2b9: call $D0DD]
 	            	| [$c2bc: ld   a,(io_read_shit_B800)]
-	jbsr	l_c30e                            	| [$c2bf: call $C30E]
+	jbsr	zero_elevator_4_x_c30e                            	| [$c2bf: call $C30E]
 	jbsr	put_score_lives_attributes_f8de                            	| [$c2c2: call $F8DE]
 	jbsr	display_player_1_and_2_text_ca7e                            	| [$c2c5: call $CA7E]
 	rts                                    	| [$c2c8: ret]
@@ -4929,7 +4926,7 @@ display_screen_1_C2C9:
 	jbsr	set_attribute_row_c361                            	| [$c2f2: call $C361]
 	jbsr	draw_credit_and_bonus_d0dd                            	| [$c2f5: call $D0DD]
 	            	| [$c2f8: ld   a,(io_read_shit_B800)]
-	jbsr	l_c30e                            	| [$c2fb: call $C30E]
+	jbsr	zero_elevator_4_x_c30e                            	| [$c2fb: call $C30E]
 	jbsr	put_score_lives_attributes_f8de                            	| [$c2fe: call $F8DE]
 	jbsr	display_player_1_and_2_text_ca7e                            	| [$c301: call $CA7E]
 	tst.b	must_play_music_6210         	| [$c304: ld   a,(must_play_music_6210)]
@@ -4939,7 +4936,10 @@ display_screen_1_C2C9:
 0:
 	jbsr	start_level_music_d0f3                            	| [$c30a: call $D0F3]
 	rts                                    	| [$c30d: ret]
-l_c30e:
+	
+* sets elevator X at 0 for screen 4 probably so guards can't use it when not
+* in this screen
+zero_elevator_4_x_c30e:
 	lea	elevator_x_screen_4_6586,a0                	| [$c30e: ld   hl,elevator_x_screen_4_6586]
 	clr.b	d0                               	| [$c311: xor  a]
 	move.b	d0,(a0)                         	| [$c312: ld   (hl),a]
@@ -5182,10 +5182,10 @@ l_c427:
 	move.b	d0,unknown_617E                 	| [$c45e: ld   (unknown_617E),a]
 	move.b	unknown_6290,d0                 	| [$c461: ld   a,(unknown_6290)]
 	move.w	d0,-(sp)                        	| [$c464: push af]
-	move.b	unknown_627D,d0                 	| [$c465: ld   a,(unknown_627D)]
+	move.b	tile_at_the_destroyable_wall_location_627D,d0                 	| [$c465: ld   a,(tile_at_the_destroyable_wall_location_627D)]
 	move.b	d0,unknown_6290                 	| [$c468: ld   (unknown_6290),a]
 	move.w	(sp)+,d0                        	| [$c46b: pop  af]
-	move.b	d0,unknown_627D                 	| [$c46c: ld   (unknown_627D),a]
+	move.b	d0,tile_at_the_destroyable_wall_location_627D                 	| [$c46c: ld   (tile_at_the_destroyable_wall_location_627D),a]
 	move.b	is_key_hunt_phase_6341,d0                 	| [$c46f: ld   a,(is_key_hunt_phase_6341)]
 	move.w	d0,-(sp)                        	| [$c472: push af]
 	move.b	unknown_6340,d0                 	| [$c473: ld   a,(unknown_6340)]
@@ -6725,11 +6725,12 @@ l_ce3b:
 	rts                                    	| [$ce4c: ret]
 
 switch_to_screen_5_CE4D:
-	move.b	unknown_627D,d0                 	| [$ce4d: ld   a,(unknown_627D)]
+	move.b	tile_at_the_destroyable_wall_location_627D,d0                 	| [$ce4d: ld   a,(tile_at_the_destroyable_wall_location_627D)]
 	move.w	#0x91F3,d6                       	| [$ce50: ld   ($91F3),a]
     jbsr	osd_w_videoram
 	cmp.b	#0xE0,d0                         	| [$ce53: cp   $E0]
-	jeq	l_ce58                             	| [$ce55: jr   z,$CE58]
+	jeq	l_ce58                             	| [$ce55: jr   z,$CE58] branches if blank tile (wall destroyed)
+	* wall is still up, lower tile is just before in the tilemap
 	subq.b	#1,d0                           	| [$ce57: dec  a]
 l_ce58:
 	move.w	#0x91F4,d6                       	| [$ce58: ld   ($91F4),a]
@@ -7223,8 +7224,6 @@ check_if_level_completed_D12F:
 	lea	bags_coordinates_609C,a3
 	move.b	#0x36,d1
 clr_bags:
-	clr.b	(A3)+
-	clr.b	(A3)+
 	clr.b	(A3)+
 	subq.b	#1,d1
 	jne	clr_bags
@@ -8050,8 +8049,8 @@ check_if_must_award_gun_d7a9:
 	move.b	d0,guard_2_has_gun_62A3                 	| [$d7c2: ld   (guard_2_has_gun_62A3),a]
 	move.b	d0,guards_shoot_on_sight_6299                 	| [$d7c5: ld   (guards_shoot_on_sight_6299),a]
 	rts                                    	| [$d7c8: ret]
-l_d7c9:
-	                               	| [$d7c9: xor  a]
+
+clear_misc_variables_d7c9:	                               	| [$d7c9: xor  a]
 	clr.b	holds_barrow_61C7            	| [$d7ca: ld   (holds_barrow_61C7),a]
 	clr.b	has_pick_61CF                	| [$d7cd: ld   (has_pick_61CF),a]
 	clr.b	player_in_elevator_4_6014                 	| [$d7d0: ld   (player_in_elevator_4_6014),a]
@@ -8686,8 +8685,8 @@ l_dc4e:
 	addq.w	#1,a3                           	| [$dc55: inc  iy]
 	subq.b	#1,d1                           	| [...]
 	jne	l_dc4e                             	| [$dc57: djnz $DC4E]
-	**jra	l_dc5b                             	| [$dc59: jr   $DC5B]
-**l_dc5b:
+											| [$dc59: jr   $DC5B]
+				
 	move.l	(sp)+,a3                        	| [$dc5b: pop  iy]
 
 	movem.w	(sp)+,d1/d2                    	| [$dc5d: pop  bc]
@@ -8699,7 +8698,7 @@ l_dc4e:
 	lea	bomb_explosion_attr_backup_buffer_6304,a2                	| [$dc68: ld   ix,bomb_explosion_attr_backup_buffer_6304]
 	jbsr	osd_r_colorram                    	| [$dc6c: ld   a,(iy+$00)]
 	move.b	d0,(A2)+                    	| [$dc6f: ld   (ix+$00),a]
-	move.b	(0x01,a3),d0                    	| [$dc72: ld   a,(iy+$01)]
+	READ_COLORRAM	1                    	| [$dc72: ld   a,(iy+$01)]
 	move.b	d0,(A2)+                   	| [$dc75: ld   (ix+$01),a]
 	READ_COLORRAM	-0x20                   	| [$dc78: ld   a,(iy-$20)]
 	move.b	d0,(A2)+                   	| [$dc7b: ld   (ix+$02),a]
@@ -9824,7 +9823,7 @@ l_e58c:
 	move.b	#0x24,d1                        	| [$e591: ld   b,$24]
 l_e593:
 	move.b	d0,(A2)+                    	| [$e593: ld   (ix+$00),a]
-	addq.w	#1,a2                           	| [$e596: inc  ix]
+											| [$e596: inc  ix]
  
 	subq.b	#1,d1                           	| [...]
 	jne	l_e593                             	| [$e598: djnz $E593]
@@ -9910,7 +9909,8 @@ l_e629:
 	subq.b	#1,d0                           	| [$e62d: dec  a]
 	move.b	d0,(a1)                         	| [$e62e: ld   (de),a]
 	rts                                    	| [$e62f: ret]
-l_e630:
+	
+check_if_gun_is_picked_e630:
 	move.b	player_screen_600D,d0           	| [$e630: ld   a,(player_screen_600D)]
 	cmp.b	#0x03,d0                         	| [$e633: cp   $03]
 	beq.b	0f                               	| [...]
@@ -9940,7 +9940,7 @@ l_e630:
     jbsr	osd_w_colorram
 	rts                                    	| [$e666: ret]
 l_e667:
-	move.b	player_gun_nb_shots_6294,d0                 	| [$e667: ld   a,(player_gun_nb_shots_6294)]
+	tst.b	player_gun_nb_shots_6294                 	| [$e667: ld   a,(player_gun_nb_shots_6294)]
 	                         	| [$e66a: cp   $00]
 	beq.b	0f                               	| [...]
 	rts                                    	| [$e66c: ret  nz] [...]
@@ -10600,10 +10600,10 @@ check_destroyable_wall_tile_ea77:
 	jeq	l_ea98                             	| [$ea8b: jr   z,$EA98]
 	subq.b	#2,d0                           	| [$ea8d: dec  a] * 2
 	move.w	#0x91F3,d6                       	| [$ea8f: ld   ($91F3),a]
-	jbsr	osd_r_videoram
+	jbsr	osd_w_videoram
 	subq.b	#1,d0                           	| [$ea92: dec  a]
 	move.w	#0x91F4,d6                       	| [$ea93: ld   ($91F4),a]
-    jbsr	osd_r_videoram
+    jbsr	osd_w_videoram
 	jra	l_eaa0                             	| [$ea96: jr   $EAA0]
 l_ea98:
 	move.b	#0xE0,d0                        	| [$ea98: ld   a,$E0]
@@ -10612,9 +10612,10 @@ l_ea98:
 	move.w	#0x91F4,d6                       	| [$ea9d: ld   ($91F4),a]
     jbsr	osd_w_videoram
 l_eaa0:
-	move.w	#0x91F3,d5                       	| [$eaa0: ld   a,($91F3)]
+	* read the value of the time, save it
+	move.w	#0x91F3,d6                       	| [$eaa0: ld   a,($91F3)]
     jbsr	osd_r_videoram
-	move.b	d0,unknown_627D                 	| [$eaa3: ld   (unknown_627D),a]
+	move.b	d0,tile_at_the_destroyable_wall_location_627D                 	| [$eaa3: ld   (tile_at_the_destroyable_wall_location_627D),a]
 	rts                                    	| [$eaa6: ret]
 update_player_screen_address_from_xy_eaa7:
 	lea	player_struct_6580,a2          	| [$eaa7: ld   ix,player_struct_6580]

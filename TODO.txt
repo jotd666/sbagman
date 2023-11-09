@@ -1,22 +1,17 @@
-- test search key phase: OK but ACT 0!!
-- bomb blasts wall OK, but switch screens and wall is back again (can be crossed, though)
-- if lose with the gun gun not drawn at screen 3
-- armurerie in english at screen 3: doesn't work despite tiles defined!
-- bomb exploding save/restore background doesn't work for bottom left
-  tile.
-- big bagman fingers animation is wrong
 - write a script to detect move.w to/from ram: in progress
+- big bagman fingers animation is wrong
+- test bagman first opus and publish!!
 
-- hard bags locations to code
+minor/not reproduced:
 
-- maybe fix original bug: threaten guard with pickaxe so it doesn't move and disappears???
+- hard bags locations cheat to code
 - gun cheat doesn't work properly. act 2 gun set must happen too soon
   vs start of the game
-
+- invincible flag doesn't work for gun
+- maybe fix original bug: threaten guard with pickaxe so it doesn't move and disappears???
 - maybe omit tiles 0x249-24B and handle this with update_bg_tile
-- sometimes mechanical stairs appear in the bagman title!! (maybe ok now)
 - optimize l_c16d with AND?
-
 - original bug (can't reproduce)? high fall into a wagon: makes "et hopla" wagon drop sound
   then dies instead of playing dying sound
+- sometimes mechanical stairs appear in the bagman title!! (maybe ok now)
 
