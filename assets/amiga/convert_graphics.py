@@ -105,6 +105,7 @@ used_cluts[0x249] = [0xF]
 
 used_cluts.update({k:[0x4] for k in range(0x255,0x25D)})
 
+
 # bomb exploding
 used_cluts.update({k:[8] for k in range(0x367,0x37E)})
 #bomb fuse animation
@@ -118,6 +119,8 @@ used_cluts.update({k:[0xC] for k in range(0x100,0x146)})
 used_cluts.update({k:[0xC] for k in range(0x200,0x231)})
 used_cluts.update({k:[0xC] for k in range(0x2A6,0x2BC)})
 used_cluts.update({k:[0xC] for k in  [0x162,0x19B,0x1AD,0X1B2,0x1BD]})
+# fingers
+used_cluts.update({k+0x100:[0xC] for k in [0xB8,0xBD,0xBA,0x43,0x44,0x45]})
 # mechanical stair tiles
 used_cluts.update({k:[0xF] for k in range(0x3C8,0x3DA)})
 used_cluts.update({k:[0xF] for k in range(0x35F,0x367)})

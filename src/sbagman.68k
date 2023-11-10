@@ -189,17 +189,17 @@ read_rom:
 	swap	d6
 	clr.w	d6
 	swap	d6
-	.ifndef		RELEASE
 	cmp.w	#0xC000,d6
 	bcc.b	0f
+	.ifndef		RELEASE
 	cmp.w	#0x6000,d6
 	bcc.b	rr_error
+	.endif
 	bra.b	1f
 0:
 	* offset to make up for gap as area 0x6000-0xC000 isn't dumped/mapped
 	sub.w	#0xC000-0x6000,d6
 1:
-	.endif
 
 	move.l	a0,-(sp)
 	lea		game_mem,a0
@@ -209,8 +209,9 @@ read_rom:
 	rts
 	
 rr_error:
-	jbsr	assert_failed_blitz
+	jbsr	osd_break
 	illegal
+	
 	
 * < A0: source (HL)
 * < A1: destination (DE)
@@ -3187,7 +3188,7 @@ l_140e:
               	| [$142d: ld   a,d]
 	                         	| [$142e: cp   $00]
 	                            	| [$1430: jr   nz,$1429]
-	* big bagman finger
+	* big bagman fingers
 	move.b	#0x43,d0
 	WRITE_VIDEORAM	0x40                 	| [$1432: ld   (ix+$40),$43]
 								| [$1436: ld   de,$0700]
@@ -3360,7 +3361,7 @@ credit_inserted_loop:
 	rts
 	
 check_if_credit_inserted_1542:
-	move.b	number_of_credits_6000,d0       	| [$1542: ld   a,(number_of_credits_6000)]
+	tst.b	number_of_credits_6000       	| [$1542: ld   a,(number_of_credits_6000)]
 	                         	| [$1545: cp   $00]
 	bne.b	0f                               	| [...]
 	rts                                    	| [$1547: ret  z] [...]
@@ -3370,8 +3371,8 @@ check_if_credit_inserted_1542:
 	bne.b	0f                               	| [...]
 	rts                                    	| [$154d: ret  z] [...]
 0:
-	clr.b	d0                               	| [$154e: ld   a,$00]
-	move.b	d0,check_scenery_disabled_61ED  	| [$1550: ld   (check_scenery_disabled_61ED),a]
+	                               	| [$154e: ld   a,$00]
+	clr.b	check_scenery_disabled_61ED  	| [$1550: ld   (check_scenery_disabled_61ED),a]
 	            	| [$1553: ld   a,(io_read_shit_B800)]
 	move.l	(sp)+,a0                        	| [$1556: pop  hl]
 	jra	l_14fd                             	| [$1557: jr   $14FD]
@@ -7187,9 +7188,9 @@ l_d100:
 	* TODO play music ??
 	LEA_ROM	       0x5000,a0                      	| [$d111: ld   hl,$5000]
 l_d114:
-	move.l	a0,ay_sound_pointer_6140        	| [$d114: ld   (ay_sound_pointer_6140),hl]
-	clr.b	d0                               	| [$d117: xor  a]
-	move.b	d0,ay_sound_start_6142          	| [$d118: ld   (ay_sound_start_6142),a]
+	*move.l	a0,ay_sound_pointer_6140        	| [$d114: ld   (ay_sound_pointer_6140),hl]
+	*clr.b	d0                               	| [$d117: xor  a]
+	*move.b	d0,ay_sound_start_6142          	| [$d118: ld   (ay_sound_start_6142),a]
 	rts                                    	| [$d11b: ret]
 
 * super-useless code that tests stuff and does ... nothing
@@ -9837,8 +9838,8 @@ l_e593:
 	clr.b	unknown_62FB                 	| [$e5ad: ld   (unknown_62FB),a]
 	clr.b	bomb_picked_up_6323                 	| [$e5b0: ld   (bomb_picked_up_6323),a]
 	clr.b	bomb_timer_6324                 	| [$e5b3: ld   (bomb_timer_6324),a]
-	clr.b	screen_base_screen_address_6326                 	| [$e5b6: ld   (screen_base_screen_address_6326),a]
-	clr.b	unknown_6327                 	| [$e5b9: ld   (unknown_6327),a]
+	clr.w	screen_base_screen_address_6326                 	| [$e5b6: ld   (screen_base_screen_address_6326),a]
+											| [$e5b9: ld   (unknown_6327),a]
 	clr.b	player_in_elevator_5_62E5                 	| [$e5bc: ld   (player_in_elevator_5_62E5),a]
 	clr.b	guard_1_in_elevator_5_62E9                 	| [$e5bf: ld   (guard_1_in_elevator_5_62E9),a]
 	clr.b	unknown_62EA                 	| [$e5c2: ld   (unknown_62EA),a]

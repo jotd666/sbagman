@@ -283,7 +283,6 @@
 	.global	bomb_5_screen_6320
 	.global	bomb_picked_up_6323
 	.global	bomb_timer_6324
-	.global	unknown_6327
 	.global	unknown_632A
 	.global	unknown_screen_address_632F
 	.global	unknown_6332
@@ -475,8 +474,10 @@ unknown_608F:
 	.align	2
 guard_logical_address_6091:
 	ds.w	1
+	.align	2
 guard_struct_pointer_6093:
 	ds.l	1
+	.align	2
 guard_direction_pointer_6095:
 	ds.l	1
 guard_2_not_moving_timeout_counter_6097:
@@ -512,6 +513,7 @@ unknown_6144:
 	ds.b	1
 unknown_6145:
 	ds.b	1
+	.align	2
 unknown_pointer_6146:
 	ds.l	1
 guard_1_not_moving_flag_6148:
@@ -524,8 +526,9 @@ wait_flag_6152:
 	ds.b	1
 unknown_6153:
 	ds.b	1
+	.align	2
 unknown_6154:
-	ds.b	2
+	ds.w	1
 unknown_6156:
 	ds.b	1
 unknown_6157:
@@ -643,8 +646,10 @@ unknown_61FD:
 	.align	2
 unknown_61FF:
 	ds.w	1
+	.align	2
 unknown_pointer_6201:
 	ds.l	1
+	.align	2
 unknown_pointer_6203:
 	ds.l	1
 unknown_6205:
@@ -789,6 +794,7 @@ unknown_62DA:
 	.align	2
 unknown_pointer_62DB:
 	ds.l	1
+	.align	2
 elevator_5_screen_address_62DD:
 	ds.w	1
 
@@ -812,14 +818,15 @@ unknown_62EE:
 	ds.b	2
 jail_buddy_aniimation_counter_62F0:
 	ds.b	1
+	.align	2
 jail_buddy_aniimation_rom_address_62F1:
-	ds.b	4
+	ds.w	2
 bomb_must_detonate_62F5:
 	ds.b	1
 	.align	2
 bomb_explosion_tiles_pointer_62F6:
 	ds.l	1
-
+	.align	2
 explosion_screen_address_62F8:
 	ds.w	1
 
@@ -868,14 +875,15 @@ bomb_picked_up_6323:
 	ds.b	1
 bomb_timer_6324:
 	ds.b	2
+	.align	2
 screen_base_screen_address_6326:
-	ds.b	1
-unknown_6327:
-	ds.b	3
+	ds.w	2
+
 unknown_632A:
 	ds.b	5
+	.align	2
 unknown_screen_address_632F:
-	ds.b	3
+	ds.w	2
 unknown_6332:
 	ds.b	2
 bomb_just_dropped_6334:

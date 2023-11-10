@@ -1,6 +1,7 @@
-- write a script to detect move.w to/from ram: in progress
-- big bagman fingers animation is wrong
 - test bagman first opus and publish!!
+- very easy mode
+- validate command line arguments
+- integrate music
 
 minor/not reproduced:
 
@@ -13,5 +14,5 @@ minor/not reproduced:
 - optimize l_c16d with AND?
 - original bug (can't reproduce)? high fall into a wagon: makes "et hopla" wagon drop sound
   then dies instead of playing dying sound
-- sometimes mechanical stairs appear in the bagman title!! (maybe ok now)
+- sometimes mechanical stairs appear in the bagman title!! (maybe ok now, well, not sure)
 

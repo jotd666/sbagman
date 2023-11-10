@@ -255,7 +255,7 @@ _user:
 	move.l	d0,dip_switch_start_lives
 	bra.b	3f
 2:
-	move.l	#2,dip_switch_start_lives		| 3 lives default
+	move.l	#4,dip_switch_start_lives		| 5 lives default
 3:
 	
 
@@ -320,7 +320,7 @@ _user:
 	
 	move.b	dip_switch_start_lives+3(pc),d1
 	bne.b	1f
-	moveq	#2,d1	| 3 lives is default
+	moveq	#4,d1	| 3 lives is default
 1:
 	* DSW 0 = 2 lives
 	subq.b	#1,d1
@@ -849,13 +849,13 @@ osd_update_sprites:
 	addq.w	#4,a5
 21:
 	move.l	(a5),d4
-	.ifndef	RELEASE
 	bne.b	22f
+	.ifndef	RELEASE
 	lea		sprite_buffer_doesnt_exist_error(pc),a0
 	jbsr	osd_break
+	.endif
 	jra		30f
 22:
-	.endif
 	move.l	d4,a5	| sprite pointer
 
 	* add offsets to both X & Y
@@ -1910,6 +1910,10 @@ osd_read_inputs:
 	bclr	#2,d0
 0:
 	tst.b	(0x40,a0)		| space key (gun alt control)
+	beq.b	0f
+	bclr	#2,d0
+0:
+	tst.b	(0x64,a0)		| alt key (gun alt control)
 	beq.b	0f
 	bclr	#2,d0
 0:
