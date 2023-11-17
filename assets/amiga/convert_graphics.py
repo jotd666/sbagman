@@ -2,6 +2,12 @@ import os,re,bitplanelib,ast,json,glob
 from PIL import Image,ImageOps
 
 
+# set to True to get png dumps in "dumps"
+dump_tiles = False
+dump_sprites = False
+
+
+
 import collections
 
 def ensure_empty(d):
@@ -130,8 +136,6 @@ used_cluts.update({k:[0x4] for k in range(0x1D4,0x1D8)})
 jail_buddy_tiles = 0x78,0x7C,0x74,0x72,0x6E,0x6A,0x76,0x7E,0x7A,0xE0
 used_cluts.update({k:[0x8] for k in jail_buddy_tiles})
 
-dump_tiles = True
-dump_sprites = True
 if dump_tiles:
     if not os.path.exists(dump_dir):
         os.mkdir(dump_dir)

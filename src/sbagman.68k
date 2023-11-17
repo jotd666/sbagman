@@ -154,13 +154,13 @@ start_a_sound:
 	jbsr		osd_sound_start
 	movem.l	(a7)+,a0/d1
 	rts
-	
-play_first_tune:
-	move.w	#TUNE1_SND,d0
-	jra		play_tune
 
-play_second_tune:
-	move.w	#TUNE2_SND,d0
+tune_table:
+	dc.w	TUNE3_SND
+	dc.w	TUNE1_SND
+	dc.w	TUNE2_SND
+
+
 play_tune:
 	move.w	d0,-(a7)
 	move.b	time_61E8,d0                    	| [$3ba6: ld   a,(time_61E8)]
@@ -2698,8 +2698,8 @@ l_0f91:
 	jbsr	set_bags_coordinates_easy_level_CFDB	| [$0fb7: call set_bags_coordinates_easy_level_CFDB]
 	jbsr	set_bags_coordinates_player_2_CFE7         	| [$0fba: call set_bags_coordinates_player_2_CFE7]
 	clr.b	d0                               	| [$0fbd: xor  a]
-	move.b	d0,unknown_6353                 	| [$0fbe: ld   (unknown_6353),a]
-	jbsr	l_d0f7                            	| [$0fc1: call $D0F7]
+	move.b	d0,current_tune_6353                 	| [$0fbe: ld   (current_tune_6353),a]
+	jbsr	play_next_tune_d0f7                            	| [$0fc1: call $D0F7]
 	clr.b	d0                               	| [$0fc4: xor  a]
 	move.b	d0,unknown_6348                 	| [$0fc5: ld   (unknown_6348),a]
 	rts                                    	| [$0fc8: ret]
@@ -6663,7 +6663,7 @@ l_cdc1:
 l_cdcc:
 	jbsr	osd_disable_display                               	| [$cdcc: xor  a]
 	                       	| [$cdcd: ld   ($A003),a]
-	clr.b	unknown_658F                 	| [$cdd0: ld   (unknown_658F),a]
+	clr.b	bullet_y_658F                 	| [$cdd0: ld   (bullet_y_658F),a]
 	clr.b	is_player_bullet_in_air_6297                 	| [$cdd3: ld   (is_player_bullet_in_air_6297),a]
 	clr.b	bomb_must_detonate_62F5                 	| [$cdd6: ld   (bomb_must_detonate_62F5),a]
 	clr.b	bomb_explosion_frame_timer_62FA                 	| [$cdd9: ld   (bomb_explosion_frame_timer_62FA),a]
@@ -7171,23 +7171,32 @@ start_level_music_d0f3:
 	beq.b	0f                               	| [...]
 	rts                                    	| [$d0f6: ret  nz] [...]
 0:
-l_d0f7:
-	move.b	unknown_6353,d0                 	| [$d0f7: ld   a,(unknown_6353)]
+
+play_next_tune_d0f7:
+	clr.w	d0
+	move.b	current_tune_6353,d0                 	| [$d0f7: ld   a,(current_tune_6353)]
 	addq.b	#1,d0                           	| [$d0fa: inc  a]
 	cmp.b	#0x03,d0                         	| [$d0fb: cp   $03]
 	jcs	l_d100                             	| [$d0fd: jr   c,$D100]
 	clr.b	d0                               	| [$d0ff: xor  a]
 l_d100:
-	move.b	d0,unknown_6353                 	| [$d100: ld   (unknown_6353),a]
-	LEA_ROM	       0x3B68,a0                      	| [$d103: ld   hl,$3B68]
-	cmp.b	#0x01,d0                         	| [$d106: cp   $01]
-	jeq	l_d114                             	| [$d108: jr   z,$D114]
-	LEA_ROM	       0x3800,a0                      	| [$d10a: ld   hl,$3800]
-	cmp.b	#0x02,d0                         	| [$d10d: cp   $02]
-	jeq	l_d114                             	| [$d10f: jr   z,$D114]
-	* TODO play music ??
-	LEA_ROM	       0x5000,a0                      	| [$d111: ld   hl,$5000]
+	move.b	d0,current_tune_6353                 	| [$d100: ld   (current_tune_6353),a]
+	add.b	d0,d0
+	lea		tune_table(pc),a0
+	move.w	(a0,d0.w),d0
+	bsr		play_tune
+	               	| [$d103: ld   hl,$3B68]
+	          	| [$d106: cp   $01]
+	        	| [$d108: jr   z,$D114]
+	               	| [$d10a: ld   hl,$3800]
+	          	| [$d10d: cp   $02]
+	        	| [$d10f: jr   z,$D114]
+	
+	               	| [$d111: ld   hl,$5000]
 l_d114:
+	* D0=1: first screen tune
+	* D0=2: second screen tune
+	* D0=3: third screen tune
 	*move.l	a0,ay_sound_pointer_6140        	| [$d114: ld   (ay_sound_pointer_6140),hl]
 	*clr.b	d0                               	| [$d117: xor  a]
 	*move.b	d0,ay_sound_start_6142          	| [$d118: ld   (ay_sound_start_6142),a]
@@ -10130,7 +10139,26 @@ handle_player_gun_e76f:
 	beq.b	0f                               	| [...]
 	rts                                    	| [$e774: ret  nz] [...]
 0:
-	* draw flashing gun in status bar
+	* jotd: avoid flickering: either draw the gun tile or draw blank
+	* but not gun then blank. Requires some adapting!
+	
+	tst.b	player_gun_nb_shots_6294
+	bne.b	0f
+	* clear gun icon if no more bullets
+	jbsr		clear_gun_status
+	* and exit, no bullets, nothing to do
+	rts
+0:
+	addq.b	#0x04,gun_flash_timer_6352                 	| [$e78b: ld   a,(gun_flash_timer_6352)]
+	move.b	gun_flash_timer_6352,d0                 	| [$e790: ld   (gun_flash_timer_6352),a]
+	cmp.b	#0x80,d0                         	| [$e793: cp   $80]
+	jcs	0f                             	| [$e795: jr   c,$E79C]
+	* clear gun icon 50% of the time
+	jbsr		clear_gun_status
+	* test if shoot button pressed 
+	jra		1f
+0:
+	* draw flashing gun in status bar 50% of the time
 	move.b	#0xBD,d0                        	| [$e775: ld   a,$BD]
 	move.w	#0x921F,d6                       	| [$e777: ld   ($921F),a]
     jbsr	osd_w_videoram
@@ -10142,24 +10170,11 @@ handle_player_gun_e76f:
 	.endif
 	move.w	#0x9A1F,d6                       	| [$e77c: ld   ($9A1F),a]
     jbsr	osd_w_colorram
-	tst.b	player_gun_nb_shots_6294                 	| [$e77f: ld   a,(player_gun_nb_shots_6294)]
-	                         	| [$e782: cp   $00]
-	jne	l_e78b                             	| [$e784: jr   nz,$E78B]
-	* clear gun if no more bullets
-	bsr		clear_gun_status
-l_e78b:
-	move.b	gun_flash_timer_6352,d0                 	| [$e78b: ld   a,(gun_flash_timer_6352)]
-	addq.b	#0x04,d0                        	| [$e78e: add  a,$04]
-	move.b	d0,gun_flash_timer_6352                 	| [$e790: ld   (gun_flash_timer_6352),a]
-	cmp.b	#0x80,d0                         	| [$e793: cp   $80]
-	jcs	l_e79c                             	| [$e795: jr   c,$E79C]
-	bsr		clear_gun_status
-l_e79c:
 	tst.b	is_player_bullet_in_air_6297                 	| [$e79c: ld   a,(is_player_bullet_in_air_6297)]
 	                         	| [$e79f: cp   $00]
-	beq.b	0f                               	| [...]
+	beq.b	1f                               	| [...]
 	rts                                    	| [$e7a1: ret  nz] [...]
-0:
+1:
 	jbsr	test_gun_button_e5d2                            	| [$e7a2: call $E5D2]
 	move.b	d1,d0                           	| [$e7a5: ld   a,b]
 	                         	| [$e7a6: cp   $00]
@@ -10207,9 +10222,9 @@ l_e7d3:
 									| [$e7eb: add  a,b]
 									| [$e7ec: add  a,b]
 									| [$e7ed: add  a,b]
-	move.b	d0,unknown_658E                 	| [$e7ee: ld   (unknown_658E),a]
+	move.b	d0,bullet_x_658E                 	| [$e7ee: ld   (bullet_x_658E),a]
 	move.b	(0x03,a2),d0                    	| [$e7f1: ld   a,(ix+$03)]
-	move.b	d0,unknown_658F                 	| [$e7f4: ld   (unknown_658F),a]
+	move.b	d0,bullet_y_658F                 	| [$e7f4: ld   (bullet_y_658F),a]
 	move.b	#0x10,d0                        	| [$e7f7: ld   a,$10]
 	move.b	d0,wagon_2_shadow_sprite_658C   	| [$e7f9: ld   (wagon_2_shadow_sprite_658C),a]
 	move.b	#0x0F,d0                        	| [$e7fc: ld   a,$0F]
@@ -10284,7 +10299,7 @@ l_e869:
 	cmp.b	#0x02,d0                         	| [$e883: cp   $02]
 	jne	l_e914                             	| [$e885: jp   nz,$E914]
 l_e888:
-	move.b	unknown_658E,d0                 	| [$e888: ld   a,(unknown_658E)]
+	move.b	bullet_x_658E,d0                 	| [$e888: ld   a,(bullet_x_658E)]
 	cmp.b	#0x10,d0                         	| [$e88b: cp   $10]
 	jcs	l_e914                             	| [$e88d: jp   c,$E914]
 	cmp.b	#0xF0,d0                         	| [$e890: cp   $F0]
@@ -10296,27 +10311,31 @@ l_e888:
 	lea	player_struct_6580,a2          	| [$e89d: ld   ix,player_struct_6580]
 	lea	player_death_flag_6025,a0      	| [$e8a1: ld   hl,player_death_flag_6025]
 	lea	player_death_flag_6025,a1      	| [$e8a4: ld   de,player_death_flag_6025]
-	jbsr	l_e8de                            	| [$e8a7: call $E8DE]
+	jbsr	bullet_collision_e8de                            	| [$e8a7: call $E8DE]
+	bsr		is_invincible
+	beq.b	0f
+	clr.b	player_death_flag_6025
+0:
 	move.b	guard_1_screen_6099,d0          	| [$e8aa: ld   a,(guard_1_screen_6099)]
 	move.b	d0,current_character_screen_index_6098	| [$e8ad: ld   (current_character_screen_index_6098),a]
 	lea	guard_1_struct_6594,a2         	| [$e8b0: ld   ix,guard_1_struct_6594]
 	lea	guard_1_death_flag_629F,a0                	| [$e8b4: ld   hl,guard_1_death_flag_629F]
 	lea	unknown_6156,a1                	| [$e8b7: ld   de,unknown_6156]
-	jbsr	l_e8de                            	| [$e8ba: call $E8DE]
+	jbsr	bullet_collision_e8de                            	| [$e8ba: call $E8DE]
 	move.b	guard_2_screen_609A,d0          	| [$e8bd: ld   a,(guard_2_screen_609A)]
 	move.b	d0,current_character_screen_index_6098	| [$e8c0: ld   (current_character_screen_index_6098),a]
 	lea	guard_2_struct_6598,a2         	| [$e8c3: ld   ix,guard_2_struct_6598]
 	lea	guard_2_death_flag_62A7,a0                	| [$e8c7: ld   hl,guard_2_death_flag_62A7]
 	lea	unknown_6157,a1                	| [$e8ca: ld   de,unknown_6157]
-	jbsr	l_e8de                            	| [$e8cd: call $E8DE]
+	jbsr	bullet_collision_e8de                            	| [$e8cd: call $E8DE]
 	move.l	(sp)+,a2                        	| [$e8d0: pop  ix]
 	move.b	bullet_direction_6298,d0                 	| [$e8d2: ld   a,(bullet_direction_6298)]
 	move.b	d0,d1                           	| [$e8d5: ld   b,a]
-	move.b	unknown_658E,d0                 	| [$e8d6: ld   a,(unknown_658E)]
+	move.b	bullet_x_658E,d0                 	| [$e8d6: ld   a,(bullet_x_658E)]
 	add.b	d1,d0                            	| [$e8d9: add  a,b]
-	move.b	d0,unknown_658E                 	| [$e8da: ld   (unknown_658E),a]
+	move.b	d0,bullet_x_658E                 	| [$e8da: ld   (bullet_x_658E),a]
 	rts                                    	| [$e8dd: ret]
-l_e8de:
+bullet_collision_e8de:
 	move.b	current_character_screen_index_6098,d0	| [$e8de: ld   a,(current_character_screen_index_6098)]
 	move.b	d0,d1                           	| [$e8e1: ld   b,a]
 	move.b	player_screen_600D,d0           	| [$e8e2: ld   a,(player_screen_600D)]
@@ -10334,7 +10353,7 @@ l_e8de:
 	move.b	d0,d1                           	| [$e8f0: ld   b,a]
 	add.b	#0x10,d0                         	| [$e8f1: add  a,$10]
 	move.b	d0,d2                           	| [$e8f3: ld   c,a]
-	move.b	unknown_658E,d0                 	| [$e8f4: ld   a,(unknown_658E)]
+	move.b	bullet_x_658E,d0                 	| [$e8f4: ld   a,(bullet_x_658E)]
 	cmp.b	d1,d0                            	| [$e8f7: cp   b]
 	bcc.b	0f                               	| [...]
 	rts                                    	| [$e8f8: ret  c] [...]
@@ -10343,7 +10362,7 @@ l_e8de:
 	bcs.b	0f                               	| [...]
 	rts                                    	| [$e8fa: ret  nc] [...]
 0:
-	move.b	unknown_658F,d0                 	| [$e8fb: ld   a,(unknown_658F)]
+	move.b	bullet_y_658F,d0                 	| [$e8fb: ld   a,(bullet_y_658F)]
 	addq.b	#0x07,d0                        	| [$e8fe: add  a,$07]
 	move.b	d0,d1                           	| [$e900: ld   b,a]
 	sub.b	#0x0E,d0                         	| [$e901: sub  $0E]
@@ -10365,7 +10384,7 @@ l_e8de:
 l_e914:
 	clr.b	d0                               	| [$e914: xor  a]
 	move.b	d0,is_player_bullet_in_air_6297                 	| [$e915: ld   (is_player_bullet_in_air_6297),a]
-	move.b	d0,unknown_658F                 	| [$e918: ld   (unknown_658F),a]
+	move.b	d0,bullet_y_658F                 	| [$e918: ld   (bullet_y_658F),a]
 	rts                                    	| [$e91b: ret]
 l_e91c:
 	lea	player_struct_6580,a2          	| [$e91c: ld   ix,player_struct_6580]
@@ -10929,12 +10948,12 @@ l_ec5e:
 	move.b	#0xB1,d0                        	| [$ec66: ld   a,$B1]
 	move.b	d0,object_held_struct_659C      	| [$ec68: ld   (object_held_struct_659C),a]
 	rts                                    	| [$ec6b: ret]
-l_ec6c:
+write_game_over_ec6c:
 	move.w	#0x926E,d6                      	| [$ec6c: ld   hl,$926E]
 	LEA_ROM	       0x56A1,a1                      	| [$ec6f: ld   de,$56A1]
 	jbsr	display_localized_text_CA67       	| [$ec72: call display_localized_text_CA67]
 	rts                                    	| [$ec75: ret]
-l_ec76:
+wait_a_while_ec76:
 
 	move.w	#20,d0
 	jbsr	osd_wait
@@ -12786,13 +12805,14 @@ init_new_game_F951:
 *	move.b	d0,ay_sound_start_6142          	| [$f958: ld   (ay_sound_start_6142),a]
 *	jbsr	l_d4e7                            	| [$f95b: call $D4E7]
 	jne	l_f96d                             	| [$f95e: jr   nz,$F96D]
-	LEA_ROM	       0x3B68,a0                      	| [$f960: ld   hl,$3B68]
+	                      	| [$f960: ld   hl,$3B68]
 	* play first tune
-	jbsr	play_first_tune
-	*move.b	a0,ay_sound_pointer_6140        	| [$f963: ld   (ay_sound_pointer_6140),hl]
-	*clr.b	d0                               	| [$f966: xor  a]
-	*move.b	d0,ay_sound_start_6142          	| [$f967: ld   (ay_sound_start_6142),a]
-	*move.b	d0,unknown_6348                 	| [$f96a: ld   (unknown_6348),a]
+	move.w	#TUNE1_SND,d0
+	jbsr	play_tune
+										| [$f963: ld   (ay_sound_pointer_6140),hl]
+											| [$f966: xor  a]
+										| [$f967: ld   (ay_sound_start_6142),a]
+										| [$f96a: ld   (unknown_6348),a]
 l_f96d:
 	jbsr	osd_disable_display                               	| [$f96d: xor  a]
 	                       	| [$f96e: ld   ($A003),a]
@@ -12881,11 +12901,11 @@ player_dies_F9E1:
 	clr.b	d0                               	| [$fa17: xor  a]
 	move.b	d0,wait_flag_6152               	| [$fa18: ld   (wait_flag_6152),a]
     jbsr   osd_enable_vblank_interrupt  | ei
+	jbsr	osd_sound_stop
 							| [$fa1c: call play_sample_EC84]
 	move.b	lives_6056,d0                   	| [$fa1f: ld   a,(lives_6056)]
 	                         	| [$fa22: cp   $00]
 	jeq	l_fa35                             	| [$fa24: jr   z,$FA35]
-	jbsr	osd_sound_stop
 	* plays "aie aie aie" sample
 	move.w	#PLAYER_KILLED_TALK_SND,d0
 	jbsr	start_a_sound                            	| [$1f88: call $2018]
@@ -12897,6 +12917,9 @@ l_fa35:
 *	jbsr	l_d4e7                            	| [$fa35: call $D4E7]
 	*jne	l_fa4b                             	| [$fa38: jr   nz,$FA4B]
     	jbsr   osd_disable_vblank_interrupt  | di
+	* game over music
+	move.w	#GAME_OVER_TUNE_SND,d0
+	jbsr		play_tune
 	*LEA_ROM	       0x3F60,a0                      	| [$fa3b: ld   hl,$3F60]
 	*move.b	a0,ay_sound_pointer_6140        	| [$fa3e: ld   (ay_sound_pointer_6140),hl]
 	*clr.b	d0                               	| [$fa41: xor  a]
@@ -12919,8 +12942,12 @@ l_fa55:
 	move.b	lives_6056,d0                   	| [$fa5b: ld   a,(lives_6056)]
 	                       	| [$fa5e: cp   $00]
 	jne	l_fa68                             	| [$fa60: jr   nz,$FA68]
-	jbsr	l_ec6c                            	| [$fa62: call $EC6C]
-	jbsr	l_ec76                            	| [$fa65: call $EC76]
+	jbsr	write_game_over_ec6c                            	| [$fa62: call $EC6C]
+	jbsr	wait_a_while_ec76                            	| [$fa65: call $EC76]
+
+	move.w	#0x140,d0
+	jbsr	osd_wait
+
 l_fa68:
 	jbsr	start_new_life_FAEA               	| [$fa68: call start_new_life_FAEA]
 	lea	object_held_struct_659C,a2     	| [$fa6b: ld   ix,object_held_struct_659C]
@@ -13006,7 +13033,7 @@ start_new_life_FAEA:
 	clr.b	holds_barrow_61C7            	| [$fb14: ld   (holds_barrow_61C7),a]
 	rts                                    	| [$fb17: ret]
 l_fb18:
-	jbsr	l_ec6c                            	| [$fb18: call $EC6C]
+	jbsr	write_game_over_ec6c                            	| [$fb18: call $EC6C]
 	clr.b	d0                               	| [$fb1b: xor  a]
 	move.b	d0,gameplay_allowed_6054        	| [$fb1c: ld   (gameplay_allowed_6054),a]
                   	| [$fb1f: ld   b,$16]

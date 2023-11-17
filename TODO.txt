@@ -1,14 +1,17 @@
-- test bagman first opus and publish!!
 - very easy mode
 - validate command line arguments
-- integrate music
+- highscore entry: cannot enter more than 3 letters
+- music tune 1 start & len problem tune 3 problem
+- when music is completed, step sound fx go crazy
+- too much memory used when music is on
+
+- invincible flag doesn't work for gun: to test
+- hard bags locations cheat
+- gun cheat doesn't work properly. act 2 gun set must happen too soon
+  vs start of the game
 
 minor/not reproduced:
 
-- hard bags locations cheat to code
-- gun cheat doesn't work properly. act 2 gun set must happen too soon
-  vs start of the game
-- invincible flag doesn't work for gun
 - maybe fix original bug: threaten guard with pickaxe so it doesn't move and disappears???
 - maybe omit tiles 0x249-24B and handle this with update_bg_tile
 - optimize l_c16d with AND?

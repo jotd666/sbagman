@@ -602,6 +602,8 @@ _vblank:
 	
 	subq	#1,d1
 
+	move.w	d1,0x200
+	
 	move.w	d1,music_tick
 	bne.b	13f
 	bsr		osd_sound_stop
@@ -661,7 +663,9 @@ osd_break:
 	* sends a WinUAE command to enter WinUAE debugger
 	.ifndef	RELEASE
 	pea     0.w
-	move.l  a0,-(sp)
+	* Normally it would point to where the result of the command is written, but since the last parameter (first pushed)
+	* indicating the number of bytes to write is 0, nothing is written.
+	pea     0.w	
 	pea     1003f-1002f
 	pea     1002f(pc)
 	pea     -1.w

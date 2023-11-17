@@ -26,7 +26,7 @@
 	OPT_BLOCK_GUARD_ONE=0
 	* set to 1 for: only guard at screen 3 is moving
 	OPT_BLOCK_GUARD_TWO=0
-    OPT_START_SCORE=0x0
+    OPT_START_SCORE=0
 	OPT_SKIP_INTRO_SCREEN=0
 	OPT_SKIP_GAME_DEMO=0
 	* disable guard reset if not moving
@@ -61,11 +61,13 @@
 	.equ	PLAYER_KILLED_TUNE_SND,     		  14
 	.equ	TUNE1_SND,			                  15
 	.equ	TUNE2_SND,			                  16
+	.equ	TUNE3_SND,			                  17
+	.equ	GAME_OVER_TUNE_SND,			          18
 	* same as player climb/walk only less loud
-	.equ	GUARD_CLIMB_SND,                      17
-	.equ	GUARD_WALK_SND,                       18
+	.equ	GUARD_CLIMB_SND,                      19
+	.equ	GUARD_WALK_SND,                       20
 	* same as player climb sound
-	.equ	TYPING_SND,                      19
+	.equ	TYPING_SND,                           21
 
 
 

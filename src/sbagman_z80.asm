@@ -1856,7 +1856,7 @@ start_a_game_0F15:
 0FB7: CD DB CF    call set_bags_coordinates_easy_level_CFDB
 0FBA: CD E7 CF    call copy_bags_coordinates_player_2_CFE7
 0FBD: AF          xor  a
-0FBE: 32 53 63    ld   (unknown_6353),a
+0FBE: 32 53 63    ld   (current_tune_6353),a
 0FC1: CD F7 D0    call $D0F7
 0FC4: AF          xor  a
 0FC5: 32 48 63    ld   (unknown_6348),a
@@ -5073,7 +5073,7 @@ CDCA: F1          pop  af
 CDCB: C9          ret
 CDCC: AF          xor  a
 CDCD: 32 03 A0    ld   ($A003),a
-CDD0: 32 8F 65    ld   (unknown_658F),a
+CDD0: 32 8F 65    ld   (bullet_y_658F),a
 CDD3: 32 97 62    ld   (unknown_6297),a
 CDD6: 32 F5 62    ld   (bomb_must_detonate_62F5),a
 CDD9: 32 FA 62    ld   (unknown_62FA),a
@@ -5490,12 +5490,12 @@ D0EF: CD 67 CA    call display_localized_text_CA67
 D0F2: C9          ret
 D0F3: CD D9 D4    call is_ay_sound_playing_D4D9
 D0F6: C0          ret  nz
-D0F7: 3A 53 63    ld   a,(unknown_6353)
+D0F7: 3A 53 63    ld   a,(current_tune_6353)
 D0FA: 3C          inc  a
 D0FB: FE 03       cp   $03
 D0FD: 38 01       jr   c,$D100
 D0FF: AF          xor  a
-D100: 32 53 63    ld   (unknown_6353),a
+D100: 32 53 63    ld   (current_tune_6353),a
 D103: 21 68 3B    ld   hl,$3B68
 D106: FE 01       cp   $01
 D108: 28 0A       jr   z,$D114
@@ -7902,9 +7902,9 @@ E7EA: 80          add  a,b
 E7EB: 80          add  a,b
 E7EC: 80          add  a,b
 E7ED: 80          add  a,b
-E7EE: 32 8E 65    ld   (unknown_658E),a
+E7EE: 32 8E 65    ld   (bullet_x_658E),a
 E7F1: DD 7E 03    ld   a,(ix+$03)
-E7F4: 32 8F 65    ld   (unknown_658F),a
+E7F4: 32 8F 65    ld   (bullet_y_658F),a
 E7F7: 3E 10       ld   a,$10
 E7F9: 32 8C 65    ld   (wagon_2_shadow_sprite_658C),a
 E7FC: 3E 0F       ld   a,$0F
@@ -7977,7 +7977,7 @@ E87D: CD 05 0E    call check_against_space_tiles_0E05
 E880: 3A 0B 60    ld   a,(way_clear_flag_600B)
 E883: FE 02       cp   $02
 E885: C2 14 E9    jp   nz,$E914
-E888: 3A 8E 65    ld   a,(unknown_658E)
+E888: 3A 8E 65    ld   a,(bullet_x_658E)
 E88B: FE 10       cp   $10
 E88D: DA 14 E9    jp   c,$E914
 E890: FE F0       cp   $F0
@@ -8004,9 +8004,9 @@ E8CD: CD DE E8    call $E8DE
 E8D0: DD E1       pop  ix
 E8D2: 3A 98 62    ld   a,(unknown_6298)
 E8D5: 47          ld   b,a
-E8D6: 3A 8E 65    ld   a,(unknown_658E)
+E8D6: 3A 8E 65    ld   a,(bullet_x_658E)
 E8D9: 80          add  a,b
-E8DA: 32 8E 65    ld   (unknown_658E),a
+E8DA: 32 8E 65    ld   (bullet_x_658E),a
 E8DD: C9          ret
 E8DE: 3A 98 60    ld   a,(current_character_screen_index_6098)
 E8E1: 47          ld   b,a
@@ -8021,12 +8021,12 @@ E8EE: D6 08       sub  $08
 E8F0: 47          ld   b,a
 E8F1: C6 10       add  a,$10
 E8F3: 4F          ld   c,a
-E8F4: 3A 8E 65    ld   a,(unknown_658E)
+E8F4: 3A 8E 65    ld   a,(bullet_x_658E)
 E8F7: B8          cp   b
 E8F8: D8          ret  c
 E8F9: B9          cp   c
 E8FA: D0          ret  nc
-E8FB: 3A 8F 65    ld   a,(unknown_658F)
+E8FB: 3A 8F 65    ld   a,(bullet_y_658F)
 E8FE: C6 07       add  a,$07
 E900: 47          ld   b,a
 E901: D6 0E       sub  $0E
@@ -8043,7 +8043,7 @@ E911: 18 01       jr   $E914
 E913: C9          ret
 E914: AF          xor  a
 E915: 32 97 62    ld   (unknown_6297),a
-E918: 32 8F 65    ld   (unknown_658F),a
+E918: 32 8F 65    ld   (bullet_y_658F),a
 E91B: C9          ret
 E91C: DD 21 80 65 ld   ix,player_struct_6580
 E920: FD 21 AF 62 ld   iy,unknown_62AF

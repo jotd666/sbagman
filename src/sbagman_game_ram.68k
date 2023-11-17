@@ -303,7 +303,7 @@
 	.global	unknown_634D
 	.global	unknown_6351
 	.global	gun_flash_timer_6352
-	.global	unknown_6353
+	.global	current_tune_6353
 	.global	unknown_6356
 	.global	unknown_6358
 	.global	unknown_635B
@@ -311,8 +311,8 @@
 	.global	unknown_6360
 	.global	elevator_x_screen_4_6586
 	.global	unknown_658D
-	.global	unknown_658E
-	.global	unknown_658F
+	.global	bullet_x_658E
+	.global	bullet_y_658F
 	.global	unknown_6595
 	.global	bomb_explosion_tiles_pointer_62F6
 	.global	unknown_pointer_633D
@@ -923,7 +923,7 @@ unknown_6351:
 	ds.b	1
 gun_flash_timer_6352:
 	ds.b	1
-unknown_6353:
+current_tune_6353:
 	ds.b	3
 unknown_6356:
 	ds.b	2
@@ -959,9 +959,9 @@ wagon_2_shadow_sprite_658C:
 	ds.b	1
 unknown_658D:
 	ds.b	1
-unknown_658E:
+bullet_x_658E:
 	ds.b	1
-unknown_658F:
+bullet_y_658F:
 	ds.b	1
 
 wagon_3_shadow_sprite_6590:
