@@ -48,9 +48,9 @@ sound_dict = {
 "REWARD_TUNE_SND"              :{"index":13,"channel":ay,"sample_rate":hq_sample_rate,"priority":10},
 "PLAYER_KILLED_TUNE_SND"       :{"index":14,"channel":ay,"sample_rate":hq_sample_rate,"priority":10},
 "TUNE1_SND"              :{"index":15,"pattern":1,"loops":False,"volume":32,"ticks":4000-0x770},
-"TUNE2_SND"              :{"index":16,"pattern":9,"loops":False,"volume":32,"ticks":4000-0x880},
-"TUNE3_SND"              :{"index":17,"pattern":16,"loops":False,"volume":32,"ticks":3000-0x310},
-"GAME_OVER_TUNE_SND"              :{"index":18,"pattern":0x19,"loops":False,"volume":32,"ticks":540},
+"TUNE2_SND"              :{"index":16,"pattern":10,"loops":False,"volume":32,"ticks":4000-0x880},
+"TUNE3_SND"              :{"index":17,"pattern":17,"loops":False,"volume":32,"ticks":3000-0x310},
+"GAME_OVER_TUNE_SND"     :{"index":18,"pattern":0x1a,"loops":False,"volume":32,"ticks":540},
 }
 
 max_sound = max(x["index"] for x in sound_dict.values())+1
