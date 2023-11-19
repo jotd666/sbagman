@@ -1,11 +1,6 @@
-- very easy mode
 - validate command line arguments
-- highscore entry: cannot enter more than 3 letters
-- music tune 1 start & len problem tune 3 problem
-- when music is completed, step sound fx go crazy
-- too much memory used when music is on
+- when dying music should restart as first music!
 
-- invincible flag doesn't work for gun: to test
 - hard bags locations cheat
 - gun cheat doesn't work properly. act 2 gun set must happen too soon
   vs start of the game
@@ -17,5 +12,4 @@ minor/not reproduced:
 - optimize l_c16d with AND?
 - original bug (can't reproduce)? high fall into a wagon: makes "et hopla" wagon drop sound
   then dies instead of playing dying sound
-- sometimes mechanical stairs appear in the bagman title!! (maybe ok now, well, not sure)
 

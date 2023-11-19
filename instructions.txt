@@ -42,8 +42,23 @@ CHEATKEYS: cheat keys:
 FRENCH: localize some parts in french
 GUNATSTART: everyone get guns (like in ACT 2+)
 HARDBAGS: start with hard level bags layout
-SKILL: difficulty dip switch
+SKILL: difficulty dip switch. Default: very easy mode
 STARTLIVES: 2,3,4,5 lives dip switch
+
+Very easy mode:
+
+The game is brutally hard, even in easy mode. There are 2 reasons for that:
+- guards speed is crazy towards the end, faster than bagman
+- timer at 4000 is just not enough for 5 screens and the level 5 elevator
+
+Act 1 can still be completed like that, but act 2 is near impossible (plus the
+guards now shoot on sight). So very easy mode tries to make game easier
+
+- timer is now 6000
+- score is 1/2th of the score in the other (arcade) modes
+- guards speed won't be as crazy, because of lower score but also
+  because of a speed limitation I have added (matches max Bagman speed)
+
 
 Hiscores save:
 

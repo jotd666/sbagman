@@ -10,6 +10,7 @@ Game uses 99% of the transcoded original code for better accuracy.
 Some memory read bugs & text typos have been fixed, some not. 
 Music never loses the tempo.
 Sound use samples.
+Highscore entry allow longer names
 Game still has original bugs left
 
 History: 
@@ -26,14 +27,15 @@ History:
 #### AMIGA
 
 - fully playable with sound
-- still bugs
-- missing features
 
 #### NEO GEO
 
 - not planned ATM ...
 
 ### FEATURES:
+
+- "very easy" mode that makes the game playable
+- better highscore entry
 
 #### CREDITS:
 

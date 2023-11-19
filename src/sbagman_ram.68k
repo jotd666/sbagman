@@ -19,6 +19,7 @@
 	.global guard_1_inactive
 	.global guard_2_inactive
 	.global	vblank_ack
+	.global	very_easy_flag
 	.ifdef	__amiga__
 	
 	.ascii	"RAM_STRT"
@@ -49,7 +50,7 @@ ATTRIBUTE_RAM:						| $8400
 	.align	2
 	
 last_played_sound_timer_table:
-	ds.w	20
+	ds.w	0x20
 sound_timer:
 	.word	0
 vbl_sync_counter_start_screen:
@@ -63,6 +64,8 @@ infinite_lives_flag:
 guns_at_start_flag:
 	.byte	0
 infinite_time_flag:
+	.byte	0
+very_easy_flag:
 	.byte	0
 hard_bags_flag:
 	.byte	0

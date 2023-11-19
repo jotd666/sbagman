@@ -50,7 +50,7 @@ sound_dict = {
 "TUNE1_SND"              :{"index":15,"pattern":1,"loops":False,"volume":32,"ticks":4000-0x770},
 "TUNE2_SND"              :{"index":16,"pattern":10,"loops":False,"volume":32,"ticks":4000-0x880},
 "TUNE3_SND"              :{"index":17,"pattern":17,"loops":False,"volume":32,"ticks":3000-0x310},
-"GAME_OVER_TUNE_SND"     :{"index":18,"pattern":0x1a,"loops":False,"volume":32,"ticks":540},
+"GAME_OVER_TUNE_SND"     :{"index":18,"pattern":0x1a,"loops":False,"volume":32,"ticks":520},
 }
 
 max_sound = max(x["index"] for x in sound_dict.values())+1

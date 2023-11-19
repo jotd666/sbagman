@@ -140,10 +140,12 @@ start_a_sound:
 	move.w	(a0,d0.w),d1
 	jeq		0f			| zero: not played ever: play it
 	sub.w	sound_timer,d1
+	jeq		1f			| played just now: ignore
 	jcc		0f			| wrap around
 	neg.w	d1
 	cmp.w	#42,d1		| empiric
 	jcc		0f
+1:
 	* too close: don't play
 	movem.l	(a7)+,a0/d1
 	rts
@@ -3162,7 +3164,7 @@ l_1365:
 	move.w	#0x08-1,d1                        	| [$1408: ld   b,$08]
 	move.w	#0x9191,d6                      	| [$140a: ld   ix,$9191]
 l_140e:
-	* bagman fingers
+	* bagman fingers move
 	move.b	#0xB8,d0
 	WRITE_VIDEORAM	0x40                 	| [$140e: ld   (ix+$40),$B8]
 	                      	| [$1412: ld   de,$0700]
@@ -3322,7 +3324,7 @@ l_14fd:
 	lea	player_struct_6580,a0          	| [$1504: ld   hl,player_struct_6580]
 	clr.b	d0                               	| [$1507: ld   a,$00]
 	move.b	d0,gameplay_allowed_6054        	| [$1509: ld   (gameplay_allowed_6054),a]
-	move.b	number_of_credits_6000,d0       	| [$150c: ld   a,(number_of_credits_6000)]
+	tst.b	number_of_credits_6000       	| [$150c: ld   a,(number_of_credits_6000)]
 	                         	| [$150f: cp   $00]
 	beq.b	0f                               	| [...]
 	rts                                    	| [$1511: ret  nz] [...]
@@ -3350,7 +3352,16 @@ l_153a:
 	rts                                    	| [$1541: ret]
 
 credit_inserted_loop:
-	
+	* save d1. Without that, if credit is inserted when
+	* Bagman is moving his fingers a strange bug occurs and game locks up
+	* because d1 is tampered with and the loop never ends
+	* also we save then jsr to original routine, as it pops up the stack
+	* so saving D1 in original routine would crash the game!
+	move.w	d1,-(a7)
+	bsr.b	1f
+	move.w	(a7)+,d1
+	rts
+1:
 	lsr.w	#8,d7
 	lsr.w	#1,d7
 0:
@@ -3374,7 +3385,8 @@ check_if_credit_inserted_1542:
 	                               	| [$154e: ld   a,$00]
 	clr.b	check_scenery_disabled_61ED  	| [$1550: ld   (check_scenery_disabled_61ED),a]
 	            	| [$1553: ld   a,(io_read_shit_B800)]
-	move.l	(sp)+,a0                        	| [$1556: pop  hl]
+	* pops up the stack if not intermission: interrupt loop and return
+	addq.l	#4,a7                        	| [$1556: pop  hl]
 	jra	l_14fd                             	| [$1557: jr   $14FD]
 
 l_1565:
@@ -4123,6 +4135,10 @@ really_add_to_score_5500:
 	jne	l_5531                             	| [$550b: jp   nz,$5531]
 	lea	player_1_score_6176,a2                	| [$550e: ld   ix,player_1_score_6176]
 l_5512:
+	tst.b	very_easy_flag
+	beq.b	0f
+	lsr.w	#1,d6		| 1/2th of score in very easy mode
+0:
 	* pre-shift D6 MSB as it would destroy X flag
 	move.w	d6,d5                           	| [$551d: ld   a,h]
 	lsr.w	#8,d5
@@ -5469,7 +5485,7 @@ compute_guard_speed_from_dipsw_C5EE:
 	                  			         	| [$c605: ld   b,a]
 l_c606:
 	jbsr	osd_read_dipswitches                       	| [$c606: ld   a,($B000)]
-        CLEAR_XC_FLAG
+       CLEAR_XC_FLAG
 	roxr.b	#3,d0                           	| [$c609: rr   a] * 3
 	not.b	d0                               	| [$c60f: cpl]
 	and.b	#0x03,d0                         	| [$c610: and  $03]
@@ -5486,13 +5502,23 @@ l_c619:
  * easy:	10000->20000 :	2
  * easy:	20000-30000:	4
  * easy:	30000->40000 :	5
- * easy:	after 40000 :	 9
- * easy:	after 50000 :	 10
+ * easy:	40000 :	 9
+ * easy:	50000 :	 10
+ * easy:	60000 :	 10
+ * easy:	70000 :	 11
+ * easy:	80000 :	 12
+ * easy:	90000 :	 13
+ * easy:	100000 :	 14 !!!
+ 
  * medium:	0->10000 :	2
  * medium:	10000->20000:	 4
  * medium:	20000->30000 :	5
  * medium:	30000->40000 :	9
  * medium:	after 40000:	10
+ *
+ * very easy mode follows easy mode, but score is 1/4th of the score
+ * so guard speed remains low
+ 
 compute_guard_speed_c61d:
 	cmp.b	#0x01,d0                         	| [$c61d: cp   $01]
 	bcc.b	0f                               	| [...]
@@ -5518,7 +5544,54 @@ compute_guard_speed_c61d:
 	bcc.b	0f                               	| [...]
 	rts                                    	| [$c633: ret  c] [...]
 0:
-	jra	l_ff00                             	| [$c634: jp   $FF00]
+	                             	| [$c634: jp   $FF00]
+	tst.b	very_easy_flag
+	beq.b	0f
+	move.b	#0x0A,d1
+	* very easy mode: guard speeds are limited to 10 even with a very high score
+	rts
+									
+	* another proof (if it was needed!) that
+	* super bagman wants you dead even more than bagman:
+	* guard speed increases even over 40000/50000 points to speeds never
+	* attained in the original Bagman. In the original Bagman, guard speed
+	* cannot exceed Bagman speed (when he doesn't carry bags). Now guard speed
+	* can be faster than Bagman! almost as fast as wagons! (max 14 vs max 10)
+	*
+	* original bug: speed is never 10 as Jacques forgot to set
+	* speed below. It tests > 50000 and > 60000 without setting speed at 10
+	* so guard speed remains the same from 50000 to 70000 then it increases
+	* and catches up! (9 => 11)
+	*
+	* the part of code below was added to Bagman code at the end of the ROM
+	* I moved it here for more clarity
+	
+	
+0:
+	cmp.b	#0x06,d0                         	| [$ff00: cp   $06]
+	bcc.b	0f                               	| [...]
+	rts                                    	| [$ff02: ret  c] [...]
+0:
+	move.b	#0x0B,d1                        	| [$ff03: ld   b,$0B]
+	cmp.b	#0x07,d0                         	| [$ff05: cp   $07]
+	bcc.b	0f                               	| [...]
+	rts                                    	| [$ff07: ret  c] [...]
+0:
+	move.b	#0x0C,d1                        	| [$ff08: ld   b,$0C]
+	cmp.b	#0x08,d0                         	| [$ff0a: cp   $08]
+	bcc.b	0f                               	| [...]
+	rts                                    	| [$ff0c: ret  c] [...]
+0:
+	move.b	#0x0D,d1                        	| [$ff0d: ld   b,$0D]
+	cmp.b	#0x09,d0                         	| [$ff0f: cp   $09]
+	bcc.b	0f                               	| [...]
+	rts                                    	| [$ff11: ret  c] [...]
+0:
+	* after 100000 points speed "stabilizes" but it's crazy :)
+	move.b	#0x0E,d1                        	| [$ff12: ld   b,$0E]
+	cmp.b	#0x0A,d0                         	| [$ff14: cp   $0A]
+	rts                                    	| [$ff16: ret]
+	
 l_c637:
 	lea	guard_1_struct_6594,a2         	| [$c637: ld   ix,guard_1_struct_6594]
 	lea	object_held_struct_659C,a3     	| [$c63b: ld   iy,object_held_struct_659C]
@@ -5837,13 +5910,15 @@ l_c849:
 	jbsr	busy_wait_c887                            	| [$c858: call $C887]
 	rts                                    	| [$c85b: ret]
 l_c85c:
+	* highscore entry was limited to 3 letters which is stupid
+	* original game allowed much longer names, restored that
 	move.b	d6,d0                           	| [$c85c: ld   a,l]
 	and.b	#0xF0,d0                         	| [$c85d: and  $F0]
-	cmp.b	#0xC0,d0                         	| [$c85f: cp   $C0]
+	cmp.b	#0x80,d0                         	| [$c85f: cp   $C0]
 	jne	l_c867                             	| [$c861: jr   nz,$C867]
 	move.w	d6,d0                           	| [$c863: ld   a,h]
 	lsr.w	#8,d0
-	cmp.b	#0x91,d0                         	| [$c864: cp   $91]
+	cmp.b	#0x90,d0                         	| [$c864: cp   $91]
 	bne.b	0f                               	| [...]
 	rts                                    	| [$c866: ret  z] [...]
 0:
@@ -5878,7 +5953,7 @@ write_highscore_name_letter_c87c:
 	rts                                    	| [$c886: ret]
 busy_wait_c887:
 	* wait some time (highscore letter input)
-	move.w	#30,d0
+	move.w	#20,d0
 	jbsr	osd_wait
 
 	rts                                    	| [$c89a: ret]
@@ -11680,6 +11755,10 @@ l_f279:
 	move.b	d0,(0x02,a3)                    	| [$f298: ld   (iy+$02),a]
     jbsr   osd_enable_vblank_interrupt  | ei
 	move.b	#0x40,d0                        	| [$f29c: ld   a,$40]
+	tst.b	very_easy_flag
+	beq.b	0f
+	add.b	#0x20,d0			| 6000 not 4000
+0:
 	move.b	d0,time_61E8                    	| [$f29e: ld   (time_61E8),a]
 	jbsr	check_if_level_completed_D12F     	| [$f2a1: call check_if_level_completed_D12F]
 l_f2a4:
@@ -12848,6 +12927,10 @@ l_f9a3:
 	move.w	#0x18,d1                        	| [$f9a9: ld   bc,$0018] 24
 	jbsr	ldir                              	| [$f9ac: ldir]
  	move.b	#0x40,d0                        	| [$f9ae: ld   a,$40]
+	tst.b	very_easy_flag
+	beq.b	0f
+	add.b	#0x20,d0
+0:
 	move.b	d0,time_61E8                    	| [$f9b0: ld   (time_61E8),a]
 	move.b	#0x01,d0                        	| [$f9b3: ld   a,$01]
 	move.b	d0,extra_life_awarded_6286      	| [$f9b5: ld   (extra_life_awarded_6286),a]
@@ -13678,29 +13761,7 @@ l_feae:
 	move.b	d0,sprite_object_y_659F         	| [$fee9: ld   (sprite_object_y_659F),a]
 	rts                                    	| [$feec: ret]
 
-l_ff00:
-	cmp.b	#0x06,d0                         	| [$ff00: cp   $06]
-	bcc.b	0f                               	| [...]
-	rts                                    	| [$ff02: ret  c] [...]
-0:
-	move.b	#0x0B,d1                        	| [$ff03: ld   b,$0B]
-	cmp.b	#0x07,d0                         	| [$ff05: cp   $07]
-	bcc.b	0f                               	| [...]
-	rts                                    	| [$ff07: ret  c] [...]
-0:
-	move.b	#0x0C,d1                        	| [$ff08: ld   b,$0C]
-	cmp.b	#0x08,d0                         	| [$ff0a: cp   $08]
-	bcc.b	0f                               	| [...]
-	rts                                    	| [$ff0c: ret  c] [...]
-0:
-	move.b	#0x0D,d1                        	| [$ff0d: ld   b,$0D]
-	cmp.b	#0x09,d0                         	| [$ff0f: cp   $09]
-	bcc.b	0f                               	| [...]
-	rts                                    	| [$ff11: ret  c] [...]
-0:
-	move.b	#0x0E,d1                        	| [$ff12: ld   b,$0E]
-	cmp.b	#0x0A,d0                         	| [$ff14: cp   $0A]
-	rts                                    	| [$ff16: ret]
+
 
 l_ff17:
 	move.b	d0,(A2)                    	| [$ff17: ld   (ix+$00),a]
