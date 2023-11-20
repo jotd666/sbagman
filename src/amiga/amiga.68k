@@ -153,6 +153,7 @@ start:
 		.global osd_write_high_scores
 		.global osd_sound_start
 		.global osd_sound_stop
+		.global	osd_is_music_playing
 		.global	osd_get_random
 		.global	osd_wait
 
@@ -224,10 +225,15 @@ _user:
 	or.l	#8,cheat_flags
 	st.b	cheat_used
 2:
+	move.l	(A0)+,D0	| INFBULLETS/S
+	beq.b	2f
+	or.l	#0x10,cheat_flags
+	st.b	cheat_used
+2:
 	move.l	(A0)+,D0	| CHEATKEYS/S
 	beq.b	2f
 	* cheat isn't used as long as no cheat key is used
-	or.l	#0x10,cheat_flags
+	or.l	#0x20,cheat_flags
 2:
 	move.l	(A0)+,D0	| HARDBAGS/S
 	beq.b	2f
@@ -356,6 +362,8 @@ _user:
 	sne		infinite_time_flag
 	btst	#3,d0
 	sne		infinite_pickaxe_time_flag
+	btst	#4,d0
+	sne		infinite_bullets_flag
 	
 	jsr	 _detect_controller_types 
 	clr.b	controller_joypad_0
@@ -1058,7 +1066,10 @@ alloc_sprite:
 	
 	rts
 	
-
+osd_is_music_playing:
+	tst.w	music_tick
+	sne		d0
+	rts
 	
 osd_sound_start:
 	cmp.b	#CREDIT_SND,d0
@@ -2105,7 +2116,7 @@ handle_keyboard:
     bsr	toggle_pause
 0:
 
-	btst	#4,cheat_flags+3
+	btst	#5,cheat_flags+3	| check if cheat keys active
 	jeq		10f
 	* cheat keys
 	cmp.b	#0x50,d0	| F1 key
@@ -2217,7 +2228,7 @@ program_args_end:
 	.align	4
 read_args_string:
 	.byte	read_args_string_end-read_args_string
-	.ascii	"INVINCIBLE/S,INFLIVES/S,INFTIME/S,INFPICK/S,"
+	.ascii	"INVINCIBLE/S,INFLIVES/S,INFTIME/S,INFPICK/S,INFBULLETS/S"
 	.ascii	"CHEATKEYS/S,HARDBAGS/S,FRENCH/S,GUNSATSTART/S,SKILL/K/N,STARTLIVES/K/N"
 read_args_string_end:
 

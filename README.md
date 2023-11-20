@@ -36,6 +36,9 @@ History:
 
 - "very easy" mode that makes the game playable
 - better highscore entry
+- "hard bags" layout: starts with bags layout of act 2, and
+  continues with an unseen hard bags layout (unseen because
+  of an original bug)
 
 #### CREDITS:
 

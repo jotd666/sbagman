@@ -198,7 +198,7 @@
 	.global	elevator_struct_6584
 	.global	wagon_1_struct_6588
 	.global	unknown_658B
-	.global	wagon_2_shadow_sprite_658C
+	.global	bullet_shadow_sprite_658C
 	.global	wagon_3_shadow_sprite_6590
 	.global	object_held_struct_659C
 	.global	sprite_object_x_659E
@@ -228,7 +228,7 @@
 	.global	player_has_gun_6293
 	.global	player_gun_nb_shots_6294
 	.global	unknown_6295
-	.global	is_player_bullet_in_air_6297
+	.global	is_a_bullet_in_air_6297
 	.global	bullet_direction_6298
 	.global	guards_shoot_on_sight_6299
 	.global	guard_1_has_gun_629B
@@ -729,7 +729,7 @@ player_gun_nb_shots_6294:
 	ds.b	1
 unknown_6295:
 	ds.b	2
-is_player_bullet_in_air_6297:
+is_a_bullet_in_air_6297:
 	ds.b	1
 * 0: no bullet, 1: going right, -1: going left
 * note: only one bullet can move, if the guards fire
@@ -955,7 +955,7 @@ wagon_data_658A:
 	ds.b	1
 unknown_658B:
 	ds.b	1
-wagon_2_shadow_sprite_658C:
+bullet_shadow_sprite_658C:
 	ds.b	1
 unknown_658D:
 	ds.b	1

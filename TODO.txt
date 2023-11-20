@@ -1,10 +1,3 @@
-- validate command line arguments
-- when dying music should restart as first music!
-
-- hard bags locations cheat
-- gun cheat doesn't work properly. act 2 gun set must happen too soon
-  vs start of the game
-
 minor/not reproduced:
 
 - maybe fix original bug: threaten guard with pickaxe so it doesn't move and disappears???

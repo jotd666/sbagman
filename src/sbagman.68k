@@ -6691,7 +6691,7 @@ l_cd79:
 	rts                                    	| [$cd8a: ret  z] [...]
 0:
 	lea	player_y_6583,a0               	| [$cd8b: ld   hl,player_y_6583]
-	lea	wagon_2_shadow_sprite_658C,a2  	| [$cd8e: ld   ix,wagon_2_shadow_sprite_658C]
+	lea	bullet_shadow_sprite_658C,a2  	| [$cd8e: ld   ix,bullet_shadow_sprite_658C]
 	move.b	(a0),d0                         	| [$cd92: ld   a,(hl)]
 	cmp.b	#0x40,d0                         	| [$cd93: cp   $40]
 	jne	l_cd9c                             	| [$cd95: jr   nz,$CD9C]
@@ -6739,7 +6739,7 @@ l_cdcc:
 	jbsr	osd_disable_display                               	| [$cdcc: xor  a]
 	                       	| [$cdcd: ld   ($A003),a]
 	clr.b	bullet_y_658F                 	| [$cdd0: ld   (bullet_y_658F),a]
-	clr.b	is_player_bullet_in_air_6297                 	| [$cdd3: ld   (is_player_bullet_in_air_6297),a]
+	clr.b	is_a_bullet_in_air_6297                 	| [$cdd3: ld   (is_a_bullet_in_air_6297),a]
 	clr.b	bomb_must_detonate_62F5                 	| [$cdd6: ld   (bomb_must_detonate_62F5),a]
 	clr.b	bomb_explosion_frame_timer_62FA                 	| [$cdd9: ld   (bomb_explosion_frame_timer_62FA),a]
 	clr.b	bomb_picked_up_6323                 	| [$cddc: ld   (bomb_picked_up_6323),a]
@@ -7028,17 +7028,20 @@ decrease_timer_cfa7:
 	rts                                    	| [$354e: ret]
 
 set_bags_coordinates_hard_level_CFBD:
-	move.b	act_number_60D3,d0                 	| [$cfbd: ld   a,(act_number_60D3)]
-	addq.b	#1,d0                           	| [$cfc0: inc  a]
-	move.b	d0,act_number_60D3                 	| [$cfc1: ld   (act_number_60D3),a]
-	clr.b	d0                               	| [$cfc4: xor  a]
-	move.b	d0,is_key_hunt_phase_6341                 	| [$cfc5: ld   (is_key_hunt_phase_6341),a]
+	                 	| [$cfbd: ld   a,(act_number_60D3)]
+	addq.b	#1,act_number_60D3                           	| [$cfc0: inc  a]
+	                 	| [$cfc1: ld   (act_number_60D3),a]
+	                               	| [$cfc4: xor  a]
+	clr.b	is_key_hunt_phase_6341                 	| [$cfc5: ld   (is_key_hunt_phase_6341),a]
+do_set_bags_coordinates_hard_level:
 	lea	bags_coordinates_609C,a1       	| [$cfc8: ld   de,bags_coordinates_609C]
 	LEA_ROM	       0x1B15,a0                      	| [$cfcb: ld   hl,$1B15]
-	* that looks suspiciously buggy as d0 is always 0...
-	* maybe this layout (unreachable) is even harder. We'll try it!
-	cmp.b	#0x02,d0                         	| [$cfce: cp   $02]
-	jne	set_bags_coords_cfd5                             	| [$cfd0: jr   nz,$CFD5]
+	* original code is buggy as d0 is always 0... it was probably to
+	* test against act number but is never reached so that 3rd bag layout is unseen
+	* this layout (unreachable) is harder too, but different. We're using that
+	* for act 2 of hard bags setting (if someone can reach that point...)
+	tst.b	hard_bags_flag                         	| [$cfce: cp   $02]
+	jeq	set_bags_coords_cfd5                             	| [$cfd0: jr   nz,$CFD5]
 	LEA_ROM	       0x1B4E,a0                      	| [$cfd2: ld   hl,$1B4E]
 	
 set_bags_coords_cfd5:
@@ -7050,6 +7053,9 @@ set_bags_coords_cfd5:
  	rts                                    	| [$cfda: ret]
 
 set_bags_coordinates_easy_level_CFDB:
+	tst.b	hard_bags_flag
+	jne		do_set_bags_coordinates_hard_level
+
 	lea	bags_coordinates_609C,a1       	| [$cfdb: ld   de,bags_coordinates_609C]
 	LEA_ROM	       0x1ADC,a0                      	| [$cfde: ld   hl,$1ADC]
 	bra.b	set_bags_coords_cfd5
@@ -7242,7 +7248,11 @@ draw_credit_and_bonus_d0dd:
 	rts                                    	| [$d0f2: ret]
 
 start_level_music_d0f3:
-	jbsr	is_ay_sound_playing_D4D9                 	| [$d0f3: call is_ay_sound_playing_D4D9]
+	* the only location where we need to check if music is playing
+	* else if music is playing, the tune is skipped and next tune will
+	* be played next time.
+	jbsr	osd_is_music_playing                 	| [$d0f3: call is_ay_sound_playing_D4D9]
+	tst.b	d0
 	beq.b	0f                               	| [...]
 	rts                                    	| [$d0f6: ret  nz] [...]
 0:
@@ -7756,7 +7766,7 @@ update_all_sprites_D511:
 	lea	wagon_1_struct_6588,a2                	| [$3e12: ld   ix,wagon_1_struct_6588]
 	lea	wagon_1_shadow_sprite_65AC,a3                	| [$3e16: ld   iy,wagon_1_shadow_sprite_65AC]
 	jbsr	update_sprite_data_d6d7           	| [$3e1a: call update_sprite_data_d6d7]
-	lea	wagon_2_shadow_sprite_658C,a2                	| [$3e1d: ld   ix,wagon_2_shadow_sprite_658C]
+	lea	bullet_shadow_sprite_658C,a2                	| [$3e1d: ld   ix,bullet_shadow_sprite_658C]
 	lea	unknown_65B0,a3                	| [$3e21: ld   iy,unknown_65B0]
 	jbsr	update_sprite_data_d6d7           	| [$3e25: call update_sprite_data_d6d7]
 	lea	wagon_3_shadow_sprite_6590,a2                	| [$3e28: ld   ix,wagon_3_shadow_sprite_6590]
@@ -9912,6 +9922,10 @@ l_e593:
  
 	subq.b	#1,d1                           	| [...]
 	jne	l_e593                             	| [$e598: djnz $E593]
+	
+	* in case gun cheat mode is set, enable it now (after player variables
+	* have been cleared)
+	bsr		check_if_must_award_gun_d7a9
 	                              	| [$e59a: xor  a]
 	clr.b	bomb_must_detonate_62F5                 	| [$e59b: ld   (bomb_must_detonate_62F5),a]
 	clr.l	bomb_explosion_tiles_pointer_62F6                 	| [$e59e: ld   (bomb_explosion_tiles_pointer_62F6),a]
@@ -9949,6 +9963,7 @@ test_gun_button_e5d2:
 	and.b	#0x04,d0                         	| [$e5ee: and  $04]
 	cmp.b	#0x04,d0                         	| [$e5f0: cp   $04]
 	jne	l_e5f7                             	| [$e5f2: jr   nz,$E5F7]
+	* shoot the gun
 	move.b	#0x01,d1                        	| [$e5f4: ld   b,$01]
 	rts                                    	| [$e5f6: ret]
 l_e5f7:
@@ -10050,7 +10065,7 @@ l_e67d:
 	beq.b	0f                               	| [...]
 	rts                                    	| [$e68a: ret  nz] [...]
 0:
-	move.b	is_player_bullet_in_air_6297,d0                 	| [$e68b: ld   a,(is_player_bullet_in_air_6297)]
+	move.b	is_a_bullet_in_air_6297,d0                 	| [$e68b: ld   a,(is_a_bullet_in_air_6297)]
 	cmp.b	#0x01,d0                         	| [$e68e: cp   $01]
 	bne.b	0f                               	| [...]
 	rts                                    	| [$e690: ret  z] [...]
@@ -10130,7 +10145,7 @@ l_e6f9:
 	beq.b	0f                               	| [...]
 	rts                                    	| [$e706: ret  nz] [...]
 0:
-	move.b	is_player_bullet_in_air_6297,d0                 	| [$e707: ld   a,(is_player_bullet_in_air_6297)]
+	move.b	is_a_bullet_in_air_6297,d0                 	| [$e707: ld   a,(is_a_bullet_in_air_6297)]
 	cmp.b	#0x01,d0                         	| [$e70a: cp   $01]
 	bne.b	0f                               	| [...]
 	rts                                    	| [$e70c: ret  z] [...]
@@ -10231,7 +10246,7 @@ handle_player_gun_e76f:
 	* clear gun icon 50% of the time
 	jbsr		clear_gun_status
 	* test if shoot button pressed 
-	jra		1f
+	jra		10f
 0:
 	* draw flashing gun in status bar 50% of the time
 	move.b	#0xBD,d0                        	| [$e775: ld   a,$BD]
@@ -10245,7 +10260,8 @@ handle_player_gun_e76f:
 	.endif
 	move.w	#0x9A1F,d6                       	| [$e77c: ld   ($9A1F),a]
     jbsr	osd_w_colorram
-	tst.b	is_player_bullet_in_air_6297                 	| [$e79c: ld   a,(is_player_bullet_in_air_6297)]
+10:
+	tst.b	is_a_bullet_in_air_6297                 	| [$e79c: ld   a,(is_a_bullet_in_air_6297)]
 	                         	| [$e79f: cp   $00]
 	beq.b	1f                               	| [...]
 	rts                                    	| [$e7a1: ret  nz] [...]
@@ -10266,11 +10282,15 @@ l_e7b4:
 	bne.b	0f                               	| [...]
 	rts                                    	| [$e7b9: ret  z] [...]
 0:
-	move.b	(0x01,a3),d0                    	| [$e7ba: ld   a,(iy+$01)]
-	subq.b	#1,d0                           	| [$e7bd: dec  a]
-	move.b	d0,(0x01,a3)                    	| [$e7be: ld   (iy+$01),a]
+	* consume one bullet
+	tst.b	infinite_bullets_flag
+	bne.b	0f
+	subq.b	#1,(0x01,a3)                    	| [$e7ba: ld   a,(iy+$01)]
+											| [$e7bd: dec  a]
+												| [$e7be: ld   (iy+$01),a]
+0:
 	move.b	#0x01,d0                        	| [$e7c1: ld   a,$01]
-	move.b	d0,is_player_bullet_in_air_6297                 	| [$e7c3: ld   (is_player_bullet_in_air_6297),a]
+	move.b	d0,is_a_bullet_in_air_6297                 	| [$e7c3: ld   (is_a_bullet_in_air_6297),a]
 	move.b	#0x01,d1                        	| [$e7c6: ld   b,$01]
 	move.b	(A2),d0                    	| [$e7c8: ld   a,(ix+$00)]
 	and.b	#0x80,d0                         	| [$e7cb: and  $80]
@@ -10301,7 +10321,7 @@ l_e7d3:
 	move.b	(0x03,a2),d0                    	| [$e7f1: ld   a,(ix+$03)]
 	move.b	d0,bullet_y_658F                 	| [$e7f4: ld   (bullet_y_658F),a]
 	move.b	#0x10,d0                        	| [$e7f7: ld   a,$10]
-	move.b	d0,wagon_2_shadow_sprite_658C   	| [$e7f9: ld   (wagon_2_shadow_sprite_658C),a]
+	move.b	d0,bullet_shadow_sprite_658C   	| [$e7f9: ld   (bullet_shadow_sprite_658C),a]
 	move.b	#0x0F,d0                        	| [$e7fc: ld   a,$0F]
 	move.b	d0,unknown_658D                 	| [$e7fe: ld   (unknown_658D),a]
 	move.b	#0x30,d0                        	| [$e801: ld   a,$30]
@@ -10348,14 +10368,14 @@ l_e853:
 
 
 l_e861:
-	move.b	is_player_bullet_in_air_6297,d0                 	| [$e861: ld   a,(is_player_bullet_in_air_6297)]
+	move.b	is_a_bullet_in_air_6297,d0                 	| [$e861: ld   a,(is_a_bullet_in_air_6297)]
 	cmp.b	#0x01,d0                         	| [$e864: cp   $01]
 	beq.b	0f                               	| [...]
 	rts                                    	| [$e866: ret  nz] [...]
 0:
 	jra	l_e888                             	| [$e867: jr   $E888]
 l_e869:
-	move.b	is_player_bullet_in_air_6297,d0                 	| [$e869: ld   a,(is_player_bullet_in_air_6297)]
+	move.b	is_a_bullet_in_air_6297,d0                 	| [$e869: ld   a,(is_a_bullet_in_air_6297)]
 	cmp.b	#0x01,d0                         	| [$e86c: cp   $01]
 	beq.b	0f                               	| [...]
 	rts                                    	| [$e86e: ret  nz] [...]
@@ -10458,7 +10478,7 @@ bullet_collision_e8de:
 	rts                                    	| [$e913: ret]
 l_e914:
 	clr.b	d0                               	| [$e914: xor  a]
-	move.b	d0,is_player_bullet_in_air_6297                 	| [$e915: ld   (is_player_bullet_in_air_6297),a]
+	move.b	d0,is_a_bullet_in_air_6297                 	| [$e915: ld   (is_a_bullet_in_air_6297),a]
 	move.b	d0,bullet_y_658F                 	| [$e918: ld   (bullet_y_658F),a]
 	rts                                    	| [$e91b: ret]
 l_e91c:
@@ -10728,7 +10748,7 @@ update_guard_2_screen_address_from_xy_EABE:
 	move.b	guard_2_screen_609A,d0          	| [$eac6: ld   a,(guard_2_screen_609A)]
 	jra	l_eae8                             	| [$eac9: jr   $EAE8]
 l_eacb:
-	lea	wagon_2_shadow_sprite_658C,a2  	| [$eacb: ld   ix,wagon_2_shadow_sprite_658C]
+	lea	bullet_shadow_sprite_658C,a2  	| [$eacb: ld   ix,bullet_shadow_sprite_658C]
 	lea	unknown_62B2,a3                	| [$eacf: ld   iy,unknown_62B2]
 	move.b	player_screen_600D,d0           	| [$ead3: ld   a,(player_screen_600D)]
 	                             	| [$ead6: jr   $EAE8]
@@ -12883,7 +12903,7 @@ init_new_game_F951:
 *	clr.b	d0                               	| [$f957: xor  a]
 *	move.b	d0,ay_sound_start_6142          	| [$f958: ld   (ay_sound_start_6142),a]
 *	jbsr	l_d4e7                            	| [$f95b: call $D4E7]
-	jne	l_f96d                             	| [$f95e: jr   nz,$F96D]
+*	jne	l_f96d                             	| [$f95e: jr   nz,$F96D]
 	                      	| [$f960: ld   hl,$3B68]
 	* play first tune
 	move.w	#TUNE1_SND,d0

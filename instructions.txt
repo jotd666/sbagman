@@ -22,7 +22,7 @@ Command line arguments (no whdload, but 1.3 compatible)
 Usage:
 
 sbagman INVINCIBLE/S,INFLIVES/S,INFTIME/S,INFPICK/S,
-       CHEATKEYS/S,HARDBAGS/S,FRENCH/S,GUNATSTART/S,SKILL/K/N,STARTLIVES/K/N
+       CHEATKEYS/S,HARDBAGS/S,FRENCH/S,GUNSATSTART/S,SKILL/K/N,STARTLIVES/K/N
 
 Options/dipswitches:
 
@@ -36,13 +36,14 @@ CHEATKEYS: cheat keys:
 * F3: add 10000 points (and make guards slightly faster each time)
 * F4: toggle guard 1 inactive
 * F5: toggle guard 2 inactive
-* F6: teleport player at right
+* F6: teleport player at right (fails at screen 5)
 * F7: teleport player up
 * F8: game over
 FRENCH: localize some parts in french
-GUNATSTART: everyone get guns (like in ACT 2+)
-HARDBAGS: start with hard level bags layout
-SKILL: difficulty dip switch. Default: very easy mode
+GUNSATSTART: everyone get guns (like in ACT 2+)
+HARDBAGS: start with hard level bags layout, and as a bonus then act 2
+has unseen original hard bags layout (originally unreachable due to a bug)
+SKILL: difficulty dip switch. Default: very easy mode (not arcade)
 STARTLIVES: 2,3,4,5 lives dip switch
 
 Very easy mode:
