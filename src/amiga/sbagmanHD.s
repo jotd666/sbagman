@@ -47,7 +47,7 @@ _config
 	dc.b	"C3:X:hard bags layout:0;"
 	dc.b	"C3:X:french language:1;"
 	dc.b	"C3:X:guns at start for everyone:2;"
-	dc.b    "C4:L:difficulty:very easy;easy,medium,hard,hardest;"
+	dc.b    "C4:L:difficulty:very easy,easy,medium,hard,hardest;"
 	dc.b    "C5:L:start lives:default,2,3,4,5;"
 	dc.b	0
 

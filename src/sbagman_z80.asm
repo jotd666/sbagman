@@ -101,7 +101,7 @@
 011C: DD 21 98 65 ld   ix,guard_2_struct_6598
 0120: FD 21 BC 65 ld   iy,guard_2_shadow_sprite_65BC
 0124: CD D7 D6    call update_sprite_data_d6d7
-0127: 3A 43 63    ld   a,(unknown_6343)
+0127: 3A 43 63    ld   a,(jail_buddy_free_6343)
 012A: FE 01       cp   $01
 012C: 28 0B       jr   z,$0139
 012E: 3A 53 60    ld   a,(game_locked_6053)
@@ -3583,7 +3583,7 @@ C1AD: CD 0E C3    call $C30E
 C1B0: 3A 00 B8    ld   a,(io_read_shit_B800)
 C1B3: CD DE F8    call $F8DE
 C1B6: CD 7E CA    call $CA7E
-C1B9: CD F3 D0    call $D0F3
+C1B9: CD F3 D0    call play_next_tune_if_possible_d0f3
 C1BC: 3E 63       ld   a,$63
 C1BE: D3 58       out  ($58),a
 C1C0: C9          ret
@@ -3658,7 +3658,7 @@ C263: 10 F8       djnz $C25D
 C265: CD 0E C3    call $C30E
 C268: CD DE F8    call $F8DE
 C26B: CD 7E CA    call $CA7E
-C26E: CD F3 D0    call $D0F3
+C26E: CD F3 D0    call play_next_tune_if_possible_d0f3
 C271: C9          ret
 C272: CD CD C3    call $C3CD
 C275: 3E 3F       ld   a,$3F
@@ -3723,7 +3723,7 @@ C301: CD 7E CA    call $CA7E
 C304: 3A 10 62    ld   a,(must_play_music_6210)
 C307: FE 00       cp   $00
 C309: C8          ret  z
-C30A: CD F3 D0    call $D0F3
+C30A: CD F3 D0    call play_next_tune_if_possible_d0f3
 C30D: C9          ret
 C30E: 21 86 65    ld   hl,elevator_x_screen_4_6586
 C311: AF          xor  a
@@ -5488,6 +5488,7 @@ D0E9: 11 05 57    ld   de,$5705
 D0EC: 21 40 92    ld   hl,$9240
 D0EF: CD 67 CA    call display_localized_text_CA67
 D0F2: C9          ret
+play_next_tune_if_possible_d0f3:
 D0F3: CD D9 D4    call is_ay_sound_playing_D4D9
 D0F6: C0          ret  nz
 D0F7: 3A 53 63    ld   a,(current_tune_6353)
@@ -5579,7 +5580,7 @@ D1B1: 32 A1 60    ld   (unknown_60A1),a
 D1B4: C9          ret
 
 
-D1D0: 3A 43 63    ld   a,(unknown_6343)
+D1D0: 3A 43 63    ld   a,(jail_buddy_free_6343)
 D1D3: FE 01       cp   $01
 D1D5: 28 1C       jr   z,$D1F3
 D1D7: AF          xor  a
@@ -5589,7 +5590,7 @@ D1DE: 3E E0       ld   a,$E0
 D1E0: 32 0E 93    ld   ($930E),a
 D1E3: 32 0F 93    ld   ($930F),a
 D1E6: 3E 01       ld   a,$01
-D1E8: 32 43 63    ld   (unknown_6343),a
+D1E8: 32 43 63    ld   (jail_buddy_free_6343),a
 D1EB: 32 41 63    ld   (is_key_hunt_phase_6341),a
 D1EE: 3E E0       ld   a,$E0
 D1F0: 32 8E 93    ld   ($938E),a
@@ -5603,7 +5604,7 @@ D201: 3A 83 65    ld   a,(player_y_6583)
 D204: FE 18       cp   $18
 D206: C0          ret  nz
 D207: 3E 00       ld   a,$00
-D209: 32 43 63    ld   (unknown_6343),a
+D209: 32 43 63    ld   (jail_buddy_free_6343),a
 D20C: 32 53 60    ld   (game_locked_6053),a
 D20F: 3E 01       ld   a,$01
 D211: 32 41 63    ld   (is_key_hunt_phase_6341),a
@@ -5944,7 +5945,7 @@ D4DF: DD 7E 03    ld   a,(ix+$03)
 D4E2: DD E1       pop  ix
 D4E4: FE FF       cp   $FF
 D4E6: C0          ret  nz
-D4E7: 3A 43 63    ld   a,(unknown_6343)
+D4E7: 3A 43 63    ld   a,(jail_buddy_free_6343)
 D4EA: FE 01       cp   $01
 D4EC: C8          ret  z
 D4ED: 3A 10 62    ld   a,(must_play_music_6210)
@@ -6067,7 +6068,7 @@ D603: 32 9C 65    ld   (object_held_struct_659C),a
 D606: 3E 24       ld   a,$24
 D608: 32 9D 65    ld   (unknown_659D),a
 D60B: C9          ret
-D60C: 3A 43 63    ld   a,(unknown_6343)
+D60C: 3A 43 63    ld   a,(jail_buddy_free_6343)
 D60F: FE 00       cp   $00
 D611: C8          ret  z
 D612: 3A 80 65    ld   a,(player_struct_6580)
@@ -6986,7 +6987,7 @@ DEA3: 67          ld   h,a
 DEA4: D1          pop  de
 DEA5: C9          ret
 
-DEF7: 3A 43 63    ld   a,(unknown_6343)
+DEF7: 3A 43 63    ld   a,(jail_buddy_free_6343)
 DEFA: FE 01       cp   $01
 DEFC: C8          ret  z
 DEFD: 3A F0 62    ld   a,(unknown_62F0)
@@ -8924,7 +8925,7 @@ F108: CD 0D E2    call $E20D
 F10B: CD 28 E2    call $E228
 F10E: CD F7 DE    call $DEF7
 F111: CD 08 D7    call $D708
-F114: 3A 43 63    ld   a,(unknown_6343)
+F114: 3A 43 63    ld   a,(jail_buddy_free_6343)
 F117: FE 01       cp   $01
 F119: CC 2F D1    call z,check_if_level_completed_D12F
 F11C: 3A 11 63    ld   a,(has_bomb_6311)

@@ -1,8 +1,10 @@
+- damienD floppy menu does strange stuff with options
+- last life: no AIE AIE AIE, direct game over
+- start 2 player mode not working
+
 minor/not reproduced:
 
 - maybe fix original bug: threaten guard with pickaxe so it doesn't move and disappears???
-- maybe omit tiles 0x249-24B and handle this with update_bg_tile
 - optimize l_c16d with AND?
-- original bug (can't reproduce)? high fall into a wagon: makes "et hopla" wagon drop sound
-  then dies instead of playing dying sound
+
 

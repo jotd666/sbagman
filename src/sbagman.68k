@@ -2701,6 +2701,7 @@ l_0f91:
 	jbsr	set_bags_coordinates_player_2_CFE7         	| [$0fba: call set_bags_coordinates_player_2_CFE7]
 	clr.b	d0                               	| [$0fbd: xor  a]
 	move.b	d0,current_tune_6353                 	| [$0fbe: ld   (current_tune_6353),a]
+	* always play tune 1 (first screen tune)
 	jbsr	play_next_tune_d0f7                            	| [$0fc1: call $D0F7]
 	clr.b	d0                               	| [$0fc4: xor  a]
 	move.b	d0,unknown_6348                 	| [$0fc5: ld   (unknown_6348),a]
@@ -3016,6 +3017,7 @@ l_12f8:
       	| [$12ff: ld   a,d]
 	                         	| [$1300: cp   $00]
 	                             	| [$1302: jr   nz,$12FB]
+	* attract sounds are now forced to on anyway
 	jbsr	osd_read_dipswitches                       	| [$1304: ld   a,($B000)]
 	and.b	#0x40,d0                         	| [$1307: and  $40]
 	cmp.b	#0x40,d0                         	| [$1309: cp   $40]
@@ -3481,6 +3483,7 @@ l_15e6:
 	jbsr	l_1682                            	| [$15e7: call $1682]
 	move.w	(sp)+,d0                        	| [$15ea: pop  af]
 	move.b	d0,d1                           	| [$15eb: ld   b,a]
+	* why did I put dsw in D5??
 	move.b	flipped_dip_switches_copy_6163,d5	| [$15ec: ld   a,(flipped_dip_switches_copy_6163)]
 	move.b	d1,d0                           	| [$15f3: ld   a,b]
 	and.b	#0x04,d5                         	| [$15ef: and  $04]
@@ -4770,7 +4773,7 @@ display_screen_5_c189:
 	            	| [$c1b0: ld   a,(io_read_shit_B800)]
 	jbsr	put_score_lives_attributes_f8de                            	| [$c1b3: call $F8DE]
 	jbsr	display_player_1_and_2_text_ca7e                            	| [$c1b6: call $CA7E]
-	jbsr	start_level_music_d0f3                            	| [$c1b9: call $D0F3]
+	jbsr	play_next_tune_if_possible_d0f3                            	| [$c1b9: call $D0F3]
 	move.b	#0x63,d0                        	| [$c1bc: ld   a,$63]
 **out  ($58),a
 	rts                                    	| [$c1c0: ret]
@@ -4866,7 +4869,7 @@ l_c265:
 	jbsr	zero_elevator_4_x_c30e                            	| [$c265: call $C30E]
 	jbsr	put_score_lives_attributes_f8de                            	| [$c268: call $F8DE]
 	jbsr	display_player_1_and_2_text_ca7e                            	| [$c26b: call $CA7E]
-	jbsr	start_level_music_d0f3                            	| [$c26e: call $D0F3]
+	jbsr	play_next_tune_if_possible_d0f3                            	| [$c26e: call $D0F3]
 	rts                                    	| [$c271: ret]
 display_screen_2_c272:
 	jbsr	clear_screen_c3cd                            	| [$c272: call $C3CD]
@@ -4951,7 +4954,7 @@ display_screen_1_C2C9:
 	bne.b	0f                               	| [...]
 	rts                                    	| [$c309: ret  z] [...]
 0:
-	jbsr	start_level_music_d0f3                            	| [$c30a: call $D0F3]
+	jbsr	play_next_tune_if_possible_d0f3                            	| [$c30a: call $D0F3]
 	rts                                    	| [$c30d: ret]
 	
 * sets elevator X at 0 for screen 4 probably so guards can't use it when not
@@ -7247,16 +7250,26 @@ draw_credit_and_bonus_d0dd:
 	jbsr	display_localized_text_CA67       	| [$d0ef: call display_localized_text_CA67]
 	rts                                    	| [$d0f2: ret]
 
-start_level_music_d0f3:
+* game calls that routine when player is killed. By luck (not sure)?
+* the game variables tell that some sound is playing so the music index doesn't
+* increase. Later, the game starts tune 1
+* if the "sound is playing" check was false, we would get a different tune
+* each time the player is killed and returns to screen one.
+* this music management is really programming by sheer luck.
+*
+* to workaround that effect that I can't emulate, each time the player
+* is killed, I'll reset the music index to 0 so first tune (index 1)
+* will be played
+
+play_next_tune_if_possible_d0f3:
 	* the only location where we need to check if music is playing
 	* else if music is playing, the tune is skipped and next tune will
 	* be played next time.
 	jbsr	osd_is_music_playing                 	| [$d0f3: call is_ay_sound_playing_D4D9]
 	tst.b	d0
-	beq.b	0f                               	| [...]
+	beq.b	play_next_tune_d0f7                               	| [...]
+	* music is aleady playing, don't do anything
 	rts                                    	| [$d0f6: ret  nz] [...]
-0:
-
 play_next_tune_d0f7:
 	clr.w	d0
 	move.b	current_tune_6353,d0                 	| [$d0f7: ld   a,(current_tune_6353)]
@@ -7456,9 +7469,10 @@ l_d236:
 	move.b	d0,is_key_hunt_phase_6341                 	| [$d240: ld   (is_key_hunt_phase_6341),a]
 	move.b	#0x01,d0                        	| [$d243: ld   a,$01]
 	move.b	d0,gameplay_allowed_6054        	| [$d245: ld   (gameplay_allowed_6054),a]
-	move.b	lives_6056,d0                   	| [$d248: ld   a,(lives_6056)]
-	addq.b	#1,d0                           	| [$d24b: inc  a]
-	move.b	d0,lives_6056                   	| [$d24c: ld   (lives_6056),a]
+												| [$d248: ld   a,(lives_6056)]
+	* game still awards 1 life on level completed
+	addq.b	#1,lives_6056                           	| [$d24b: inc  a]
+											| [$d24c: ld   (lives_6056),a]
 	jbsr	osd_disable_vblank_interrupt	|	di
 	move.b	#0x40,d1                        	| [$d250: ld   b,$40]
 	lea	player_struct_6580,a0          	| [$d252: ld   hl,player_struct_6580]
@@ -7698,6 +7712,36 @@ l_d464:
 	                 	| [$d473: ld   (unknown_6008),a]
 	rts                                    	| [$d476: ret]
 
+
+check_if_must_play_music_d4e7:
+	move.b	jail_buddy_free_6343,d0                 	| [$d4e7: ld   a,(unknown_6343)]
+	cmp.b	#0x01,d0                         	| [$d4ea: cp   $01]
+	bne.b	0f                               	| [...]
+	rts                                    	| [$d4ec: ret  z] [...]
+0:
+	move.b	must_play_music_6210,d0         	| [$d4ed: ld   a,(must_play_music_6210)]
+	cmp.b	#0x01,d0                         	| [$d4f0: cp   $01]
+	bne.b	0f                               	| [...]
+	rts                                    	| [$d4f2: ret  z] [...]
+0:
+	move.b	number_of_credits_6000,d0       	| [$d4f3: ld   a,(number_of_credits_6000)]
+	                               	| [$d4f6: cp   $00]
+	jne	l_d509                             	| [$d4f8: jr   nz,$D509]
+	* 
+	move.b	gameplay_allowed_6054,d0        	| [$d4fa: ld   a,(gameplay_allowed_6054)]
+	cmp.b	#0x01,d0                         	| [$d4fd: cp   $01]
+	jeq	l_d509                             	| [$d4ff: jr   z,$D509]
+	* check if attract sound is on (which is always true here)
+	jbsr	osd_read_dipswitches              	| [$d501: ld   a,(dip_switch_B000)]
+	and.b	#0x40,d0                         	| [$d504: and  $40]		; extra life WTF
+	cmp.b	#0x40,d0                         	| [$d506: cp   $40]
+	rts                                    	| [$d508: ret]
+l_d509:
+	* returns with Z flag set: music can be played
+	clr.b	d0                               	| [$d509: ld   a,$00]
+	tst.b	d0                               	| [$d50b: cp   $00]
+	rts                                    	| [$d50d: ret]
+	
 l_d481:
 	jbsr	read_rom                         	| [$d481: ld   a,(hl)]
 
@@ -11065,26 +11109,28 @@ wait_a_while_ec76:
 					| [$ec81: djnz $EC78]
 	rts                                    	| [$ec83: ret]
 
-play_sample_EC84:
-	move.b	must_play_music_6210,d0         	| [$ec84: ld   a,(must_play_music_6210)]
-	cmp.b	#0x01,d0                         	| [$ec87: cp   $01]
-	jeq	l_ec9a                             	| [$ec89: jr   z,$EC9A]
-	move.b	gameplay_allowed_6054,d0        	| [$ec8b: ld   a,(gameplay_allowed_6054)]
-	cmp.b	#0x01,d0                         	| [$ec8e: cp   $01]
-	jeq	l_ec9a                             	| [$ec90: jr   z,$EC9A]
-	jbsr	osd_read_dipswitches                       	| [$ec92: ld   a,($B000)]
-	and.b	#0x40,d0                         	| [$ec95: and  $40]
-	cmp.b	#0x40,d0                         	| [$ec97: cp   $40]
-	beq.b	0f                               	| [...]
-	rts                                    	| [$ec99: ret  nz] [...]
-0:
-l_ec9a:
-	lea	unknown_61BD,a1                	| [$ec9a: ld   de,unknown_61BD]
-	move.w	#0x06,d1                        	| [$ec9d: ld   bc,$0006] 6
-	jbsr	ldir                              	| [$eca0: ldir]
-	move.b	#0x01,d0                        	| [$eca2: ld   a,$01]
-	move.b	d0,unknown_61F3                 	| [$eca4: ld   (unknown_61F3),a]
-	rts                                    	| [$eca7: ret]
+* no longer needed
+*play_sample_EC84:
+*	move.b	must_play_music_6210,d0         	| [$ec84: ld   a,(must_play_music_6210)]
+*	cmp.b	#0x01,d0                         	| [$ec87: cp   $01]
+*	jeq	l_ec9a                             	| [$ec89: jr   z,$EC9A]
+*	move.b	gameplay_allowed_6054,d0        	| [$ec8b: ld   a,(gameplay_allowed_6054)]
+*	cmp.b	#0x01,d0                         	| [$ec8e: cp   $01]
+*	jeq	l_ec9a                             	| [$ec90: jr   z,$EC9A]
+*	* check attract sound
+*	jbsr	osd_read_dipswitches                       	| [$ec92: ld   a,($B000)]
+*	and.b	#0x40,d0                         	| [$ec95: and  $40]
+*	cmp.b	#0x40,d0                         	| [$ec97: cp   $40]
+*	beq.b	0f                               	| [...]
+*	rts                                    	| [$ec99: ret  nz] [...]
+*0:
+*l_ec9a:
+*	lea	unknown_61BD,a1                	| [$ec9a: ld   de,unknown_61BD]
+*	move.w	#0x06,d1                        	| [$ec9d: ld   bc,$0006] 6
+*	jbsr	ldir                              	| [$eca0: ldir]
+*	move.b	#0x01,d0                        	| [$eca2: ld   a,$01]
+*	move.b	d0,unknown_61F3                 	| [$eca4: ld   (unknown_61F3),a]
+*	rts                                    	| [$eca7: ret]
 
 game_startup_eca8:
     jbsr	osd_disable_vblank_interrupt   	| [$eca8: xor  a]
@@ -11097,10 +11143,11 @@ l_ecc1:
 	jbsr	play_intro_1218                   	| [$ecc1: call play_intro_1218]
 	jbsr	set_bags_coordinates_easy_level_CFDB	| [$ecc4: call set_bags_coordinates_easy_level_CFDB]
 	jbsr	set_bags_coordinates_player_2_CFE7         	| [$ecc7: call set_bags_coordinates_player_2_CFE7]
-	* TODO sound
+
 *	LEA_ROM	       0x513C,a0                      	| [$ecca: ld   hl,$513C]
 *	move.b	a0,ay_sound_pointer_6140        	| [$eccd: ld   (ay_sound_pointer_6140),hl]
 *	move.b	a0,unknown_634E                 	| [$ecd0: ld   (unknown_634E),hl]
+
 	move.b	#0x38,d0                        	| [$ecd3: ld   a,$38]
 	move.b	d0,unknown_634D                 	| [$ecd5: ld   (unknown_634D),a]
 	clr.b	d0                               	| [$ecd8: xor  a]
@@ -11108,7 +11155,16 @@ l_ecc1:
 l_ecdc:
 	jbsr	osd_disable_vblank_interrupt 		| di
 	            	| [$ecdd: ld   a,(io_read_shit_B800)]
-	jbsr	init_new_game_F951                	| [$ece0: call init_new_game_F951]
+	* when credit is inserted game proceeds to a fake start then displays
+	* "push start button" screen
+	* jotd: had to force skip music play
+	* When not doing this, the music is played in the "push start button" screen.
+	* music is not played in the original game because credit sound is still playing
+	* so the music cannot be triggered. But here
+	* we allow music to be played anytime if music not already playing
+	* (as we cannot know easily if a SFX sample is still played)
+	
+	jbsr	init_new_game_f96d                	| [$ece0: call init_new_game_F951]
 	jbsr	init_guard_directions_and_wagons_C314	| [$ece3: call init_guard_directions_and_wagons_C314]
 	                               	| [$ece6: xor  a]
 	clr.b	player_death_flag_6025       	| [$ece7: ld   (player_death_flag_6025),a]
@@ -12902,8 +12958,8 @@ init_new_game_F951:
 *	move.b	a0,ay_sound_pointer_6140        	| [$f954: ld   (ay_sound_pointer_6140),hl]
 *	clr.b	d0                               	| [$f957: xor  a]
 *	move.b	d0,ay_sound_start_6142          	| [$f958: ld   (ay_sound_start_6142),a]
-*	jbsr	l_d4e7                            	| [$f95b: call $D4E7]
-*	jne	l_f96d                             	| [$f95e: jr   nz,$F96D]
+	jbsr	check_if_must_play_music_d4e7                            	| [$f95b: call $D4E7]
+	jne	init_new_game_f96d                             	| [$f95e: jr   nz,$F96D]
 	                      	| [$f960: ld   hl,$3B68]
 	* play first tune
 	move.w	#TUNE1_SND,d0
@@ -12912,7 +12968,7 @@ init_new_game_F951:
 											| [$f966: xor  a]
 										| [$f967: ld   (ay_sound_start_6142),a]
 										| [$f96a: ld   (unknown_6348),a]
-l_f96d:
+init_new_game_f96d:
 	jbsr	osd_disable_display                               	| [$f96d: xor  a]
 	                       	| [$f96e: ld   ($A003),a]
 	jbsr	display_screen_1_C2C9                 	| [$f971: call display_screen_1_C2C9]
@@ -12952,6 +13008,8 @@ l_f9a3:
 	add.b	#0x20,d0
 0:
 	move.b	d0,time_61E8                    	| [$f9b0: ld   (time_61E8),a]
+	* note that as opposed to Bagman, this greedy game doesn't even
+	* award extra lives on 30000/40000. Bit 6 of DSW means attract sound
 	move.b	#0x01,d0                        	| [$f9b3: ld   a,$01]
 	move.b	d0,extra_life_awarded_6286      	| [$f9b5: ld   (extra_life_awarded_6286),a]
 	move.b	d0,unknown_6019                 	| [$f9b8: ld   (unknown_6019),a]
@@ -13017,8 +13075,8 @@ player_dies_F9E1:
 	jbsr	start_a_sound
 	jra	l_fa4b                             	| [$fa33: jr   $FA4B]
 l_fa35:
-*	jbsr	l_d4e7                            	| [$fa35: call $D4E7]
-	*jne	l_fa4b                             	| [$fa38: jr   nz,$FA4B]
+	jbsr	check_if_must_play_music_d4e7                            	| [$fa35: call $D4E7]
+	jne	l_fa4b                             	| [$fa38: jr   nz,$FA4B]
     	jbsr   osd_disable_vblank_interrupt  | di
 	* game over music
 	move.w	#GAME_OVER_TUNE_SND,d0
@@ -13052,6 +13110,10 @@ l_fa55:
 	jbsr	osd_wait
 
 l_fa68:
+	* jotd: workaround to avoid cycling of music due to not properly
+	* emulating AY sound driver (see comments in "play_next_tune_if_possible_d0f3")
+	* the workaround is to make sure tune 1 is played on restart and nothing else
+	clr.b	current_tune_6353
 	jbsr	start_new_life_FAEA               	| [$fa68: call start_new_life_FAEA]
 	lea	object_held_struct_659C,a2     	| [$fa6b: ld   ix,object_held_struct_659C]
 	move.b	d0,(A2)                    	| [$fa6f: ld   (ix+$00),a]

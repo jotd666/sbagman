@@ -245,7 +245,7 @@ _user:
 2:
 	move.l	(A0)+,D0	| GUNSATSTART/S
 	beq.b	2f
-	or.l	#4,misc_options
+	or.l	#8,misc_options
 2:
 
 	move.l	(A0)+,D0	| SKILL/S
@@ -263,6 +263,10 @@ _user:
 2:
 	move.l	#4,dip_switch_start_lives		| 5 lives default
 3:
+	move.l	(A0)+,D0	| EXTRA40000/S
+	beq.b	2f
+	or.l	#4,misc_options
+2:
 	
 
 	lea		_custom,a5
@@ -348,6 +352,8 @@ _user:
 0:
 	btst	#2,d1
 	sne		guns_at_start_flag
+	
+	bset	#6,d0		| force attract sound
 	move.b	d0,dip_switches
 
 
@@ -2229,7 +2235,7 @@ program_args_end:
 read_args_string:
 	.byte	read_args_string_end-read_args_string
 	.ascii	"INVINCIBLE/S,INFLIVES/S,INFTIME/S,INFPICK/S,INFBULLETS/S"
-	.ascii	"CHEATKEYS/S,HARDBAGS/S,FRENCH/S,GUNSATSTART/S,SKILL/K/N,STARTLIVES/K/N"
+	.ascii	"CHEATKEYS/S,HARDBAGS/S,FRENCH/S,GUNSATSTART/S,SKILL/K/N,STARTLIVES/K/N,EXTRA40000/S"
 read_args_string_end:
 
 	.ifndef	RELEASE
