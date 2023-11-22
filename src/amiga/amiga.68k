@@ -371,9 +371,7 @@ _user:
 	btst	#4,d0
 	sne		infinite_bullets_flag
 	
-	jsr	 _detect_controller_types 
-	clr.b	controller_joypad_0
-	clr.b	controller_joypad_1
+	jsr	 _detect_controller_types
 
 	jra		demo_game
 
@@ -1934,6 +1932,10 @@ osd_read_inputs:
 	tst.b	(1,a0)		| "1" key like in MAME (also commands gun)
 	beq.b	0f
 	bclr	#2,d0
+0:
+	tst.b	(2,a0)		| "2" key like in MAME
+	beq.b	0f
+	bclr	#10,d0
 0:
 	tst.b	(0x40,a0)		| space key (gun alt control)
 	beq.b	0f

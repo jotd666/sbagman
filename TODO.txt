@@ -1,6 +1,5 @@
 - damienD floppy menu does strange stuff with options
 - last life: no AIE AIE AIE, direct game over
-- start 2 player mode not working
 
 minor/not reproduced:
 

@@ -128,8 +128,8 @@
 	.global	player_2_score_6179
 	.global	score_ten_thousands_player_2_617B
 	.global	number_of_players_617D
-	.global	unknown_617E
-	.global	bags_coordinates_617F
+	.global	other_player_lives_617E
+	.global	other_player_bags_coordinates_617F
 	.global	unknown_61BD
 	.global	unknown_61C0
 	.global	barrow_screen_params_61C4
@@ -155,7 +155,7 @@
 	.global	unknown_61F5
 	.global	picked_up_object_screen_address_61F6
 	.global	unknown_61F9
-	.global	unknown_screen_address_61FA
+	.global	other_player_barrow_screen_params_61FA
 	.global	unknown_61FC
 	.global	unknown_61FD
 	.global	unknown_61FF
@@ -191,8 +191,8 @@
 	.global	unknown_6285
 	.global	unknown_6288
 	.global	unknown_628A
-	.global	unknown_628C
-	.global	unknown_6290
+	.global	game_aleady_started_628C
+	.global	other_player_tile_at_the_destroyable_wall_location_6290
 	.global	unknown_pointer_62DB
 	.global	elevator_5_screen_address_62DD
 	.global	elevator_struct_6584
@@ -223,7 +223,7 @@
 	.global	key_screen_address_609F
 	.global	key_screen_60A1
 	.global	act_number_60D3
-	.global	unknown_61B6
+	.global	other_player_act_number_61B6
 	.global	unknown_61F7
 	.global	player_has_gun_6293
 	.global	player_gun_nb_shots_6294
@@ -291,7 +291,7 @@
 	.global	guard_1_killed_by_bomb_6337
 	.global	guard_2_killed_by_bomb_6338
 	.global	unknown_633A
-	.global	unknown_6340
+	.global	other_player_is_key_hunt_phase_6340
 	.global	is_key_hunt_phase_6341
 	.global	ignore_if_has_credits_6342
 	.global	jail_buddy_free_6343
@@ -488,11 +488,12 @@ guard_1_screen_6099:
 	ds.b	1
 guard_2_screen_609A:
 	ds.b	1
+	* align here so key screen address is aligned!
+	.align	2
 unknown_609B:
 	ds.b	1
 bags_coordinates_609C:
 	ds.b	3
-	.align	2
 key_screen_address_609F:
 	ds.b	2
 key_screen_60A1:
@@ -570,11 +571,14 @@ current_player_617C:
 	ds.b	1
 number_of_players_617D:
 	ds.b	1
-unknown_617E:
+other_player_lives_617E:
 	ds.b	1
-bags_coordinates_617F:
-	ds.b	62
-unknown_61B6:
+	* act number must follow bags coords
+	* or it won't be swapped properly
+	* when players change
+other_player_bags_coordinates_617F:
+	ds.b	55
+other_player_act_number_61B6:
 	ds.b	7
 unknown_61BD:
 	ds.b	3
@@ -637,7 +641,7 @@ picked_up_object_screen_address_61F6:
 unknown_61F9:
 	ds.b	1
 	.align	2
-unknown_screen_address_61FA:
+other_player_barrow_screen_params_61FA:
 	ds.w	1
 unknown_61FC:
 	ds.b	1
@@ -719,9 +723,9 @@ unknown_6288:
 	ds.b	2
 unknown_628A:
 	ds.b	2
-unknown_628C:
+game_aleady_started_628C:
 	ds.b	4
-unknown_6290:
+other_player_tile_at_the_destroyable_wall_location_6290:
 	ds.b	3
 player_has_gun_6293:
 	ds.b	1
@@ -899,7 +903,7 @@ unknown_633A:
 	.align		2
 unknown_pointer_633D:
 	ds.l	1
-unknown_6340:
+other_player_is_key_hunt_phase_6340:
 	ds.b	1
 is_key_hunt_phase_6341:
 	ds.b	1

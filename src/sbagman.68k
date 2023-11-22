@@ -350,7 +350,7 @@ game_tick_0038:
         jbsr	osd_disable_vblank_interrupt  	| [$004a: ld   (interrupt_control_A000),a]
 	jbsr	l_ca91                            	| [$004e: call $CA91]
 	jbsr	l_1565                            	| [$0051: call $1565]
-	move.b	unknown_628C,d0                 	| [$0054: ld   a,(unknown_628C)]
+	move.b	game_aleady_started_628C,d0                 	| [$0054: ld   a,(game_aleady_started_628C)]
 	cmp.b	#0x01,d0                         	| [$0057: cp   $01]
 	bne.b	0f                               	| [...]
 	jbsr	read_player_controls_1689                            	| [$0059: call z,$1689]
@@ -2652,7 +2652,7 @@ l_0f59:
 	move.b	d0,number_of_credits_6000       	| [$0f62: ld   (number_of_credits_6000),a]
 	move.b	#0x0A,d0                        	| [$0f65: ld   a,$0A]
 	move.b	d0,tile_at_the_destroyable_wall_location_627D                 	| [$0f67: ld   (tile_at_the_destroyable_wall_location_627D),a]
-	move.b	d0,unknown_6290                 	| [$0f6a: ld   (unknown_6290),a]
+	move.b	d0,other_player_tile_at_the_destroyable_wall_location_6290                 	| [$0f6a: ld   (other_player_tile_at_the_destroyable_wall_location_6290),a]
 	jbsr	current_player_start_screen_d017                            	| [$0f6d: call $D017]
 	move.b	#0x01,d0                        	| [$0f70: ld   a,$01]
 	move.b	d0,must_play_music_6210         	| [$0f72: ld   (must_play_music_6210),a]
@@ -2689,10 +2689,10 @@ l_0f91:
 	addq.b	#0x01,d0                        	| [$0f9a: add  a,$01]
 	move.b	d0,lives_6056                   	| [$0f9c: ld   (lives_6056),a]
 	addq.b	#1,d0                           	| [$0f9f: inc  a]
-	move.b	d0,unknown_617E                 	| [$0fa0: ld   (unknown_617E),a]
+	move.b	d0,other_player_lives_617E                 	| [$0fa0: ld   (other_player_lives_617E),a]
 	move.w  #0X91C3,d6                      	| [$0fa3: ld   hl,$91C3]
 	move.w	d6,barrow_screen_params_61C4    	| [$0fa6: ld   (barrow_screen_params_61C4),hl]
-	move.w	d6,unknown_screen_address_61FA  	| [$0fa9: ld   (unknown_screen_address_61FA),hl]
+	move.w	d6,other_player_barrow_screen_params_61FA  	| [$0fa9: ld   (other_player_barrow_screen_params_61FA),hl]
 	move.b	#0x01,d0                        	| [$0fac: ld   a,$01]
 	move.b	d0,barrow_screen_61C6           	| [$0fae: ld   (barrow_screen_61C6),a]
 	move.b	d0,unknown_61FC                 	| [$0fb1: ld   (unknown_61FC),a]
@@ -3616,14 +3616,16 @@ l_16a2:
 	move.b	coin_start_inputs_6051,d0       	| [$16ac: ld   a,(coin_start_inputs_6051)]
 	move.b	d0,coin_start_prev_inputs_6052  	| [$16af: ld   (coin_start_prev_inputs_6052),a]
 l_16b2:
-	jbsr	l_16e9                            	| [$16b2: call $16E9]
-	move.b	d0,d1                           	| [$16b5: ld   b,a]
-	jbsr	l_16e9                            	| [$16b6: call $16E9]
-	cmp.b	d1,d0                            	| [$16b9: cp   b]
-	jeq	l_16c1                             	| [$16ba: jr   z,$16C1]
-	move.b	d0,unknown_6360                 	| [$16bc: ld   (unknown_6360),a]
-	jra	l_16b2                             	| [$16bf: jr   $16B2]
+*	jbsr	l_16e9                            	| [$16b2: call $16E9]
+*	move.b	d0,d1                           	| [$16b5: ld   b,a]
+*	jbsr	l_16e9                            	| [$16b6: call $16E9]
+*	cmp.b	d1,d0                            	| [$16b9: cp   b]
+*	jeq	l_16c1                             	| [$16ba: jr   z,$16C1]
+*	move.b	d0,unknown_6360                 	| [$16bc: ld   (unknown_6360),a]
+*	jra	l_16b2                             	| [$16bf: jr   $16B2]
 l_16c1:
+	* get extra control bits   
+	lsr.w	#8,d0              
 	not.b	d0                               	| [$16c1: cpl]
 	jbsr	restrict_controls_if_not_playing_16f0                            	| [$16c2: call $16F0]
 	move.b	d0,coin_start_inputs_6051       	| [$16c5: ld   (coin_start_inputs_6051),a]
@@ -3803,7 +3805,7 @@ l_17e3:
 l_17f1:
 	move.w	#0x91C3,d6                      	| [$17f1: ld   hl,$91C3]
 	move.w	d6,barrow_screen_params_61C4    	| [$17f4: ld   (barrow_screen_params_61C4),hl]
-	move.w	d6,unknown_screen_address_61FA  	| [$17f7: ld   (unknown_screen_address_61FA),hl]
+	move.w	d6,other_player_barrow_screen_params_61FA  	| [$17f7: ld   (other_player_barrow_screen_params_61FA),hl]
 	move.b	#0x01,d0                        	| [$17fa: ld   a,$01]
 	move.b	d0,barrow_screen_61C6           	| [$17fc: ld   (barrow_screen_61C6),a]
 	move.b	d0,unknown_61FC                 	| [$17ff: ld   (unknown_61FC),a]
@@ -4403,7 +4405,7 @@ l_5d1c:
 l_5d2a:
 	move.w	#0x91C2,d6                      	| [$5d2a: ld   hl,$91C2]
 	move.w	d6,barrow_screen_params_61C4	| [$5d2d: ld   (barrow_screen_params_61C4),hl]
-	move.w	d6,unknown_screen_address_61FA  	| [$5d30: ld   (unknown_screen_address_61FA),hl]
+	move.w	d6,other_player_barrow_screen_params_61FA  	| [$5d30: ld   (other_player_barrow_screen_params_61FA),hl]
 	move.b	#0x01,d0                        	| [$5d33: ld   a,$01]
 	move.b	d0,barrow_screen_61C6                 	| [$5d35: ld   (barrow_screen_61C6),a]
 	move.b	d0,unknown_61FC                 	| [$5d38: ld   (unknown_61FC),a]
@@ -4460,7 +4462,7 @@ l_c006:
 l_c02e:
 	move.b	must_play_music_6210,d0         	| [$c02e: ld   a,(must_play_music_6210)]
 	cmp.b	#0x01,d0                         	| [$c031: cp   $01]
-	jne	l_c073                             	| [$c033: jr   nz,$C073]
+	jne	set_player_name_attributes_c073                             	| [$c033: jr   nz,$C073]
 	move.b	flash_counter_626D,d0           	| [$c035: ld   a,(flash_counter_626D)]
 	cmp.b	#0x20,d0                         	| [$c038: cp   $20]
 	bcc.b	0f                               	| [...]
@@ -4476,32 +4478,36 @@ l_c02e:
 l_c047:
 	move.b	unknown_626E,d0                 	| [$c047: ld   a,(unknown_626E)]
 	cmp.b	#0x01,d0                         	| [$c04a: cp   $01]
-	jeq	l_c061                             	| [$c04c: jr   z,$C061]
-	jbsr	l_c08b                            	| [$c04e: call $C08B]
+	jeq	l_c071                             	| [$c04c: jr   z,$C061]
+	jbsr	get_player_name_position_c08b                            	| [$c04e: call $C08B]
 	jeq	l_c063                             	| [$c051: jr   z,$C063]
+	* PLAYER 1
 	LEA_ROM	       0x575A,a1                      	| [$c053: ld   de,$575A]
 	jbsr	display_localized_text_CA67       	| [$c056: call display_localized_text_CA67]
-	jbsr	l_c073                            	| [$c059: call $C073]
+	jbsr	set_player_name_attributes_c073                            	| [$c059: call $C073]
 	move.b	#0x01,d0                        	| [$c05c: ld   a,$01]
 	move.b	d0,unknown_626E                 	| [$c05e: ld   (unknown_626E),a]
-l_c061:	                        	| [$c061: pop  af]
-	addq.w	#4,sp		| 32-bit stack pop
-	rts                                    	| [$c062: ret]
+    jra		l_c071          	| [$c061: pop  af]
+                        	| [$c062: ret]
 l_c063:
+	* PLAYER 2
 	LEA_ROM	       0x5763,a1                      	| [$c063: ld   de,$5763]
 	jbsr	display_localized_text_CA67       	| [$c066: call display_localized_text_CA67]
-	jbsr	l_c073                            	| [$c069: call $C073]
+	jbsr	set_player_name_attributes_c073                            	| [$c069: call $C073]
 	move.b	#0x01,d0                        	| [$c06c: ld   a,$01]
 	move.b	d0,unknown_626E                 	| [$c06e: ld   (unknown_626E),a]
+l_c071:
 	move.w	(sp)+,d0                        	| [$c071: pop  af]
+	addq.w	#2,sp							| 32-bit stack pop
 	rts                                    	| [$c072: ret]
-l_c073:
+set_player_name_attributes_c073:
 	move.b	#0x02,d0                        	| [$c073: ld   a,$02]
 	move.w	#0x9840,d6                      	| [$c075: ld   hl,$9840]
 	jbsr	write_attribute_on_line_5605      	| [$c078: call write_attribute_on_line_5605]
 	rts                                    	| [$c07b: ret]
 l_c07c:
-	jbsr	l_c08b                            	| [$c07c: call $C08B]
+	jbsr	get_player_name_position_c08b                            	| [$c07c: call $C08B]
+	* blank text to make PLAYER x flash
 	LEA_ROM	       0x576C,a1                      	| [$c07f: ld   de,$576C]
 	jbsr	display_localized_text_CA67       	| [$c082: call display_localized_text_CA67]
 	clr.b	d0                               	| [$c085: xor  a]
@@ -4509,7 +4515,7 @@ l_c07c:
 	move.w	(sp)+,d0                        	| [$c089: pop  af]
 	addq	#2,sp
 	rts                                    	| [$c08a: ret]
-l_c08b:
+get_player_name_position_c08b:
 	move.b	current_player_617C,d0          	| [$c08b: ld   a,(current_player_617C)]
 	move.w	#0x93A0,d6                      	| [$c08e: ld   hl,$93A0]
 	cmp.b	#0x01,d0                         	| [$c091: cp   $01]
@@ -4517,6 +4523,7 @@ l_c08b:
 	rts                                    	| [$c093: ret  nz] [...]
 0:
 	move.w	#0x9120,d6                      	| [$c094: ld   hl,$9120]
+	cmp.b	#0x01,d0			| set Z flag
 	rts                                    	| [$c097: ret]
 l_c098:
 	subq.w	#1,d6                           	| [$c098: dec  hl]
@@ -5140,7 +5147,7 @@ l_c3d6:
 	jne	l_c3d6                             	| [$c3e0: djnz $C3D6]
 	rts                                    	| [$c3e2: ret]
 
-l_c3e3:
+display_push_start_button_or_current_player_c3e3:
 	jbsr	osd_disable_display                               	| [$c3e3: ld   a,$00]
 	                       	| [$c3e5: ld   ($A003),a]
 	move.b	#0x04,d1                        	| [$c3e8: ld   b,$04]
@@ -5149,7 +5156,7 @@ l_c3e3:
 	jbsr	l_c3be                            	| [$c3ef: call $C3BE]
 	move.b	#0x3F,d0                        	| [$c3f2: ld   a,$3F]
 	jbsr	change_attribute_everywhere_C3A3  	| [$c3f4: call change_attribute_everywhere_C3A3]
-	move.b	unknown_628C,d0                 	| [$c3f7: ld   a,(unknown_628C)]
+	move.b	game_aleady_started_628C,d0                 	| [$c3f7: ld   a,(game_aleady_started_628C)]
 	cmp.b	#0x01,d0                         	| [$c3fa: cp   $01]
 	jeq	l_c407                             	| [$c3fc: jr   z,$C407]
 	LEA_ROM	       0x56C3,a1                      	| [$c3fe: ld   de,$56C3]
@@ -5187,31 +5194,31 @@ l_c427:
 *	jbsr	hw_video_shit_d8e2                            	| [$c436: call $D8E2]
 *l_c439:
 	lea	bags_coordinates_609C,a2       	| [$c439: ld   ix,bags_coordinates_609C]
-	lea	bags_coordinates_617F,a3       	| [$c43d: ld   iy,bags_coordinates_617F]
+	lea	other_player_bags_coordinates_617F,a3       	| [$c43d: ld   iy,other_player_bags_coordinates_617F]
 	move.b	#0x3B,d1                        	| [$c441: ld   b,$3B]
 	jbsr	swap_arrays_c47e                            	| [$c443: call $C47E]
 	lea	barrow_screen_params_61C4,a2   	| [$c446: ld   ix,barrow_screen_params_61C4]
-	lea	unknown_screen_address_61FA,a3 	| [$c44a: ld   iy,unknown_screen_address_61FA]
+	lea	other_player_barrow_screen_params_61FA,a3 	| [$c44a: ld   iy,other_player_barrow_screen_params_61FA]
 	move.b	#0x03,d1                        	| [$c44e: ld   b,$03]
 	jbsr	swap_arrays_c47e                            	| [$c450: call $C47E]
 	move.b	lives_6056,d0                   	| [$c453: ld   a,(lives_6056)]
 	move.w	d0,-(sp)                        	| [$c456: push af]
-	move.b	unknown_617E,d0                 	| [$c457: ld   a,(unknown_617E)]
+	move.b	other_player_lives_617E,d0                 	| [$c457: ld   a,(other_player_lives_617E)]
 	move.b	d0,lives_6056                   	| [$c45a: ld   (lives_6056),a]
 	move.w	(sp)+,d0                        	| [$c45d: pop  af]
-	move.b	d0,unknown_617E                 	| [$c45e: ld   (unknown_617E),a]
-	move.b	unknown_6290,d0                 	| [$c461: ld   a,(unknown_6290)]
+	move.b	d0,other_player_lives_617E                 	| [$c45e: ld   (other_player_lives_617E),a]
+	move.b	other_player_tile_at_the_destroyable_wall_location_6290,d0                 	| [$c461: ld   a,(other_player_tile_at_the_destroyable_wall_location_6290)]
 	move.w	d0,-(sp)                        	| [$c464: push af]
 	move.b	tile_at_the_destroyable_wall_location_627D,d0                 	| [$c465: ld   a,(tile_at_the_destroyable_wall_location_627D)]
-	move.b	d0,unknown_6290                 	| [$c468: ld   (unknown_6290),a]
+	move.b	d0,other_player_tile_at_the_destroyable_wall_location_6290                 	| [$c468: ld   (other_player_tile_at_the_destroyable_wall_location_6290),a]
 	move.w	(sp)+,d0                        	| [$c46b: pop  af]
 	move.b	d0,tile_at_the_destroyable_wall_location_627D                 	| [$c46c: ld   (tile_at_the_destroyable_wall_location_627D),a]
 	move.b	is_key_hunt_phase_6341,d0                 	| [$c46f: ld   a,(is_key_hunt_phase_6341)]
 	move.w	d0,-(sp)                        	| [$c472: push af]
-	move.b	unknown_6340,d0                 	| [$c473: ld   a,(unknown_6340)]
+	move.b	other_player_is_key_hunt_phase_6340,d0                 	| [$c473: ld   a,(other_player_is_key_hunt_phase_6340)]
 	move.b	d0,is_key_hunt_phase_6341                 	| [$c476: ld   (is_key_hunt_phase_6341),a]
 	move.w	(sp)+,d0                        	| [$c479: pop  af]
-	move.b	d0,unknown_6340                 	| [$c47a: ld   (unknown_6340),a]
+	move.b	d0,other_player_is_key_hunt_phase_6340                 	| [$c47a: ld   (other_player_is_key_hunt_phase_6340),a]
 	rts                                    	| [$c47d: ret]
 swap_arrays_c47e:
 	move.b	(A2),d0                    	| [$c47e: ld   a,(ix+$00)]
@@ -6200,7 +6207,6 @@ l_ca79:
 	jra	display_text_55d9                            	| [$ca7a: call $55D9]
 	rts                                    	| [$ca7d: ret]
 display_player_1_and_2_text_ca7e:
-desplay_player_1_and_2_text_ca7e:
 	* player 1
 	LEA_ROM	       0x575A,a1                      	| [$ca7e: ld   de,$575A]
 	move.w	#0x93A0,d6                      	| [$ca81: ld   hl,$93A0]
@@ -7064,7 +7070,7 @@ set_bags_coordinates_easy_level_CFDB:
 	bra.b	set_bags_coords_cfd5
 
 set_bags_coordinates_player_2_CFE7:
-	lea	bags_coordinates_617F,a1       	| [$cfe7: ld   de,bags_coordinates_617F]
+	lea	other_player_bags_coordinates_617F,a1       	| [$cfe7: ld   de,other_player_bags_coordinates_617F]
 	LEA_ROM	       0x1ADC,a0                      	| [$cfea: ld   hl,$1ADC]
 	                        	| [$cfed: ld   bc,$0036] 54
 	bra.b	set_bags_coords_cfd5
@@ -7138,8 +7144,8 @@ current_player_start_screen_d017:
 	
 	move.b	#0x01,d0                        	| [$d01d: ld   a,$01]
 	move.b	d0,game_locked_6053             	| [$d01f: ld   (game_locked_6053),a]
-	move.b	d0,unknown_628C                 	| [$d022: ld   (unknown_628C),a]
-	jbsr	l_c3e3                            	| [$d025: call $C3E3]
+	move.b	d0,game_aleady_started_628C                 	| [$d022: ld   (game_aleady_started_628C),a]
+	jbsr	display_push_start_button_or_current_player_c3e3                            	| [$d025: call $C3E3]
 	* write "PLAYER 1"
 	LEA_ROM	       0x575A,a1                      	| [$d028: ld   de,$575A]
 	move.w	#0x9274,d6                      	| [$d02b: ld   hl,$9274]
@@ -7214,7 +7220,7 @@ current_player_start_screen_d017:
 
 	clr.b	d0                               	| [$d0bc: ld   a,$00]
 	move.b	d0,game_locked_6053             	| [$d0be: ld   (game_locked_6053),a]
-	move.b	d0,unknown_628C                 	| [$d0c1: ld   (unknown_628C),a]
+	move.b	d0,game_aleady_started_628C                 	| [$d0c1: ld   (game_aleady_started_628C),a]
 	rts                                    	| [$d0c4: ret]
  * routine to perform several guard moves, sometimes at screen boundary
  * no more info
@@ -8195,11 +8201,11 @@ clear_misc_variables_d7c9:	                               	| [$d7c9: xor  a]
 	clr.b	player_in_elevator_4_6014                 	| [$d7d0: ld   (player_in_elevator_4_6014),a]
 	clr.b	player_in_wagon_1_601C       	| [$d7d3: ld   (player_in_wagon_1_601C),a]
 	clr.b	has_bag_6158                 	| [$d7d6: ld   (has_bag_6158),a]
-	clr.b	unknown_6340                 	| [$d7d9: ld   (unknown_6340),a]
+	clr.b	other_player_is_key_hunt_phase_6340                 	| [$d7d9: ld   (other_player_is_key_hunt_phase_6340),a]
 	clr.b	is_key_hunt_phase_6341                 	| [$d7dc: ld   (is_key_hunt_phase_6341),a]
 	move.b	#0x01,d0                        	| [$d7df: ld   a,$01]
 	move.b	d0,act_number_60D3                 	| [$d7e1: ld   (act_number_60D3),a]
-	move.b	d0,unknown_61B6                 	| [$d7e4: ld   (unknown_61B6),a]
+	move.b	d0,other_player_act_number_61B6                 	| [$d7e4: ld   (other_player_act_number_61B6),a]
 	rts                                    	| [$d7e7: ret]
 	
 scroll_text_up_d7e8:
@@ -11235,7 +11241,7 @@ l_ed5a:
 	cmp.b	#0x01,d0                         	| [$ed78: cp   $01]
 	jeq	l_ed9f                             	| [$ed7a: jr   z,$ED9F]
 	            	| [$ed7c: ld   a,(io_read_shit_B800)]
-	jbsr	l_c3e3                            	| [$ed7f: call $C3E3]
+	jbsr	display_push_start_button_or_current_player_c3e3                            	| [$ed7f: call $C3E3]
 	jbsr	display_player_ids_and_credit_F8A4	| [$ed82: call display_player_ids_and_credit_F8A4]
 	jbsr	write_credits_and_lives_162e                            	| [$ed85: call $162E]
 	* TODO sound!
@@ -12872,7 +12878,7 @@ display_player_ids_and_credit_F8A4:
 	jbsr	display_localized_text_CA67       	| [$f8bc: call display_localized_text_CA67]
 	move.b	#0x02,d0                        	| [$f8bf: ld   a,$02]
 	move.w	#0x9040,d6                      	| [$f8c1: ld   hl,$9040]
-	move.b	d0,(a0)                         	| [$f8c4: ld   (hl),a]
+	jbsr	osd_w_videoram                         	| [$f8c4: ld   (hl),a]
 	LEA_ROM	       0x5689,a1                      	| [$f8c5: ld   de,$5689]
 	move.w	#0x919F,d6                      	| [$f8c8: ld   hl,$919F]
 	jbsr	display_localized_text_CA67       	| [$f8cb: call display_localized_text_CA67]

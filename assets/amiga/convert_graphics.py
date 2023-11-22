@@ -111,6 +111,10 @@ used_cluts[0x249] = [0xF]
 
 used_cluts.update({k:[0x4] for k in range(0x255,0x25D)})
 
+# wireframe player start screen: orange (wireframe for highscore is already in hiscorescreen binary)
+
+for k in range(0x8A,0x90+1):
+    used_cluts[k+0x200].add(0xF)
 
 # bomb exploding
 used_cluts.update({k:[8] for k in range(0x367,0x37E)})

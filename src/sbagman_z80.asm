@@ -19,7 +19,7 @@
 004B: 32 00 A0    ld   (interrupt_control_A000),a
 004E: CD 91 CA    call $CA91
 0051: CD 65 15    call $1565
-0054: 3A 8C 62    ld   a,(unknown_628C)
+0054: 3A 8C 62    ld   a,(game_aleady_started_628C)
 0057: FE 01       cp   $01
 0059: CC 89 16    call z,read_player_controls_1689
 005C: 3A 42 61    ld   a,(ay_sound_start_6142)
@@ -1820,7 +1820,7 @@ start_a_game_0F15:
 0F62: 32 00 60    ld   (number_of_credits_6000),a
 0F65: 3E 0A       ld   a,$0A
 0F67: 32 7D 62    ld   (tile_at_the_destroyable_wall_location_627D),a
-0F6A: 32 90 62    ld   (unknown_6290),a
+0F6A: 32 90 62    ld   (other_player_tile_at_the_destroyable_wall_location_6290),a
 0F6D: CD 17 D0    call $D017
 0F70: 3E 01       ld   a,$01
 0F72: 32 10 62    ld   (must_play_music_6210),a
@@ -1845,10 +1845,10 @@ start_a_game_0F15:
 0F9A: C6 01       add  a,$01
 0F9C: 32 56 60    ld   (lives_6056),a
 0F9F: 3C          inc  a
-0FA0: 32 7E 61    ld   (unknown_617E),a
+0FA0: 32 7E 61    ld   (other_player_lives_617E),a
 0FA3: 21 C3 91    ld   hl,$91C3
 0FA6: 22 C4 61    ld   (barrow_screen_params_61C4),hl
-0FA9: 22 FA 61    ld   (unknown_screen_address_61FA),hl
+0FA9: 22 FA 61    ld   (other_player_barrow_screen_params_61FA),hl
 0FAC: 3E 01       ld   a,$01
 0FAE: 32 C6 61    ld   (barrow_screen_61C6),a
 0FB1: 32 FC 61    ld   (unknown_61FC),a
@@ -2810,7 +2810,7 @@ read_player_controls_1689:
 17EF: 18 B4       jr   $17A5
 17F1: 21 C3 91    ld   hl,$91C3
 17F4: 22 C4 61    ld   (barrow_screen_params_61C4),hl
-17F7: 22 FA 61    ld   (unknown_screen_address_61FA),hl
+17F7: 22 FA 61    ld   (other_player_barrow_screen_params_61FA),hl
 17FA: 3E 01       ld   a,$01
 17FC: 32 C6 61    ld   (barrow_screen_61C6),a
 17FF: 32 FC 61    ld   (unknown_61FC),a
@@ -3332,7 +3332,7 @@ add_to_score_5C90:
 5D28: 18 C0       jr   $5CEA
 5D2A: 21 C2 91    ld   hl,$91C2
 5D2D: 22 C4 61    ld   (barrow_screen_params_61C4),hl
-5D30: 22 FA 61    ld   (unknown_screen_address_61FA),hl
+5D30: 22 FA 61    ld   (other_player_barrow_screen_params_61FA),hl
 5D33: 3E 01       ld   a,$01
 5D35: 32 C6 61    ld   (barrow_screen_61C6),a
 5D38: 32 FC 61    ld   (unknown_61FC),a
@@ -3868,7 +3868,7 @@ C3EC: 21 00 90    ld   hl,$9000
 C3EF: CD BE C3    call $C3BE
 C3F2: 3E 3F       ld   a,$3F
 C3F4: CD A3 C3    call change_attribute_everywhere_C3A3
-C3F7: 3A 8C 62    ld   a,(unknown_628C)
+C3F7: 3A 8C 62    ld   a,(game_aleady_started_628C)
 C3FA: FE 01       cp   $01
 C3FC: 28 09       jr   z,$C407
 C3FE: 11 C3 56    ld   de,$56C3
@@ -3898,31 +3898,31 @@ C433: 2F          cpl
 C434: E6 01       and  $01
 C436: CD E2 D8    call $D8E2
 C439: DD 21 9C 60 ld   ix,bags_coordinates_609C
-C43D: FD 21 7F 61 ld   iy,bags_coordinates_617F
+C43D: FD 21 7F 61 ld   iy,other_player_bags_coordinates_617F
 C441: 06 3B       ld   b,$3B
 C443: CD 7E C4    call $C47E
 C446: DD 21 C4 61 ld   ix,barrow_screen_params_61C4
-C44A: FD 21 FA 61 ld   iy,unknown_screen_address_61FA
+C44A: FD 21 FA 61 ld   iy,other_player_barrow_screen_params_61FA
 C44E: 06 03       ld   b,$03
 C450: CD 7E C4    call $C47E
 C453: 3A 56 60    ld   a,(lives_6056)
 C456: F5          push af
-C457: 3A 7E 61    ld   a,(unknown_617E)
+C457: 3A 7E 61    ld   a,(other_player_lives_617E)
 C45A: 32 56 60    ld   (lives_6056),a
 C45D: F1          pop  af
-C45E: 32 7E 61    ld   (unknown_617E),a
-C461: 3A 90 62    ld   a,(unknown_6290)
+C45E: 32 7E 61    ld   (other_player_lives_617E),a
+C461: 3A 90 62    ld   a,(other_player_tile_at_the_destroyable_wall_location_6290)
 C464: F5          push af
 C465: 3A 7D 62    ld   a,(tile_at_the_destroyable_wall_location_627D)
-C468: 32 90 62    ld   (unknown_6290),a
+C468: 32 90 62    ld   (other_player_tile_at_the_destroyable_wall_location_6290),a
 C46B: F1          pop  af
 C46C: 32 7D 62    ld   (tile_at_the_destroyable_wall_location_627D),a
 C46F: 3A 41 63    ld   a,(is_key_hunt_phase_6341)
 C472: F5          push af
-C473: 3A 40 63    ld   a,(unknown_6340)
+C473: 3A 40 63    ld   a,(other_player_is_key_hunt_phase_6340)
 C476: 32 41 63    ld   (is_key_hunt_phase_6341),a
 C479: F1          pop  af
-C47A: 32 40 63    ld   (unknown_6340),a
+C47A: 32 40 63    ld   (other_player_is_key_hunt_phase_6340),a
 C47D: C9          ret
 C47E: DD 7E 00    ld   a,(ix+$00)
 C481: F5          push af
@@ -5361,7 +5361,7 @@ CFE4: ED B0       ldir
 CFE6: C9          ret
 
 copy_bags_coordinates_player_2_CFE7:
-CFE7: 11 7F 61    ld   de,bags_coordinates_617F
+CFE7: 11 7F 61    ld   de,other_player_bags_coordinates_617F
 CFEA: 21 DC 1A    ld   hl,$1ADC
 CFED: 01 36 00    ld   bc,$0036
 CFF0: ED B0       ldir
@@ -5398,7 +5398,7 @@ D01A: FE 01       cp   $01
 D01C: C8          ret  z
 D01D: 3E 01       ld   a,$01
 D01F: 32 53 60    ld   (game_locked_6053),a
-D022: 32 8C 62    ld   (unknown_628C),a
+D022: 32 8C 62    ld   (game_aleady_started_628C),a
 D025: CD E3 C3    call $C3E3
 D028: 11 5A 57    ld   de,$575A
 D02B: 21 74 92    ld   hl,$9274
@@ -5462,7 +5462,7 @@ D0B8: FE 00       cp   $00
 D0BA: 20 EC       jr   nz,$D0A8
 D0BC: 3E 00       ld   a,$00
 D0BE: 32 53 60    ld   (game_locked_6053),a
-D0C1: 32 8C 62    ld   (unknown_628C),a
+D0C1: 32 8C 62    ld   (game_aleady_started_628C),a
 D0C4: C9          ret
 D0C5: D5          push de
 D0C6: 06 60       ld   b,$60
@@ -6270,11 +6270,11 @@ D7CD: 32 CF 61    ld   (has_pick_61CF),a
 D7D0: 32 14 60    ld   (unknown_6014),a
 D7D3: 32 1C 60    ld   (player_in_wagon_1_601C),a
 D7D6: 32 58 61    ld   (has_bag_6158),a
-D7D9: 32 40 63    ld   (unknown_6340),a
+D7D9: 32 40 63    ld   (other_player_is_key_hunt_phase_6340),a
 D7DC: 32 41 63    ld   (is_key_hunt_phase_6341),a
 D7DF: 3E 01       ld   a,$01
 D7E1: 32 D3 60    ld   (unknown_60D3),a
-D7E4: 32 B6 61    ld   (unknown_61B6),a
+D7E4: 32 B6 61    ld   (other_player_act_number_61B6),a
 D7E7: C9          ret
 D7E8: DD E5       push ix
 D7EA: F5          push af
