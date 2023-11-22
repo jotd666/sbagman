@@ -7569,8 +7569,11 @@ test_non_blocking_tiles_D36C:
 	movem.w	d3/d4/d6,-(sp)                    	| [$d36d: push de]
                       	| [$d36d: push de]
 
-	
 	clr.b	d1                               	| [$d36f: ld   b,$00]
+	* jotd: added this, game sometimes reads slightly below 0x9000
+	cmp.w	#0x9000,d6
+	jcs		l_d38d
+
 	jbsr	l_d391                            	| [$d371: call $D391]
 	jne	l_d38d                             	| [$d374: jr   nz,$D38D]
 	addq.w	#1,d6                           	| [$d376: inc  hl]
@@ -7618,6 +7621,7 @@ l_d391:
 0:
 	cmp.b	#0x57,d0                         	| [$d3a4: cp   $57]
 	rts                                    	| [$d3a6: ret]
+
 l_d3a7:
 	clr.b	d0                               	| [$d3a7: xor  a]
 	move.b	d0,(A3)                    	| [$d3a8: ld   (iy+$00),a]
@@ -13087,6 +13091,11 @@ l_fa35:
 	* game over music
 	move.w	#GAME_OVER_TUNE_SND,d0
 	jbsr		play_tune
+
+	* plays "aie aie aie" sample too
+	move.w	#PLAYER_KILLED_TALK_SND,d0
+	jbsr	start_a_sound                            	| [$1f88: call $2018]
+
 	*LEA_ROM	       0x3F60,a0                      	| [$fa3b: ld   hl,$3F60]
 	*move.b	a0,ay_sound_pointer_6140        	| [$fa3e: ld   (ay_sound_pointer_6140),hl]
 	*clr.b	d0                               	| [$fa41: xor  a]

@@ -1,5 +1,4 @@
 - damienD floppy menu does strange stuff with options
-- last life: no AIE AIE AIE, direct game over
 
 minor/not reproduced:
 
