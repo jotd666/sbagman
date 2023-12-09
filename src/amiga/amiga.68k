@@ -2236,7 +2236,7 @@ program_args_end:
 	.align	4
 read_args_string:
 	.byte	read_args_string_end-read_args_string
-	.ascii	"INVINCIBLE/S,INFLIVES/S,INFTIME/S,INFPICK/S,INFBULLETS/S"
+	.ascii	"INVINCIBLE/S,INFLIVES/S,INFTIME/S,INFPICK/S,INFBULLETS/S,"
 	.ascii	"CHEATKEYS/S,HARDBAGS/S,FRENCH/S,GUNSATSTART/S,SKILL/K/N,STARTLIVES/K/N,EXTRA40000/S"
 read_args_string_end:
 
